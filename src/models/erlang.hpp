@@ -78,7 +78,7 @@ ostream& operator << (ostream &stream, const Erlang &model)
 	stream << "~~~~~~~~~~~" << endl;
 	stream << "    Shape\t\t\t\t= " << model.Shape() << endl;
 	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
-	stream << static_cast <const Base&> (model);
+	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
 }

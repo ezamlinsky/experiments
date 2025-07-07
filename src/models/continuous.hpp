@@ -13,7 +13,7 @@
 //****************************************************************************//
 //      Special class to encapsulate a distribution location and scale        //
 //****************************************************************************//
-class Continuous : public Base
+class Continuous : public BaseModel
 {
 //============================================================================//
 //      Members                                                               //
@@ -33,7 +33,7 @@ public:
 	Continuous (
 		double location,	// Location of the distribution
 		double scale		// Scale of the distribution
-	) : Base (Range (-INFINITY, INFINITY)),
+	) : BaseModel (Range (-INFINITY, INFINITY)),
 		location (location),
 		scale (scale)
 	{

@@ -106,7 +106,7 @@ ostream& operator << (ostream &stream, const Laplace &model)
 	stream << "\nLAPLACE DISTRIBUTION:" << std::endl;
 	stream << "=====================" << std::endl;
 	stream << static_cast <const Continuous&> (model);
-	stream << static_cast <const Base&> (model);
+	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
 }

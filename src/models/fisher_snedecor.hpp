@@ -14,7 +14,7 @@
 //****************************************************************************//
 //      Class "F"                                                             //
 //****************************************************************************//
-class F final : public Base
+class F final : public BaseModel
 {
 //============================================================================//
 //      Members                                                               //
@@ -35,7 +35,7 @@ public:
 	F (
 		size_t df1,			// The first degrees of freedom
 		size_t df2			// The second degrees of freedom
-	) : Base (Range (0, INFINITY)),
+	) : BaseModel (Range (0, INFINITY)),
 		beta (SpecialBeta (0.5 * df1, 0.5 * df2)),
 		df1 (df1),
 		df2 (df2)
@@ -84,7 +84,7 @@ public:
 			const double t1 = a * log (df1) + b * log (df2);
 			const double t2 = (a - 1.0) * log (x);
 			const double t3 = (a + b) * log (df1 * x + df2);
-			const double temp = (t1 + t2 - t3 - beta.BetaLog());
+			const double temp = t1 + t2 - t3 - beta.BetaLog();
 			return exp (temp);
 		}
 	}
@@ -137,7 +137,7 @@ ostream& operator << (ostream &stream, const F &model)
 	stream << "~~~~~~~~~~~" << endl;
 	stream << "    Degrees of freedom #1\t\t\t\t= " << model.DF1() << endl;
 	stream << "    Degrees of freedom #2\t\t\t\t= " << model.DF2() << endl;
-	stream << static_cast <const Base&> (model);
+	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
 }

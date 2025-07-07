@@ -14,7 +14,7 @@
 //****************************************************************************//
 //      Class "Beta"                                                          //
 //****************************************************************************//
-class Beta final : public Base
+class Beta final : public BaseModel
 {
 //============================================================================//
 //      Members                                                               //
@@ -35,7 +35,7 @@ public:
 	Beta (
 		double shape1,		// The first shape parameter
 		double shape2		// The second shape parameter
-	) : Base (Range (0, 1)),
+	) : BaseModel (Range (0, 1)),
 		beta (SpecialBeta (shape1, shape2)),
 		shape1 (shape1),
 		shape2 (shape2)
@@ -131,7 +131,7 @@ ostream& operator << (ostream &stream, const Beta &model)
 	stream << "~~~~~~~~~~~" << endl;
 	stream << "    Shape #1\t\t\t\t= " << model.Shape1() << endl;
 	stream << "    Shape #2\t\t\t\t= " << model.Shape2() << endl;
-	stream << static_cast <const Base&> (model);
+	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
 }

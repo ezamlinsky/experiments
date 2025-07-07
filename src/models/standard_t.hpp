@@ -14,7 +14,7 @@
 //****************************************************************************//
 //      Class "StandardT"                                                     //
 //****************************************************************************//
-class StandardT final : public Base
+class StandardT final : public BaseModel
 {
 //============================================================================//
 //      Members                                                               //
@@ -33,7 +33,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	StandardT (
 		size_t df			// Degrees of freedom
-	) : Base (Range (-INFINITY, INFINITY)),
+	) : BaseModel (Range (-INFINITY, INFINITY)),
 		beta (SpecialBeta (0.5 * df, 0.5)),
 		df (df)
 	{}
@@ -99,7 +99,7 @@ ostream& operator << (ostream &stream, const StandardT &model)
 	stream << "\nParameters:" << endl;
 	stream << "~~~~~~~~~~~" << endl;
 	stream << "    Degrees of freedom\t\t\t= " << model.DF() << endl;
-	stream << static_cast <const Base&> (model);
+	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
 }

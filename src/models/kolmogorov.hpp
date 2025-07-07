@@ -16,7 +16,7 @@
 //****************************************************************************//
 //      Class "Kolmogorov"                                                    //
 //****************************************************************************//
-class Kolmogorov final : public Base
+class Kolmogorov final : public BaseModel
 {
 //============================================================================//
 //      Members                                                               //
@@ -34,7 +34,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Kolmogorov (void) : Base (Range (-INFINITY, INFINITY))
+	Kolmogorov (void) : BaseModel (Range (-INFINITY, INFINITY))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -152,7 +152,7 @@ ostream& operator << (ostream &stream, const Kolmogorov &model)
 	stream.precision (PRECISION);
 	stream << "\nKOLMOGOROV DISTRIBUTION:" << std::endl;
 	stream << "========================" << std::endl;
-	stream << static_cast <const Base&> (model);
+	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
 }

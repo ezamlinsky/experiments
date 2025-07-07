@@ -13,7 +13,7 @@
 //****************************************************************************//
 //      Special class for PDF and CDF for gamma-related distributions         //
 //****************************************************************************//
-class SpecialGamma : public Base
+class SpecialGamma : public BaseModel
 {
 //============================================================================//
 //      Members                                                               //
@@ -36,7 +36,7 @@ public:
 	SpecialGamma (
 		size_t shape,			// Shape of the gamma distribution
 		double scale			// Scale of the gamma distribution
-	) : Base (Range (0, INFINITY)),
+	) : BaseModel (Range (0, INFINITY)),
 		gamma_shape (shape),
 		gamma_log (lgamma (0.5 * shape)),
 		gamma_scale (scale)

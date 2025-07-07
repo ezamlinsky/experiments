@@ -15,7 +15,7 @@
 //****************************************************************************//
 //      Class "Exponential"                                                   //
 //****************************************************************************//
-class Exponential final : public Base
+class Exponential final : public BaseModel
 {
 //============================================================================//
 //      Members                                                               //
@@ -34,7 +34,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Exponential (
 		double scale		// Scale of the distribution
-	) : Base (Range (0, INFINITY)),
+	) : BaseModel (Range (0, INFINITY)),
 		scale (scale)
 	{
 		if (scale <= 0.0)
@@ -121,7 +121,7 @@ ostream& operator << (ostream &stream, const Exponential &model)
 	stream << "\nParameters:" << endl;
 	stream << "~~~~~~~~~~~" << endl;
 	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
-	stream << static_cast <const Base&> (model);
+	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
 }

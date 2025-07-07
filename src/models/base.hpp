@@ -10,7 +10,6 @@
 # pragma	once
 # include	<cmath>
 # include	<random>
-# include	<vector>
 # include	"range.hpp"
 
 // Value of the step out of a point where the derivative is infinite
@@ -20,9 +19,9 @@
 # define	NEWTON_ITERATIONS	8
 
 //****************************************************************************//
-//      Class "Base"                                                          //
+//      Class "BaseModel"                                                     //
 //****************************************************************************//
-class Base
+class BaseModel
 {
 //============================================================================//
 //      Members                                                               //
@@ -31,14 +30,14 @@ private:
 	const Range range;
 
 //============================================================================//
-//      Protected  methods                                                    //
+//      Public methods                                                        //
 //============================================================================//
-protected:
+public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Base (
+	BaseModel (
 		const Range &range	// Function domain where the distribution exists
 	) : range (range)
 	{}
@@ -46,12 +45,7 @@ protected:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Destructor                                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual ~Base (void) = default;
-
-//============================================================================//
-//      Public methods                                                        //
-//============================================================================//
-public:
+	virtual ~BaseModel (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Function domain where the distribution exists                         //
@@ -209,7 +203,7 @@ public:
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Base &model)
+ostream& operator << (ostream &stream, const BaseModel &model)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);

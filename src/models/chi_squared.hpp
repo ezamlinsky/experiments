@@ -69,7 +69,7 @@ ostream& operator << (ostream &stream, const ChiSquared &model)
 	stream << "\nParameters:" << endl;
 	stream << "~~~~~~~~~~~" << endl;
 	stream << "    Degrees of freedom\t\t\t= " << model.DF() << endl;
-	stream << static_cast <const Base&> (model);
+	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
 }

@@ -110,7 +110,7 @@ ostream& operator << (ostream &stream, const AsymmetricLaplace &model)
 	stream << "================================" << std::endl;
 	stream << static_cast <const Continuous&> (model);
 	stream << "    Asymmetry\t\t\t\t= " << model.Asymmetry() << endl;
-	stream << static_cast <const Base&> (model);
+	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
 }
