@@ -11,6 +11,7 @@
 # include	<stdexcept>
 # include	<iostream>
 # include	<iomanip>
+# include	<vector>
 
 // Displayed precision for floating-point numbers
 # define	PRECISION	16
@@ -78,6 +79,26 @@ public:
 		if (value < min) value = min;
 		if (value > max) value = max;
 		return value;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Split the range into subranges (bins)                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	vector <double> Split (
+		size_t bins		// The number of bins to create for the range
+	){
+		if (bins != 0) {
+			vector <double> result;
+			result.push_back (min);
+			for (size_t i = 0; i < bins; i++) {
+				const size_t index = i + 1;
+				const double x = ((bins - index) * min + index * max) / bins;
+				result.push_back (x);
+			}
+			return result;
+		}
+		else
+			throw invalid_argument ("Split: The number of bins must be positive");
 	}
 };
 
