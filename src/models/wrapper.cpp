@@ -25,7 +25,7 @@
 //      Methods are inherited from the base distribution class                //
 //****************************************************************************//
 # define	BASE_CLASS_METHODS(class) 											\
-	.def ("Domain",		&class::Domain,	return_internal_reference <> (),		\
+	.def ("Domain",		&class::Domain,		return_internal_reference <> (),	\
 		"Function domain where the distribution exists")						\
 	.def ("Generate",	&class::Generate,	args ("count"),						\
 		"Generate random values from the distribution")							\
@@ -69,7 +69,7 @@
 	BASE_CLASS_PROPERTIES(class)												\
 	.add_property ("Location",	&class::Location,								\
 		"Location of the distribution")											\
-	.add_property ("Scale",	&class::Scale,										\
+	.add_property ("Scale",		&class::Scale,									\
 		"Scale of the distribution")
 
 //****************************************************************************//
@@ -83,7 +83,6 @@ BOOST_PYTHON_MODULE (models) {
 //============================================================================//
 //      Expose vector <double> to Python                                      //
 //============================================================================//
-	using std::vector;
 	class_ <vector <double> > ("DoubleVector")
 		.def (vector_indexing_suite <vector <double> > ());
 
@@ -95,18 +94,19 @@ BOOST_PYTHON_MODULE (models) {
 		init <double, double> (args ("min", "max"),
 			"Define range min and max values"))
 
-	// Methods
-	.def ("Clamp",		&Range::Clamp,		args ("value"),
-		"Clamp the given value to be within the range [min..max]")
-	.def (self_ns::str (self_ns::self))
+		// Methods
+		.def ("Clamp",	&Range::Clamp,	args ("value"),
+			"Clamp the given value to be within the range [min..max]")
+		.def ("Split",	&Range::Split,	args ("bins"),
+			"Split the range into subranges (bins)")
 
-	// Properties
-	.add_property ("Min",		&Range::Min,
-		"Range min value")
-	.add_property ("Max",		&Range::Max,
-		"Range max value")
-	.add_property ("Length",	&Range::Length,
-		"Length of the range");
+		// Properties
+		.add_property ("Min",		&Range::Min,
+			"Range min value")
+		.add_property ("Max",		&Range::Max,
+			"Range max value")
+		.add_property ("Length",	&Range::Length,
+			"Length of the range");
 
 //============================================================================//
 //      Expose ConfidenceInterval class to Python                             //
@@ -116,16 +116,16 @@ BOOST_PYTHON_MODULE (models) {
 		init <double, double, Range> (args ("level", "value", "range"),
 			"Define a value and its range"))
 
-	// Methods
-	.def (self_ns::str (self_ns::self))
+		// Methods
+		.def (self_ns::str (self_ns::self))
 
-	// Properties
-	.add_property ("Level",	&ConfidenceInterval::Level,
-		"Confidence level of the confidence interval")
-	.add_property ("Value",	&ConfidenceInterval::Value,
-		"The central value of the confidence interval")
-	.add_property ("RelError",	&ConfidenceInterval::RelError,
-		"Relative error of the value");
+		// Properties
+		.add_property ("Level",	&ConfidenceInterval::Level,
+			"Confidence level of the confidence interval")
+		.add_property ("Value",	&ConfidenceInterval::Value,
+			"The central value of the confidence interval")
+		.add_property ("RelError",	&ConfidenceInterval::RelError,
+			"Relative error of the value");
 
 //============================================================================//
 //      Non-parameterized distributions                                       //
@@ -138,11 +138,11 @@ BOOST_PYTHON_MODULE (models) {
 		"Model for a Kolmogorov distribution",
 		init <> ("Create a new Kolmogorov distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(Kolmogorov)
+		// Methods
+		BASE_CLASS_METHODS(Kolmogorov)
 
-	// Properties
-	BASE_CLASS_PROPERTIES(Kolmogorov);
+		// Properties
+		BASE_CLASS_PROPERTIES(Kolmogorov);
 
 //============================================================================//
 //      Beta related distributions                                            //
@@ -156,13 +156,13 @@ BOOST_PYTHON_MODULE (models) {
 		init <size_t> (args ("df"),
 			"Create a new Student’s T-distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(StandardT)
+		// Methods
+		BASE_CLASS_METHODS(StandardT)
 
-	// Properties
-	BASE_CLASS_PROPERTIES(StandardT)
-	.add_property ("DF",	&StandardT::DF,
-		"Degrees of freedom of the distribution");
+		// Properties
+		BASE_CLASS_PROPERTIES(StandardT)
+		.add_property ("DF",	&StandardT::DF,
+			"Degrees of freedom of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose F class to Python                                              //
@@ -172,15 +172,15 @@ BOOST_PYTHON_MODULE (models) {
 		init <size_t, size_t> (args ("df1", "df2"),
 			"Create a new Snedecor's F-distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(F)
+		// Methods
+		BASE_CLASS_METHODS(F)
 
-	// Properties
-	BASE_CLASS_PROPERTIES(F)
-	.add_property ("DF1",	&F::DF1,
-		"The first degrees of freedom of the distribution")
-	.add_property ("DF2",	&F::DF2,
-		"The second degrees of freedom of the distribution");
+		// Properties
+		BASE_CLASS_PROPERTIES(F)
+		.add_property ("DF1",	&F::DF1,
+			"The first degrees of freedom of the distribution")
+		.add_property ("DF2",	&F::DF2,
+			"The second degrees of freedom of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose Beta class to Python                                           //
@@ -190,15 +190,15 @@ BOOST_PYTHON_MODULE (models) {
 		init <double, double> (args ("shape1", "shape2"),
 			"Create a new Beta distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(Beta)
+		// Methods
+		BASE_CLASS_METHODS(Beta)
 
-	// Properties
-	BASE_CLASS_PROPERTIES(Beta)
-	.add_property ("Shape1",	&Beta::Shape1,
-		"The first shape parameter of the distribution")
-	.add_property ("Shape2",	&Beta::Shape2,
-		"The second shape parameter of the distribution");
+		// Properties
+		BASE_CLASS_PROPERTIES(Beta)
+		.add_property ("Shape1",	&Beta::Shape1,
+			"The first shape parameter of the distribution")
+		.add_property ("Shape2",	&Beta::Shape2,
+			"The second shape parameter of the distribution");
 
 //============================================================================//
 //      Gamma related distributions                                           //
@@ -212,15 +212,15 @@ BOOST_PYTHON_MODULE (models) {
 		init <size_t, double> (args ("shape", "scale"),
 			"Create a new Erlang distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(Erlang)
+		// Methods
+		BASE_CLASS_METHODS(Erlang)
 
-	// Properties
-	BASE_CLASS_PROPERTIES(Erlang)
-	.add_property ("Shape",	&Erlang::Shape,
-		"Shape of the distribution")
-	.add_property ("Scale",	&Erlang::Scale,
-		"Scale of the distribution");
+		// Properties
+		BASE_CLASS_PROPERTIES(Erlang)
+		.add_property ("Shape",	&Erlang::Shape,
+			"Shape of the distribution")
+		.add_property ("Scale",	&Erlang::Scale,
+			"Scale of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose Chi-Squared class to Python                                    //
@@ -230,13 +230,13 @@ BOOST_PYTHON_MODULE (models) {
 		init <size_t> (args ("df"),
 			"Create a new Chi-Squared distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(ChiSquared)
+		// Methods
+		BASE_CLASS_METHODS(ChiSquared)
 
-	// Properties
-	BASE_CLASS_PROPERTIES(ChiSquared)
-	.add_property ("DF",	&ChiSquared::DF,
-		"Degrees of freedom of the distribution");
+		// Properties
+		BASE_CLASS_PROPERTIES(ChiSquared)
+		.add_property ("DF",	&ChiSquared::DF,
+			"Degrees of freedom of the distribution");
 
 //============================================================================//
 //      Continuous distributions                                              //
@@ -250,15 +250,15 @@ BOOST_PYTHON_MODULE (models) {
 		init <double> (args ("scale"),
 			"Create a new Exponential distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(Exponential)
-	.def ("Mean_ConfidenceInterval",	&Exponential::Mean_ConfidenceInterval,
-		args ("level", "size"), "Confidence interval of the mean value")
+		// Methods
+		BASE_CLASS_METHODS(Exponential)
+		.def ("Mean_ConfidenceInterval",	&Exponential::Mean_ConfidenceInterval,
+			args ("level", "size"), "Confidence interval of the mean value")
 
-	// Properties
-	BASE_CLASS_PROPERTIES(Exponential)
-	.add_property ("Scale",	&Exponential::Scale,
-		"Scale of the distrsibution");
+		// Properties
+		BASE_CLASS_PROPERTIES(Exponential)
+		.add_property ("Scale",	&Exponential::Scale,
+			"Scale of the distrsibution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose Normal class to Python                                         //
@@ -268,15 +268,15 @@ BOOST_PYTHON_MODULE (models) {
 		init <double, double> (args ("location", "scale"),
 			"Create a new Normal (Gaussian) distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(Normal)
-	.def ("Mean_ConfidenceInterval",	&Normal::Mean_ConfidenceInterval,
-		args ("level", "size"), "Confidence interval of the mean")
-	.def ("Variance_ConfidenceInterval",	&Normal::Variance_ConfidenceInterval,
-		args ("level", "size"), "Confidence interval of the variance")
+		// Methods
+		BASE_CLASS_METHODS(Normal)
+		.def ("Mean_ConfidenceInterval",	&Normal::Mean_ConfidenceInterval,
+			args ("level", "size"), "Confidence interval of the mean")
+		.def ("Variance_ConfidenceInterval",	&Normal::Variance_ConfidenceInterval,
+			args ("level", "size"), "Confidence interval of the variance")
 
-	// Properties
-	CONTINUOUS_CLASS_PROPERTIES (Normal);
+		// Properties
+		CONTINUOUS_CLASS_PROPERTIES (Normal);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose Laplace class to Python                                        //
@@ -286,15 +286,15 @@ BOOST_PYTHON_MODULE (models) {
 		init <double, double> (args ("location", "scale"),
 			"Create a new Laplace distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(Laplace)
-	.def ("MAD_ConfidenceInterval",	&Laplace::MAD_ConfidenceInterval,
-		args ("level", "size"), "Confidence interval of the Mean Absolute Deviation (MAD)")
+		// Methods
+		BASE_CLASS_METHODS(Laplace)
+		.def ("MAD_ConfidenceInterval",	&Laplace::MAD_ConfidenceInterval,
+			args ("level", "size"), "Confidence interval of the Mean Absolute Deviation (MAD)")
 
-	// Properties
-	CONTINUOUS_CLASS_PROPERTIES (Laplace)
-	.add_property ("MAD",	&Laplace::MAD,
-		"Mean Absolute Deviation (MAD) of the distrsibution");
+		// Properties
+		CONTINUOUS_CLASS_PROPERTIES (Laplace)
+		.add_property ("MAD",	&Laplace::MAD,
+			"Mean Absolute Deviation (MAD) of the distrsibution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose AsymmetricLaplace class to Python                              //
@@ -304,13 +304,13 @@ BOOST_PYTHON_MODULE (models) {
 		init <double, double, double> (args ("location", "scale", "asymmetry"),
 			"Create a new asymmetric Laplace distribution"))
 
-	// Methods
-	BASE_CLASS_METHODS(AsymmetricLaplace)
+		// Methods
+		BASE_CLASS_METHODS(AsymmetricLaplace)
 
-	// Properties
-	CONTINUOUS_CLASS_PROPERTIES (AsymmetricLaplace)
-	.add_property ("Asymmetry",	&AsymmetricLaplace::Asymmetry,
-		"Asymmetry of the distrsibution");
+		// Properties
+		CONTINUOUS_CLASS_PROPERTIES (AsymmetricLaplace)
+		.add_property ("Asymmetry",	&AsymmetricLaplace::Asymmetry,
+			"Asymmetry of the distrsibution");
 }
 /*
 ################################################################################
