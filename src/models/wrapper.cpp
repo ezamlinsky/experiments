@@ -35,6 +35,8 @@
 		"Probability Density Function (PDF)")									\
 	.def ("CDF",		&class::CDF,		args ("x"),							\
 		"Cumulative Distribution Function (CDF)")								\
+	.def ("data",		&class::data,		return_internal_reference <> (),	\
+		"Extract internal data from the distribution")							\
 	.def (self_ns::str (self_ns::self))
 
 //****************************************************************************//
