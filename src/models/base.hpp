@@ -9,6 +9,7 @@
 */
 # pragma	once
 # include	<cmath>
+# include	<memory>
 # include	<random>
 # include	"range.hpp"
 
@@ -192,12 +193,20 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Convert an instance of a derived class to the base class              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const BaseModel& data (void) const {
+		return *this;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (double x) const = 0;
 	virtual double CDF (double x) const = 0;
 	virtual double Mean (void) const = 0;
 	virtual double Variance (void) const = 0;
+	virtual unique_ptr <const BaseModel> clone (void) const = 0;
 };
 
 //****************************************************************************//
