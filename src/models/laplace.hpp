@@ -94,6 +94,13 @@ public:
 	virtual double Variance (void) const override {
 		return 2.0 * scale * scale;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Clone the distribution model                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual unique_ptr <const BaseModel> clone (void) const {
+		return unique_ptr <const BaseModel> (new Laplace (*this));
+	}
 };
 
 //****************************************************************************//

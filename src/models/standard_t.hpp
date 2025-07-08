@@ -85,6 +85,13 @@ public:
 		else
 			return INFINITY;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Clone the distribution model                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual unique_ptr <const BaseModel> clone (void) const {
+		return unique_ptr <const BaseModel> (new StandardT (*this));
+	}
 };
 
 //****************************************************************************//

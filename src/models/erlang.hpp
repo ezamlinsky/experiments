@@ -63,6 +63,13 @@ public:
 	virtual double Variance (void) const override {
 		return shape * gamma_scale * gamma_scale;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Clone the distribution model                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual unique_ptr <const BaseModel> clone (void) const {
+		return unique_ptr <const BaseModel> (new Erlang (*this));
+	}
 };
 
 //****************************************************************************//

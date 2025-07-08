@@ -116,6 +116,13 @@ public:
 		const double temp = shape1 + shape2;
 		return shape1 * shape2 / (temp * temp * (temp + 1.0));
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Clone the distribution model                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual unique_ptr <const BaseModel> clone (void) const {
+		return unique_ptr <const BaseModel> (new Beta (*this));
+	}
 };
 
 //****************************************************************************//

@@ -97,6 +97,13 @@ public:
 		const double coeff = scale * scale;
 		return (1.0 + sqr) / temp * coeff;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Clone the distribution model                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual unique_ptr <const BaseModel> clone (void) const {
+		return unique_ptr <const BaseModel> (new AsymmetricLaplace (*this));
+	}
 };
 
 //****************************************************************************//
