@@ -86,7 +86,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Split (
 		size_t bins		// The number of bins to create for the range
-	){
+	) const {
 		if (bins != 0) {
 			vector <double> result;
 			result.push_back (min);
