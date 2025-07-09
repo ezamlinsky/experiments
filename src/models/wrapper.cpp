@@ -89,7 +89,7 @@ BOOST_PYTHON_MODULE (models) {
 		.def (vector_indexing_suite <vector <double> > ());
 
 //============================================================================//
-//      Expose Range class to Python                                          //
+//      Expose "Range" class to Python                                        //
 //============================================================================//
 	class_ <Range> ("Range",
 		"Contain a valid range for a numeric value",
@@ -112,7 +112,7 @@ BOOST_PYTHON_MODULE (models) {
 			"Length of the range");
 
 //============================================================================//
-//      Expose ConfidenceInterval class to Python                             //
+//      Expose "ConfidenceInterval" class to Python                           //
 //============================================================================//
 	class_ <ConfidenceInterval> ("ConfidenceInterval",
 		"A confidence interval for a value",
@@ -123,9 +123,9 @@ BOOST_PYTHON_MODULE (models) {
 		.def (self_ns::str (self_ns::self))
 
 		// Properties
-		.add_property ("Level",	&ConfidenceInterval::Level,
+		.add_property ("Level",		&ConfidenceInterval::Level,
 			"Confidence level of the confidence interval")
-		.add_property ("Value",	&ConfidenceInterval::Value,
+		.add_property ("Value",		&ConfidenceInterval::Value,
 			"The central value of the confidence interval")
 		.add_property ("RelError",	&ConfidenceInterval::RelError,
 			"Relative error of the value");
@@ -135,7 +135,7 @@ BOOST_PYTHON_MODULE (models) {
 //============================================================================//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose Kolmogorov class to Python                                     //
+//      Expose "Kolmogorov" class to Python                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <Kolmogorov> ("Kolmogorov",
 		"Model for a Kolmogorov distribution",
@@ -152,7 +152,7 @@ BOOST_PYTHON_MODULE (models) {
 //============================================================================//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose StandardT class to Python                                      //
+//      Expose "StandardT" class to Python                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <StandardT> ("StandardT",
 		"Model for a Student’s T-distribution",
@@ -168,7 +168,7 @@ BOOST_PYTHON_MODULE (models) {
 			"Degrees of freedom of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose F class to Python                                              //
+//      Expose "F" class to Python                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <F> ("F",
 		"Model for a Snedecor's F-distribution",
@@ -186,7 +186,7 @@ BOOST_PYTHON_MODULE (models) {
 			"The second degrees of freedom of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose Beta class to Python                                           //
+//      Expose "Beta" class to Python                                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <Beta> ("Beta",
 		"Model for the Beta distribution",
@@ -208,7 +208,7 @@ BOOST_PYTHON_MODULE (models) {
 //============================================================================//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose Erlang class to Python                                         //
+//      Expose "Erlang" class to Python                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <Erlang> ("Erlang",
 		"Model for an Erlang distribution",
@@ -226,7 +226,7 @@ BOOST_PYTHON_MODULE (models) {
 			"Scale of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose Chi-Squared class to Python                                    //
+//      Expose "Chi-Squared" class to Python                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <ChiSquared> ("ChiSquared",
 		"Model for a Chi-Squared distribution",
@@ -246,7 +246,7 @@ BOOST_PYTHON_MODULE (models) {
 //============================================================================//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose Exponential class to Python                                    //
+//      Expose "Exponential" class to Python                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <Exponential> ("Exponential",
 		"Model for an Exponential distribution",
@@ -260,11 +260,11 @@ BOOST_PYTHON_MODULE (models) {
 
 		// Properties
 		BASE_CLASS_PROPERTIES(Exponential)
-		.add_property ("Scale",	&Exponential::Scale,
+		.add_property ("Scale",				&Exponential::Scale,
 			"Scale of the distrsibution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose Normal class to Python                                         //
+//      Expose "Normal" class to Python                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <Normal> ("Normal",
 		"Model for a Normal (Gaussian) distribution",
@@ -273,7 +273,7 @@ BOOST_PYTHON_MODULE (models) {
 
 		// Methods
 		BASE_CLASS_METHODS(Normal)
-		.def ("Mean_ConfidenceInterval",	&Normal::Mean_ConfidenceInterval,
+		.def ("Mean_ConfidenceInterval",		&Normal::Mean_ConfidenceInterval,
 			args ("level", "size"), "Confidence interval of the mean")
 		.def ("Variance_ConfidenceInterval",	&Normal::Variance_ConfidenceInterval,
 			args ("level", "size"), "Confidence interval of the variance")
@@ -282,7 +282,7 @@ BOOST_PYTHON_MODULE (models) {
 		CONTINUOUS_CLASS_PROPERTIES (Normal);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose Laplace class to Python                                        //
+//      Expose "Laplace" class to Python                                      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <Laplace> ("Laplace",
 		"Model for a Laplace distribution",
@@ -296,11 +296,11 @@ BOOST_PYTHON_MODULE (models) {
 
 		// Properties
 		CONTINUOUS_CLASS_PROPERTIES (Laplace)
-		.add_property ("MAD",	&Laplace::MAD,
+		.add_property ("MAD",			&Laplace::MAD,
 			"Mean Absolute Deviation (MAD) of the distrsibution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose AsymmetricLaplace class to Python                              //
+//      Expose "AsymmetricLaplace" class to Python                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <AsymmetricLaplace> ("AsymmetricLaplace",
 		"Model for an asymmetric Laplace distribution",
