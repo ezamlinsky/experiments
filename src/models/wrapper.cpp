@@ -101,6 +101,7 @@ BOOST_PYTHON_MODULE (models) {
 			"Clamp the given value to be within the range [min..max]")
 		.def ("Split",	&Range::Split,	args ("bins"),
 			"Split the range into subranges (bins)")
+		.def (self_ns::str (self_ns::self))
 
 		// Properties
 		.add_property ("Min",		&Range::Min,
