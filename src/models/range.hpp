@@ -45,7 +45,7 @@ public:
 	) : min (min),
 		max (max)
 	{
-		if (max < min)
+		if (!(min <= max))
 			throw invalid_argument ("Range: Passed invalid min and max values");
 	}
 
