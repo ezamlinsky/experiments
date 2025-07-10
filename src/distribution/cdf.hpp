@@ -117,7 +117,7 @@ public:
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructors for empirical data and a distribution model              //
+//      Constructors for empirical data and a theoretical model               //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	CDF (
 		const vector <double> &data,		// Empirical data
