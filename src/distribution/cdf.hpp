@@ -19,8 +19,8 @@ class CDF
 //      Members                                                               //
 //============================================================================//
 private:
-	std::shared_ptr <const CumulativeFunction> sample;
-	std::shared_ptr <const CumulativeFunction> reference;
+	shared_ptr <const CumulativeFunction> sample;
+	shared_ptr <const CumulativeFunction> reference;
 
 //============================================================================//
 //      Private methods                                                       //
@@ -69,10 +69,10 @@ private:
 		vector <double> values;
 		const vector <double> &v1 = sample -> Values();
 		const vector <double> &v2 = reference -> Values();
-		merge (v1.begin(), v1.end(), v2.begin(), v2.end(), std::back_inserter (values));
+		merge (v1.begin(), v1.end(), v2.begin(), v2.end(), back_inserter (values));
 
 		// Remove consecutive (adjacent) duplicates
-		auto last = std::unique (values.begin(), values.end());
+		auto last = unique (values.begin(), values.end());
 		values.erase (last, values.end());
 
 		// Find the supremum between two CDFs
@@ -156,7 +156,7 @@ public:
 	void ReferenceSample (
 		const vector <double> &data			// Empirical data
 	){
-		reference = std::shared_ptr <const CumulativeFunction> (new CumulativeFunction (data));
+		reference = shared_ptr <const CumulativeFunction> (new CumulativeFunction (data));
 	}
 
 	void ReferenceSample (
@@ -173,7 +173,7 @@ public:
 	){
 		const Range& range = sample -> Domain();
 		const vector <double> &values = sample -> Values();
-		reference = std::shared_ptr <const CumulativeFunction> (new CumulativeFunction (range, values, model));
+		reference = shared_ptr <const CumulativeFunction> (new CumulativeFunction (range, values, model));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -218,8 +218,8 @@ ostream& operator << (ostream &stream, const CDF &object)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << "\nCDF FUNCTIONS:" << std::endl;
-	stream << "==============" << std::endl;
+	stream << "\nCDF FUNCTIONS:" << endl;
+	stream << "==============" << endl;
 	stream << "Sample data points\t\t\t= " << object.Sample().Size() << endl;
 	stream << "Reference data points\t\t\t= " << object.Reference().Size() << endl;
 	stream.precision (restore);

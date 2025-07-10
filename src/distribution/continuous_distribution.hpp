@@ -178,8 +178,8 @@ ostream& operator << (ostream &stream, const ContinuousDistribution &object)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << "\nCONTINUOUS DISTRIBUTION:" << std::endl;
-	stream << "========================" << std::endl;
+	stream << "\nCONTINUOUS DISTRIBUTION:" << endl;
+	stream << "========================" << endl;
 	stream << "Bins\t\t\t\t\t= " << object.Bins() << endl;
 	stream << object.Domain();
 	stream.precision (restore);
