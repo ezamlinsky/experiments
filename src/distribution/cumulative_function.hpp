@@ -8,6 +8,7 @@
 ################################################################################
 */
 # pragma	once
+# include	<vector>
 # include	<algorithm>
 # include	<boost/python.hpp>
 # include	"../models/base.hpp"
@@ -147,7 +148,7 @@ public:
 	CumulativeFunction (
 		const Range &range,				// Values range
 		const vector <double> &values,	// Unique values
-		const BaseModel &model			// The theoretical model
+		const BaseModel &model			// Theoretical model of the CDF
 	) : range (range),
 		values (values),
 		theoretical (true)
