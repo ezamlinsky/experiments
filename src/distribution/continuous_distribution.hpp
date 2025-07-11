@@ -9,6 +9,7 @@
 */
 # pragma	once
 # include	"cumulative_function.hpp"
+# include	"../filters/smooth.hpp"
 
 //****************************************************************************//
 //      Class "ContinuousDistribution"                                        //
@@ -158,9 +159,8 @@ public:
 	vector <double> SmoothedPDF (
 		size_t points
 	) const {
-		// TODO: Implement these functions
-//		const auto filter = filters.SmoothFilter (points);
-//		return filter.Apply (pdf);
+		const SmoothFilter filter = SmoothFilter (points);
+		return filter.Apply (pdf);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
