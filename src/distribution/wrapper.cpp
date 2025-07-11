@@ -38,7 +38,8 @@ BOOST_PYTHON_MODULE (distribution) {
 		.add_property ("Rice",			&Bins::Rice,
 			"Rice rule")
 		.add_property ("TerrellScott",	&Bins::TerrellScott,
-			"Terrell-Scott rule");
+			"Terrell-Scott rule")
+		.def (self_ns::str (self_ns::self));
 
 //============================================================================//
 //      Expose "CumulativeFunction" class to Python                           //
