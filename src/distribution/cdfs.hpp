@@ -8,19 +8,19 @@
 ################################################################################
 */
 # include	<cmath>
-# include	"cumulative_function.hpp"
+# include	"cdf_values.hpp"
 
 //****************************************************************************//
-//      Class "CDF"                                                           //
+//      Class "CDFs"                                                          //
 //****************************************************************************//
-class CDF
+class CDFs
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 private:
-	shared_ptr <const CumulativeFunction> sample;
-	shared_ptr <const CumulativeFunction> reference;
+	shared_ptr <const CDFValues> sample;
+	shared_ptr <const CDFValues> reference;
 
 //============================================================================//
 //      Private methods                                                       //
@@ -105,49 +105,49 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors for empirical data                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	CDF (
+	CDFs (
 		const vector <double> &data			// Empirical data
-	) : sample (new CumulativeFunction (data)),
-		reference (new CumulativeFunction())
+	) : sample (new CDFValues (data)),
+		reference (new CDFValues())
 	{}
 
-	CDF (
+	CDFs (
 		const list &py_list					// Empirical data
-	) : CDF (to_vector (py_list))
+	) : CDFs (to_vector (py_list))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors for empirical data and a theoretical model               //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	CDF (
+	CDFs (
 		const vector <double> &data,		// Empirical data
 		const BaseModel &model				// Theoretical model of the CDF
-	) : CDF (data)
+	) : CDFs (data)
 	{
 		ReferenceModel (model);
 	}
 
-	CDF (
+	CDFs (
 		const list &py_list,				// Empirical data
 		const BaseModel &model				// Theoretical model of the CDF
-	) : CDF (to_vector (py_list), model)
+	) : CDFs (to_vector (py_list), model)
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors for empirical data only (a sample and a reference)       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	CDF (
+	CDFs (
 		const vector <double> &sample,		// Empirical sample data
 		const vector <double> &reference	// Empirical reference data
-	) : CDF (sample)
+	) : CDFs (sample)
 	{
 		ReferenceSample (reference);
 	}
 
-	CDF (
+	CDFs (
 		const list &sample,					// Empirical sample data
 		const list &reference				// Empirical reference data
-	) : CDF (to_vector (sample), to_vector (reference))
+	) : CDFs (to_vector (sample), to_vector (reference))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -156,7 +156,7 @@ public:
 	void ReferenceSample (
 		const vector <double> &data			// Empirical data
 	){
-		reference = shared_ptr <const CumulativeFunction> (new CumulativeFunction (data));
+		reference = shared_ptr <const CDFValues> (new CDFValues (data));
 	}
 
 	void ReferenceSample (
@@ -173,20 +173,20 @@ public:
 	){
 		const Range& range = sample -> Domain();
 		const vector <double> &values = sample -> Values();
-		reference = shared_ptr <const CumulativeFunction> (new CumulativeFunction (range, values, model));
+		reference = shared_ptr <const CDFValues> (new CDFValues (range, values, model));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Return sample CDF function                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const CumulativeFunction& Sample (void) const {
+	const CDFValues& Sample (void) const {
 		return *sample;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Return reference CDF function                                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const CumulativeFunction& Reference (void) const {
+	const CDFValues& Reference (void) const {
 		return *reference;
 	}
 
@@ -214,7 +214,7 @@ public:
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const CDF &object)
+ostream& operator << (ostream &stream, const CDFs &object)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
