@@ -8,20 +8,19 @@
 ################################################################################
 */
 # pragma	once
-# include	"base_cdf.hpp"
+# include	"base_discrete.hpp"
 # include	"../models/base.hpp"
 # include	"../models/kolmogorov.hpp"
 
 //****************************************************************************//
 //      Class "CDFValues"                                                     //
 //****************************************************************************//
-class CDFValues : public BaseCDF
+class CDFValues : public BaseDiscrete
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 private:
-	Range range;			// Values range
 	bool theoretical;		// If set, then the CDF is calculated theoretically
 
 //============================================================================//
@@ -33,8 +32,7 @@ public:
 //      Default constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	CDFValues (void)
-	:	range (Range (0, 0)),
-		theoretical (false)
+	:	theoretical (false)
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -42,8 +40,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	CDFValues (
 		const vector <double> &data		// Empirical dataset
-	) : BaseCDF (move (vector <double> (data))),
-		range (Range (min (data), max (data))),
+	) : BaseDiscrete (move (vector <double> (data))),
 		theoretical (false)
 	{}
 
@@ -54,20 +51,12 @@ public:
 		const Range &range,				// Values range
 		const vector <double> &values,	// Unique values
 		const BaseModel &model			// Theoretical model of the CDF
-	) :	BaseCDF (values),
-		range (range),
+	) :	BaseDiscrete (range, values),
 		theoretical (true)
 	{
 		// Fill the theoretical CDF table
 		for (const auto x : values)
 			cdf.push_back (model.CDF (x));
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Domain of the CDF                                                     //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const Range& Domain (void) const {
-		return range;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

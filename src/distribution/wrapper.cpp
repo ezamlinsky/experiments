@@ -11,8 +11,29 @@
 # include	"bins.hpp"
 # include	"cdf_values.hpp"
 # include	"cdfs.hpp"
+# include	"discrete_distribution.hpp"
 # include	"continuous_distribution.hpp"
 # include	"distributions.hpp"
+
+//****************************************************************************//
+//      Common methods for discrete and continuous distributions class        //
+//****************************************************************************//
+# define	DISTRIBUTIONS_COMMON(class) 										\
+	.add_property ("Size",	&class::Size, 										\
+		"Count of stored CDF data points") 										\
+	.def ("Domain",			&class::Domain, 									\
+		return_internal_reference <> (), 										\
+		"Domain of the CDF") 													\
+	.def ("Values",			&class::Values, 									\
+		return_internal_reference <> (), 										\
+		"Unique values in the dataset") 										\
+	.def ("PDF",			&class::PDF, 										\
+		return_internal_reference <> (), 										\
+		"Values of the PDF function for the dataset") 							\
+	.def ("CDF",			&class::CDF, 										\
+		return_internal_reference <> (), 										\
+		"Values of the CDF function for the dataset") 							\
+	.def (self_ns::str (self_ns::self));
 
 //****************************************************************************//
 //      Python module initialization functions                                //
@@ -101,6 +122,19 @@ void (CDFs::*ReferenceSample2)(const vector <double> &data)	= &CDFs::ReferenceSa
 		.def (self_ns::str (self_ns::self));
 
 //============================================================================//
+//      Expose "DiscreteDistribution" class to Python                         //
+//============================================================================//
+	class_ <DiscreteDistribution> ("DiscreteDistribution",
+		"Calculate pdf and cdf for a discrete distribution",
+		init <> ())
+		.def (init <const list&> (args ("data"),
+			"Calculate a distribution for empirical data"))
+		.def (init <const vector <double>&>
+			(args ("data"),
+			"Calculate a distribution for empirical data"))
+		DISTRIBUTIONS_COMMON (DiscreteDistribution)
+
+//============================================================================//
 //      Expose "ContinuousDistribution" class to Python                       //
 //============================================================================//
 	class_ <ContinuousDistribution> ("ContinuousDistribution",
@@ -115,26 +149,10 @@ void (CDFs::*ReferenceSample2)(const vector <double> &data)	= &CDFs::ReferenceSa
 		.def (init <const BaseModel&, const Range&, size_t>
 			(args ("model", "range", "bins"),
 			"Calculate a distribution for a theoretical model"))
-		.add_property ("Size",	&ContinuousDistribution::Size,
-			"Count of stored CDF data points")
-		.add_property ("Bins",	&ContinuousDistribution::Bins,
-			"Bins count the CDF function has been split for a histogram")
-		.def ("Domain",			&ContinuousDistribution::Domain,
-			return_internal_reference <> (),
-			"Domain of the CDF")
-		.def ("Values",			&ContinuousDistribution::Values,
-			return_internal_reference <> (),
-			"Unique values in the dataset")
-		.def ("PDF",			&ContinuousDistribution::PDF,
-			return_internal_reference <> (),
-			"Values of the PDF function for the dataset")
 		.def ("SmoothedPDF",	&ContinuousDistribution::SmoothedPDF,
 			args ("points"),
 			"Smoothed values of the CDF function for the dataset")
-		.def ("CDF",			&ContinuousDistribution::CDF,
-			return_internal_reference <> (),
-			"Values of the CDF function for the dataset")
-		.def (self_ns::str (self_ns::self));
+		DISTRIBUTIONS_COMMON (ContinuousDistribution)
 
 //============================================================================//
 //      Expose "Distributions" class to Python                                //

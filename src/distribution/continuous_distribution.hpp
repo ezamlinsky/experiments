@@ -2,13 +2,13 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#             CALCULATE PDF AND CDF FOR A CONTINUOUS DISTRIBUTION              #
+#       CALCULATE PDF AND CDF FOR A CONTINUOUS PROBABILITY DISTRIBUTION        #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
 # pragma	once
-# include	"base_cdf.hpp"
+# include	"base_discrete.hpp"
 # include	"../filters/smooth.hpp"
 
 //****************************************************************************//
@@ -49,7 +49,7 @@ public:
 		values = range.Split (bins);
 
 		// Compute raw CDF
-		BaseCDF cdf_data (move (vector <double> (data)));
+		BaseDiscrete cdf_data (move (vector <double> (data)));
 		const vector <double> &raw_values = cdf_data.Values();
 		const vector <double> &raw_cdf = cdf_data.CDF();
 
@@ -132,13 +132,6 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Bins count the CDF function has been split for a histogram            //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	int Bins (void) const {
-		return cdf.size() - 1;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Unique values in the dataset                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	const vector <double>& Values (void) const {
@@ -179,7 +172,7 @@ ostream& operator << (ostream &stream, const ContinuousDistribution &object)
 	stream.precision (PRECISION);
 	stream << "\nCONTINUOUS DISTRIBUTION:" << endl;
 	stream << "========================" << endl;
-	stream << "Bins\t\t\t\t\t= " << object.Bins() << endl;
+	stream << "Bins\t\t\t\t\t= " << object.Size() << endl;
 	stream << object.Domain();
 	stream.precision (restore);
 	return stream;
