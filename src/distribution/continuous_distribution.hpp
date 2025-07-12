@@ -8,7 +8,7 @@
 ################################################################################
 */
 # pragma	once
-# include	"cumulative_function.hpp"
+# include	"base_cdf.hpp"
 # include	"../filters/smooth.hpp"
 
 //****************************************************************************//
@@ -49,44 +49,43 @@ public:
 		values = range.Split (bins);
 
 		// Compute raw CDF
-		vector <double> raw_values;
-		vector <double> raw_cdf;
-		if (compute_cdf (data, raw_values, raw_cdf)) {
+		BaseCDF cdf_data (move (vector <double> (data)));
+		const vector <double> &raw_values = cdf_data.Values();
+		const vector <double> &raw_cdf = cdf_data.CDF();
 
-			// Compute the PDF and CDF functions using created bins
-			// We do linear interpolation when a value resides between
-			// two empirical points
-			double last = raw_cdf [0];
-			pdf.push_back (NAN);
-			cdf.push_back (last);
+		// Compute the PDF and CDF functions using created bins
+		// We do linear interpolation when a value resides between
+		// two empirical points
+		double last = raw_cdf [0];
+		pdf.push_back (NAN);
+		cdf.push_back (last);
 
-			size_t j = 0;
-			size_t size = values.size();
-			for (size_t i = 1; i < size; i++) {
+		size_t j = 0;
+		size_t size = values.size();
+		for (size_t i = 1; i < size; i++) {
 
-				// Get the range split value
-				const double x = values [i];
+			// Get the range split value
+			const double x = values [i];
 
-				// Skip all the values that are less than the X value
-				while (raw_values [j] < x) ++j;
+			// Skip all the values that are less than the X value
+			while (raw_values [j] < x) ++j;
 
-				// Get the last CDF point where the skip condition was correct
-				const double less_x = raw_values [j - 1];
-				const double less_y = raw_cdf [j - 1];
+			// Get the last CDF point where the skip condition was correct
+			const double less_x = raw_values [j - 1];
+			const double less_y = raw_cdf [j - 1];
 
-				// Calculate the gain value for the linear interpolation
-				const double gain = (x - less_x) / (raw_values [j] - less_x);
+			// Calculate the gain value for the linear interpolation
+			const double gain = (x - less_x) / (raw_values [j] - less_x);
 
-				// Compute interpolated value of the CDF function at the target point
-				const double cur = (1.0 - gain) * less_y + gain * raw_cdf [j];
+			// Compute interpolated value of the CDF function at the target point
+			const double cur = (1.0 - gain) * less_y + gain * raw_cdf [j];
 
-				// Save computed PDF and CDF values
-				pdf.push_back (cur - last);
-				cdf.push_back (cur);
+			// Save computed PDF and CDF values
+			pdf.push_back (cur - last);
+			cdf.push_back (cur);
 
-				// Update the last computed CDF point
-				last = cur;
-			}
+			// Update the last computed CDF point
+			last = cur;
 		}
 	}
 

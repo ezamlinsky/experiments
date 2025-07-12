@@ -9,8 +9,8 @@
 */
 # include	<boost/python.hpp>
 # include	"bins.hpp"
-# include	"cumulative_function.hpp"
-# include	"cdf.hpp"
+# include	"cdf_values.hpp"
+# include	"cdfs.hpp"
 # include	"continuous_distribution.hpp"
 # include	"distributions.hpp"
 
@@ -42,30 +42,30 @@ BOOST_PYTHON_MODULE (distribution) {
 		.def (self_ns::str (self_ns::self));
 
 //============================================================================//
-//      Expose "CumulativeFunction" class to Python                           //
+//      Expose "CDFValues" class to Python                                    //
 //============================================================================//
-	class_ <CumulativeFunction> ("CumulativeFunction",
+	class_ <CDFValues> ("CDFValues",
 		"Calculate a CDF using empirical data or a theoretical model",
 		init <> ())
-		.add_property ("Size",	&CumulativeFunction::Size,
+		.add_property ("Size",	&CDFValues::Size,
 			"Count of CDF data points for which we have values")
-		.def ("Domain",	&CumulativeFunction::Domain,
+		.def ("Domain",	&CDFValues::Domain,
 			return_internal_reference <> (),
 			"Domain of the CDF")
-		.def ("Values",	&CumulativeFunction::Values,
+		.def ("Values",	&CDFValues::Values,
 			return_internal_reference <> (),
 			"Unique values in the dataset")
-		.def ("CDF",	&CumulativeFunction::CDF,
+		.def ("CDF",	&CDFValues::CDF,
 			return_internal_reference <> (),
 			"Values of the CDF function for the dataset")
 		.def (self_ns::str (self_ns::self));
 
 //============================================================================//
-//      Expose "CDF" class to Python                                          //
+//      Expose "CDFs" class to Python                                         //
 //============================================================================//
-void (CDF::*ReferenceSample1)(const list &py_list)			= &CDF::ReferenceSample;
-void (CDF::*ReferenceSample2)(const vector <double> &data)	= &CDF::ReferenceSample;
-	class_ <CDF> ("CDF",
+void (CDFs::*ReferenceSample1)(const list &py_list)			= &CDFs::ReferenceSample;
+void (CDFs::*ReferenceSample2)(const vector <double> &data)	= &CDFs::ReferenceSample;
+	class_ <CDFs> ("CDFs",
 		"Compare two CDF functions with one another",
 		init <const list&> (args ("data"),
 			"Calculate CDF for empirical data"))
@@ -88,15 +88,15 @@ void (CDF::*ReferenceSample2)(const vector <double> &data)	= &CDF::ReferenceSamp
 			"Load another sample as a reference for the distribution test")
 		.def ("ReferenceSample",		ReferenceSample2,		args ("data"),
 			"Load another sample as a reference for the distribution test")
-		.def ("ReferenceModel",			&CDF::ReferenceModel,	args ("model"),
+		.def ("ReferenceModel",			&CDFs::ReferenceModel,	args ("model"),
 			"Load a distribution model as a reference for the distribution test")
-		.def ("Sample",					&CDF::Sample,
+		.def ("Sample",					&CDFs::Sample,
 			return_value_policy <copy_const_reference> (),
 			"Return sample CDF function")
-		.def ("Reference",				&CDF::Reference,
+		.def ("Reference",				&CDFs::Reference,
 			return_value_policy <copy_const_reference> (),
 			"Return reference CDF function")
-		.def ("KolmogorovSmirnovTest",	&CDF::KolmogorovSmirnovTest,
+		.def ("KolmogorovSmirnovTest",	&CDFs::KolmogorovSmirnovTest,
 			"Do one-sample and two-sample Kolmogorov-Smirnov tests for two CDFs")
 		.def (self_ns::str (self_ns::self));
 
@@ -119,19 +119,19 @@ void (CDF::*ReferenceSample2)(const vector <double> &data)	= &CDF::ReferenceSamp
 			"Count of stored CDF data points")
 		.add_property ("Bins",	&ContinuousDistribution::Bins,
 			"Bins count the CDF function has been split for a histogram")
-		.def ("Domain",	&ContinuousDistribution::Domain,
+		.def ("Domain",			&ContinuousDistribution::Domain,
 			return_internal_reference <> (),
 			"Domain of the CDF")
-		.def ("Values",	&ContinuousDistribution::Values,
+		.def ("Values",			&ContinuousDistribution::Values,
 			return_internal_reference <> (),
 			"Unique values in the dataset")
-		.def ("PDF",	&ContinuousDistribution::PDF,
+		.def ("PDF",			&ContinuousDistribution::PDF,
 			return_internal_reference <> (),
 			"Values of the PDF function for the dataset")
 		.def ("SmoothedPDF",	&ContinuousDistribution::SmoothedPDF,
 			args ("points"),
 			"Smoothed values of the CDF function for the dataset")
-		.def ("CDF",	&ContinuousDistribution::CDF,
+		.def ("CDF",			&ContinuousDistribution::CDF,
 			return_internal_reference <> (),
 			"Values of the CDF function for the dataset")
 		.def (self_ns::str (self_ns::self));
