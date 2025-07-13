@@ -149,7 +149,7 @@ public:
 //      Smoothed values of the CDF function for the dataset                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> SmoothedPDF (
-		size_t points
+		size_t points					// Count of neighbor points to smooth by
 	) const {
 		const SmoothFilter filter = SmoothFilter (points);
 		return filter.Apply (pdf);
