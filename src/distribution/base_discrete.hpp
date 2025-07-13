@@ -8,55 +8,8 @@
 ################################################################################
 */
 # pragma	once
-# include	<vector>
-# include	<algorithm>
-# include	<boost/python.hpp>
+# include	"../python_helpers.hpp"
 # include	"../models/range.hpp"
-
-// Use shortenings
-using namespace boost::python;
-using boost::python::list;
-using boost::python::stl_input_iterator;
-
-//****************************************************************************//
-//      Return the minimum value among the array elements                     //
-//****************************************************************************//
-static double min (
-	const vector <double> &array	// The array to scan for the minimum value
-){
-	// Check if the array is not empty
-	if (array.size())
-		return *min_element (array.begin(), array.end());
-
-	// The Range class expects this value for an empty array
-	else return 0.0;
-}
-
-//****************************************************************************//
-//      Return the maximum value among the array elements                     //
-//****************************************************************************//
-static double max (
-	const vector <double> &array	// The array to scan for the maximum value
-){
-	// Check if the array is not empty
-	if (array.size())
-		return *max_element (array.begin(), array.end());
-
-	// The Range class expects this value for an empty array
-	else return 0.0;
-}
-
-//****************************************************************************//
-//      Convert a Python list to a standard array                             //
-//****************************************************************************//
-static vector <double> to_vector (
-	const list &py_list				// The Python list to convert
-){
-	return vector <double> (
-		stl_input_iterator <double> (py_list),
-		stl_input_iterator <double> ()
-	);
-}
 
 //****************************************************************************//
 //      Class "BaseDiscrete"                                                  //
@@ -80,9 +33,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Default constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDiscrete (void)
-	:	range (Range (0, 0))
-	{}
+	BaseDiscrete (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Partial constructor                                                   //
@@ -99,7 +50,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	BaseDiscrete (
 		vector <double> &&data			// Empirical data for the calculation
-	) : range (Range (min (data), max (data)))
+	) : range (data)
 	{
 		// Check if the data vector is not empty
 		if (data.empty())

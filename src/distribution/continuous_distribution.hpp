@@ -33,9 +33,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Default constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ContinuousDistribution (void)
-	:	range (Range (0, 0))
-	{}
+	ContinuousDistribution (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors for empirical data                                       //
@@ -43,7 +41,7 @@ public:
 	ContinuousDistribution (
 		const vector <double> &data,	// Empirical dataset
 		size_t bins						// Bins count for a histogram
-	) : range (Range (min (data), max (data)))
+	) : range (data)
 	{
 		// Split the range into sub-ranges (bins)
 		values = range.Split (bins);
