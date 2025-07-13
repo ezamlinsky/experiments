@@ -13,9 +13,22 @@
 # include	"min_delay.hpp"
 
 //****************************************************************************//
+//      Common methods for time series filters                                //
+//****************************************************************************//
+# define	FILTERS_COMMON(class) 												\
+	.add_property ("Points",	&class::Points, 								\
+		"Count of neighbor points to filter by") 								\
+	.add_property ("Size",		&class::Size, 									\
+		"Size of the impulse response function") 								\
+	.def ("Impulse",			&class::Impulse, 								\
+		return_internal_reference <> (), 										\
+		"Values of the impulse response function")								\
+	.def (self_ns::str (self_ns::self));
+
+//****************************************************************************//
 //      Python module initialization functions                                //
 //****************************************************************************//
-BOOST_PYTHON_MODULE (distribution) {
+BOOST_PYTHON_MODULE (filters) {
 
 	// Use shortenings
 	using namespace boost::python;
@@ -29,10 +42,13 @@ vector <double> (MedianFilter::*Apply2)(const vector <double> &data) const	= &Me
 		"Median filter for a time series",
 		init <size_t> (args ("points"),
 			"Set count of neighbor points to filter by"))
+		.add_property ("Points",	&MedianFilter::Points,
+			"Count of neighbor points to filter by")
 		.def ("Apply",	Apply1,	args ("data"),
 			"Apply the filter to the target python list")
 		.def ("Apply",	Apply2,	args ("data"),
-			"Apply the filter to the target time series");
+			"Apply the filter to the target time series")
+		.def (self_ns::str (self_ns::self));
 
 //============================================================================//
 //      Expose "SmoothFilter" class to Python                                 //
@@ -46,7 +62,8 @@ vector <double> (SmoothFilter::*Apply4)(const vector <double> &data) const	= &Sm
 		.def ("Apply",	Apply3,	args ("data"),
 			"Apply the filter to the target python list")
 		.def ("Apply",	Apply4,	args ("data"),
-			"Apply the filter to the target time series");
+			"Apply the filter to the target time series")
+		FILTERS_COMMON(SmoothFilter);
 
 //============================================================================//
 //      Expose "MinDelayFilter" class to Python                               //
@@ -60,7 +77,8 @@ vector <double> (MinDelayFilter::*Apply6)(const vector <double> &data) const	= &
 		.def ("Apply",	Apply5,	args ("data"),
 			"Apply the filter to the target python list")
 		.def ("Apply",	Apply6,	args ("data"),
-			"Apply the filter to the target time series");
+			"Apply the filter to the target time series")
+		FILTERS_COMMON(MinDelayFilter);
 }
 /*
 ################################################################################

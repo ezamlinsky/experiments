@@ -24,7 +24,8 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	MinDelayFilter (
 		size_t points				// Count of neighbor points to filter by
-	){
+	) :	Filter (points)
+	{
 		if (points == 0)
 			throw invalid_argument ("MinDelayFilter: The number of neighbor points must be positive");
 
@@ -92,6 +93,18 @@ public:
 		return Apply (to_vector (py_list));
 	}
 };
+
+//****************************************************************************//
+//      Translate the object to a string                                      //
+//****************************************************************************//
+ostream& operator << (ostream &stream, const MinDelayFilter &object)
+{
+	stream << "\nMINIMUM DELAY FILTER:" << endl;
+	stream << "=====================" << endl;
+	stream << "Delay points\t\t\t\t= " << object.Points() << endl;
+	stream << "Impulse response length\t\t\t= " << object.Size() << endl;
+	return stream;
+}
 /*
 ################################################################################
 #                                 END OF FILE                                  #

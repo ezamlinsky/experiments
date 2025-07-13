@@ -28,7 +28,8 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	SmoothFilter (
 		size_t points			// Count of neighbor points to smooth by
-	){
+	) :	Filter (points)
+	{
 		if (points == 0)
 			throw invalid_argument ("SmoothFilter: The number of neighbor points must be positive");
 
@@ -91,6 +92,18 @@ public:
 		return Apply (to_vector (py_list));
 	}
 };
+
+//****************************************************************************//
+//      Translate the object to a string                                      //
+//****************************************************************************//
+ostream& operator << (ostream &stream, const SmoothFilter &object)
+{
+	stream << "\nSMOOTH FILTER:" << endl;
+	stream << "==============" << endl;
+	stream << "Smoothing points\t\t\t= " << object.Points() << endl;
+	stream << "Impulse response length\t\t\t= " << object.Size() << endl;
+	return stream;
+}
 /*
 ################################################################################
 #                                 END OF FILE                                  #

@@ -80,7 +80,8 @@ class Filter
 //      Members                                                               //
 //============================================================================//
 protected:
-	vector <double> impulse;
+	size_t points;				// Count of neighbor points to smooth by
+	vector <double> impulse;	// Values of the impulse response function
 
 //============================================================================//
 //      Public methods                                                        //
@@ -90,7 +91,17 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Default constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Filter (void) = default;
+	Filter (
+		size_t points			// Count of neighbor points to smooth by
+	) :	points (points)
+	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Count of neighbor points to smooth by                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	size_t Points (void) const {
+		return points;
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Size of the impulse response function                                 //

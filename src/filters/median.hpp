@@ -40,6 +40,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Count of neighbor points to filter by                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	size_t Points (void) const {
+		return points;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Apply the filter to the target time series                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Apply (
@@ -81,6 +88,17 @@ public:
 		return Apply (to_vector (py_list));
 	}
 };
+
+//****************************************************************************//
+//      Translate the object to a string                                      //
+//****************************************************************************//
+ostream& operator << (ostream &stream, const MedianFilter &object)
+{
+	stream << "\nMEDIAN FILTER:" << endl;
+	stream << "==============" << endl;
+	stream << "Median points\t\t\t\t= " << object.Points() << endl;
+	return stream;
+}
 /*
 ################################################################################
 #                                 END OF FILE                                  #
