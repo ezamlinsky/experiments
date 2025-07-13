@@ -12,6 +12,7 @@
 # include	<iostream>
 # include	<iomanip>
 # include	<vector>
+# include	<algorithm>
 
 // Displayed precision for floating-point numbers
 # define	PRECISION	16
@@ -28,8 +29,8 @@ class Range
 //      Members                                                               //
 //============================================================================//
 protected:
-	const double min;	// Min value of the range
-	const double max;	// Max value of the range
+	double min;					// Min value of the range
+	double max;					// Max value of the range
 
 //============================================================================//
 //      Public methods                                                        //
@@ -37,16 +38,44 @@ protected:
 public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor
+//      Default constructor                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Range (void)
+	:	min (0.0),
+		max (0.0)
+	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Trivial constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Range (
-		double min,		// Min value of the range
-		double max		// Max value of the range
+		double min,				// Min value of the range
+		double max				// Max value of the range
 	) : min (min),
 		max (max)
 	{
 		if (!(min <= max))
 			throw invalid_argument ("Range: Passed invalid min and max values");
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructor by empirical data                                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Range (
+		const vector <double> &data	// Dataset to find its range
+	){
+		// For an empty dataset, set the range to the default value
+		if (data.empty())
+		{
+			min = 0.0;
+			max = 0.0;
+		}
+		else
+		{
+			auto bounds = minmax_element (data.begin(), data.end());
+			min = *bounds.first;
+			max = *bounds.second;
+		}
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -74,7 +103,7 @@ public:
 //      Clamp the given value to be within the range [min..max]               //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double Clamp (
-		double value	// The value to fix
+		double value			// The value to fix
 	) const {
 		if (value < min) value = min;
 		if (value > max) value = max;
@@ -85,7 +114,7 @@ public:
 //      Split the range into subranges (bins)                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Split (
-		size_t bins		// The number of bins to create for the range
+		size_t bins				// The number of bins to create for the range
 	) const {
 		if (bins != 0) {
 			vector <double> result;
