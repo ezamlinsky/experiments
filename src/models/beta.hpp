@@ -35,7 +35,7 @@ public:
 	Beta (
 		double shape1,		// The first shape parameter
 		double shape2		// The second shape parameter
-	) : BaseModel (Range (0, 1)),
+	) : BaseModel (Range (0.0, 1.0)),
 		beta (SpecialBeta (shape1, shape2)),
 		shape1 (shape1),
 		shape2 (shape2)
