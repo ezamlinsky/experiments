@@ -13,6 +13,7 @@
 # include	<iomanip>
 # include	<vector>
 # include	<algorithm>
+# include	"../templates/array.hpp"
 
 // Displayed precision for floating-point numbers
 # define	PRECISION	16
@@ -59,24 +60,20 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor by empirical data                                         //
+//      Constructors by empirical data                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Range (
-		const vector <double> &data	// Dataset to find its range
-	){
-		// For an empty dataset, set the range to the default value
-		if (data.empty())
-		{
-			min = 0.0;
-			max = 0.0;
-		}
-		else
-		{
-			auto bounds = minmax_element (data.begin(), data.end());
-			min = *bounds.first;
-			max = *bounds.second;
-		}
+		const double data[],		// Dataset to find its range
+		size_t size
+	) :	Range()
+	{
+		if (size) Array::MinMax (min, max, data, size);
 	}
+
+	Range (
+		const vector <double> &data	// Dataset to find its range
+	) : Range (data.data(), data.size())
+	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Range min value                                                       //
@@ -97,6 +94,13 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double Length (void) const {
 		return max - min;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Middle point of the range                                             //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double MidRange (void) const {
+		return 0.5 * (max + min);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -143,6 +147,7 @@ ostream& operator << (ostream &stream, const Range &range)
 	stream << "    Min value\t\t\t\t= " << range.Min() << endl;
 	stream << "    Max value\t\t\t\t= " << range.Max() << endl;
 	stream << "    Range length\t\t\t= " << range.Length() << endl;
+	stream << "    Middle point\t\t\t= " << range.MidRange() << endl;
 	stream.precision (restore);
 	return stream;
 }
