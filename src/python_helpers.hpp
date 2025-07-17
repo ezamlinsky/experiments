@@ -12,6 +12,7 @@
 # include	<boost/python.hpp>
 
 // Use shortenings
+using namespace std;
 using namespace boost::python;
 using boost::python::list;
 
