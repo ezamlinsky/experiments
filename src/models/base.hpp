@@ -28,7 +28,7 @@ class BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
-	const Range range;
+	const Range range;		// Function domain where the distribution exists
 
 //============================================================================//
 //      Public methods                                                        //
@@ -217,13 +217,13 @@ ostream& operator << (ostream &stream, const BaseModel &model)
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
 	stream << model.Domain();
-	stream << "\nStandard metrics:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~" << endl;
+	stream << "\nStandard estimators:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~" << endl;
 	stream << "    Mean\t\t\t\t= " << model.Mean() << endl;
 	stream << "    Variance\t\t\t\t= " << model.Variance() << endl;
 	stream << "    Standard deviation\t\t\t= " << model.StdDev() << endl;
-	stream << "\nRobust metrics:" << endl;
-	stream << "~~~~~~~~~~~~~~~" << endl;
+	stream << "\nRobust estimators:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~" << endl;
 	stream << "    Median\t\t\t\t= " << model.Median() << endl;
 	stream << "    Lower quartile\t\t\t= " << model.LowerQuartile() << endl;
 	stream << "    Upper quartile\t\t\t= " << model.UpperQuartile() << endl;
