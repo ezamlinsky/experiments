@@ -12,6 +12,7 @@
 # include	"continuous.hpp"
 # include	"chi_squared.hpp"
 # include	"standard_t.hpp"
+# include	"../observations/observations.hpp"
 
 //****************************************************************************//
 //      Class "Normal"                                                        //
@@ -40,11 +41,19 @@ public:
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructor for empirical data                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Normal (
+		const Observations &data	// Empirical observations
+	) : Normal (data.Median(), data.StdDev())
+	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Confidence interval of the mean                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval Mean_ConfidenceInterval (
-		double level,	// Confidence level
-		size_t size		// Sample size
+		double level,				// Confidence level
+		size_t size					// Sample size
 	){
 		if (0.0 <= level && level <= 1.0) {
 			const auto dist = StandardT (size);
@@ -63,8 +72,8 @@ public:
 //      Confidence interval of the variance                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval Variance_ConfidenceInterval (
-		double level,	// Confidence level
-		size_t size		// Sample size
+		double level,				// Confidence level
+		size_t size					// Sample size
 	){
 		if (0.0 <= level && level <= 1.0) {
 			const auto dist = ChiSquared (size);
@@ -82,7 +91,7 @@ public:
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 		const double arg = (x - location) / scale;
 		return exp (-0.5 * arg * arg) / (scale * sqrt_2 * sqrt_pi);
@@ -92,7 +101,7 @@ public:
 //      Cumulative Distribution Function (CDF)                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 		const double arg = (x - location) / scale;
 		return 0.5 * (1.0 + erf (arg / sqrt_2));
