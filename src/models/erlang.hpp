@@ -9,6 +9,7 @@
 */
 # pragma	once
 # include	"special_gamma.hpp"
+# include	"../observations/observations.hpp"
 
 //****************************************************************************//
 //      Class "Erlang"                                                        //
@@ -19,7 +20,7 @@ class Erlang final : public SpecialGamma
 //      Members                                                               //
 //============================================================================//
 private:
-	const size_t shape;		// Shape of the distribution
+	const size_t shape;				// Shape of the distribution
 
 //============================================================================//
 //      Public methods                                                        //
@@ -30,10 +31,19 @@ public:
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Erlang (
-		size_t shape,		// Shape of the distribution
-		double scale		// Scale of the distribution
+		size_t shape,				// Shape of the distribution
+		double scale				// Scale of the distribution
 	) : SpecialGamma (shape * 2, scale),
 		shape (shape)
+	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructor for empirical data                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Erlang (
+		size_t shape,				// Shape of the distribution
+		const Observations &data	// Empirical observations
+	) : Erlang (shape, data.Mean() / shape)
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
