@@ -242,6 +242,49 @@ T MedianSqrDev (
 	delete [] temp;
 	return median;
 }
+
+//****************************************************************************//
+//      Maximum of absolute deviations                                        //
+//****************************************************************************//
+template <typename T>
+T MaxAbsDev (
+	const T array[],		// Array data
+	size_t size,			// Array size
+	T value					// The central value
+){
+	if (size > 0) {
+		T max = 0;
+		for (size_t i = 0; i < size; i++) {
+			const T val = fabs (array[i] - value);
+			if (max < val) max = val;
+		}
+		return max;
+	}
+	else
+		return NAN;
+}
+
+//****************************************************************************//
+//      Maximum of squared deviation                                          //
+//****************************************************************************//
+template <typename T>
+T MaxSqrDev (
+	const T array[],		// Array data
+	size_t size,			// Array size
+	T value					// The central value
+){
+	if (size > 0) {
+		T max = 0;
+		for (size_t i = 0; i < size; i++) {
+			const T temp = array[i] - value;
+			const T val = temp * temp;
+			if (max < val) max = val;
+		}
+		return max;
+	}
+	else
+		return NAN;
+}
 }
 /*
 ################################################################################
