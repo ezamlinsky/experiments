@@ -93,7 +93,7 @@ public:
 		// Check if the level is correct
 		if (0.0 <= level and level <= 1.0) {
 
-			// The first approach is the mean value if exists
+			// The first approximation is the mean value if exists
 			double x = Mean();
 			if (isinf (x)) x = 0;
 
@@ -118,7 +118,7 @@ public:
 				else if (der == -INFINITY)
 					step = -STEP_OUTSIDE * diff;
 
-				// A new approach
+				// A new approximation
 				x -= step;
 
 				// Clamp the value inside the distribution domain
