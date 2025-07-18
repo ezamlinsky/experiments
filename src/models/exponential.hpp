@@ -11,6 +11,7 @@
 # include	"confidence_interval.hpp"
 # include	"base.hpp"
 # include	"chi_squared.hpp"
+# include	"../observations/observations.hpp"
 
 //****************************************************************************//
 //      Class "Exponential"                                                   //
@@ -21,7 +22,7 @@ class Exponential final : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
-	const double scale;		// Scale of the distribution
+	const double scale;				// Scale of the distribution
 
 
 //============================================================================//
@@ -33,13 +34,21 @@ public:
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Exponential (
-		double scale		// Scale of the distribution
+		double scale				// Scale of the distribution
 	) : BaseModel (Range (0, INFINITY)),
 		scale (scale)
 	{
 		if (scale <= 0.0)
 			throw invalid_argument ("Exponential: The scale value must be positive");
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructor for empirical data                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Exponential (
+		const Observations &data	// Empirical observations
+	) : Exponential (data.Median() / log (2))
+	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Scale of the distribution                                             //
@@ -52,8 +61,8 @@ public:
 //      Confidence interval of the mean value                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval Mean_ConfidenceInterval (
-		double level,	// Confidence level
-		size_t size		// Sample size
+		double level,				// Confidence level
+		size_t size					// Sample size
 	){
 		if (0.0 <= level && level <= 1.0)
 		{
@@ -72,7 +81,7 @@ public:
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 		const double arg = x / scale;
 		if (arg >= 0.0)
@@ -85,7 +94,7 @@ public:
 //      Cumulative Distribution Function (CDF)                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 		const double arg = x / scale;
 		if (arg >= 0)
