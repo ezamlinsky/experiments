@@ -37,6 +37,8 @@
 		"Trim all the values greater than or equal to the target value")		\
 	.def ("Quantile",			&class::Quantile,			args ("level"),		\
 		"Quantile value for the target level")									\
+	.def ("data",				&class::data,	return_internal_reference <> (),\
+		"Extract internal data about observed values")							\
 	.def (self_ns::str (self_ns::self))
 
 //****************************************************************************//
