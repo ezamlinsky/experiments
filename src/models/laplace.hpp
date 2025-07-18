@@ -11,6 +11,7 @@
 # include	"confidence_interval.hpp"
 # include	"continuous.hpp"
 # include	"chi_squared.hpp"
+# include	"../observations/observations.hpp"
 
 //****************************************************************************//
 //      Class "Laplace"                                                       //
@@ -32,6 +33,14 @@ public:
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructor for empirical data                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Laplace (
+		const Observations &data	// Empirical observations
+	) : Laplace (data.Median(), data.MeanAbsDevFromMedian())
+	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean Absolute Deviation (MAD) of the distribution                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double MAD (void) const {
@@ -42,8 +51,8 @@ public:
 //      Confidence interval of the Mean Absolute Deviation (MAD)              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval MAD_ConfidenceInterval (
-		double level,	// Confidence level
-		size_t size		// Sample size
+		double level,				// Confidence level
+		size_t size					// Sample size
 	){
 		if (0.0 <= level && level <= 1.0)
 		{
@@ -62,7 +71,7 @@ public:
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 		const double arg = (x - location) / scale;
 		return 0.5 * exp (-fabs (arg)) / scale;
@@ -72,7 +81,7 @@ public:
 //      Cumulative Distribution Function (CDF)                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 		const double arg = (x - location) / scale;
 		if (arg < 0.0)
