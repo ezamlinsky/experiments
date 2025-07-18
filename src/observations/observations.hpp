@@ -353,7 +353,7 @@ ostream& operator << (ostream &stream, const Observations &object)
 	stream << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 	stream << "    Mean of squared deviations\t\t= " << object.MeanSqrDevFromMean() << endl;
 	stream << "    Mean of absolute deviations\t\t= " <<  object.MeanAbsDevFromMean() << endl;
-	stream << "    Median of squared deviations\t\t= " << object.MedianSqrDevFromMean() << endl;
+	stream << "    Median of squared deviations\t= " << object.MedianSqrDevFromMean() << endl;
 	stream << "    Median of absolute deviations\t= " << object.MedianAbsDevFromMean() << endl;
 	stream << "    Median of signed deviations\t\t= " << object.MedianSignDevFromMean() << endl;
 	stream << "\nDeviations from the median value:" << endl;
@@ -361,7 +361,7 @@ ostream& operator << (ostream &stream, const Observations &object)
 	stream << "    Mean of squared deviations\t\t= " << object.MeanSqrDevFromMedian() << endl;
 	stream << "    Mean of absolute deviations\t\t= " << object.MeanAbsDevFromMedian() << endl;
 	stream << "    Mean of signed deviations\t\t= " << object.MeanSignDevFromMedian() << endl;
-	stream << "    Median of squared deviations\t\t= " << object.MedianSqrDevFromMedian() << endl;
+	stream << "    Median of squared deviations\t= " << object.MedianSqrDevFromMedian() << endl;
 	stream << "    Median of absolute deviations\t= " << object.MedianAbsDevFromMedian() << endl;
 	stream << "    Median of signed deviations\t\t= " << object.MedianSignDevFromMedian() << endl;
 	stream << "\nEstimators around the mean value:" << endl;
