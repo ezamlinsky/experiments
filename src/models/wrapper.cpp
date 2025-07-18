@@ -214,6 +214,8 @@ BOOST_PYTHON_MODULE (models) {
 		"Model for an Erlang distribution",
 		init <size_t, double> (args ("shape", "scale"),
 			"Create a new Erlang distribution"))
+		.def (init <size_t, const Observations &> (args ("shape", "data"),
+			"Create a new Erlang distribution from empirical data"))
 
 		// Methods
 		BASE_CLASS_METHODS(Erlang)
@@ -252,6 +254,8 @@ BOOST_PYTHON_MODULE (models) {
 		"Model for an Exponential distribution",
 		init <double> (args ("scale"),
 			"Create a new Exponential distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Exponential distribution from empirical data"))
 
 		// Methods
 		BASE_CLASS_METHODS(Exponential)
@@ -270,6 +274,8 @@ BOOST_PYTHON_MODULE (models) {
 		"Model for a Normal (Gaussian) distribution",
 		init <double, double> (args ("location", "scale"),
 			"Create a new Normal (Gaussian) distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Normal (Gaussian) distribution from empirical data"))
 
 		// Methods
 		BASE_CLASS_METHODS(Normal)
@@ -288,6 +294,8 @@ BOOST_PYTHON_MODULE (models) {
 		"Model for a Laplace distribution",
 		init <double, double> (args ("location", "scale"),
 			"Create a new Laplace distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Laplace distribution from empirical data"))
 
 		// Methods
 		BASE_CLASS_METHODS(Laplace)
@@ -306,6 +314,8 @@ BOOST_PYTHON_MODULE (models) {
 		"Model for an asymmetric Laplace distribution",
 		init <double, double, double> (args ("location", "scale", "asymmetry"),
 			"Create a new asymmetric Laplace distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new asymmetric Laplace distribution from empirical data"))
 
 		// Methods
 		BASE_CLASS_METHODS(AsymmetricLaplace)
