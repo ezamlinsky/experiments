@@ -17,12 +17,6 @@
 class Erlang final : public SpecialGamma
 {
 //============================================================================//
-//      Members                                                               //
-//============================================================================//
-private:
-	const size_t shape;				// Shape of the distribution
-
-//============================================================================//
 //      Public methods                                                        //
 //============================================================================//
 public:
@@ -33,8 +27,7 @@ public:
 	Erlang (
 		size_t shape,				// Shape of the distribution
 		double scale				// Scale of the distribution
-	) : SpecialGamma (shape * 2, scale),
-		shape (shape)
+	) : SpecialGamma (shape * 2, scale)
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -50,7 +43,7 @@ public:
 //      Shape of the distribution                                             //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	size_t Shape (void) const {
-		return shape;
+		return gamma_shape / 2;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -61,17 +54,24 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Mode of the distribution                                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Mode (void) const {
+		return (gamma_shape / 2 - 1) * gamma_scale;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override {
-		return shape * gamma_scale;
+		return gamma_shape / 2 * gamma_scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override {
-		return shape * gamma_scale * gamma_scale;
+		return gamma_shape / 2 * gamma_scale * gamma_scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
