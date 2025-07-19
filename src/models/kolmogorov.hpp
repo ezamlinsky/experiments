@@ -22,6 +22,7 @@ class Kolmogorov final : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
+	static const double mode;		// Mode of the distribution
 	static const double mean;		// Mean of the distribution
 	static const double variance;	// Variance of the distribution
 	static const double threshold;	// The threshold value to improve precision
@@ -122,6 +123,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Mode of the distribution                                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Mode (void) const override {
+		return mode;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override {
@@ -146,6 +154,7 @@ public:
 //****************************************************************************//
 //      Internal constants used by the class                                  //
 //****************************************************************************//
+const double Kolmogorov::mode = 0.735467907916572;
 const double Kolmogorov::mean = sqrt (0.5 * M_PI) * log (2.0);
 const double Kolmogorov::variance = 0.5 * M_PI * (M_PI / 6.0 - log (2.0) * log (2.0));
 const double Kolmogorov::threshold = sqrt (log (2.0));
