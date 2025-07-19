@@ -19,10 +19,10 @@ class SpecialGamma : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
-	const size_t gamma_shape;	// Shape of the gamma distribution
 	const double gamma_log;		// Logarithm of the gamma function
 
 protected:
+	const size_t gamma_shape;	// Shape of the gamma distribution
 	const double gamma_scale;	// Scale of the gamma distribution
 
 //============================================================================//
@@ -37,8 +37,8 @@ public:
 		size_t shape,			// Shape of the gamma distribution
 		double scale			// Scale of the gamma distribution
 	) : BaseModel (Range (0, INFINITY)),
-		gamma_shape (shape),
 		gamma_log (lgamma (0.5 * shape)),
+		gamma_shape (shape),
 		gamma_scale (scale)
 	{
 		if (shape == 0.0)
