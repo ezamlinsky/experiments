@@ -93,9 +93,10 @@ public:
 		// Check if the level is correct
 		if (0.0 <= level and level <= 1.0) {
 
-			// The first approximation is the mean value if exists
-			double x = Mean();
-			if (isinf (x)) x = 0;
+			// The first approximation is the mode value (if it exists),
+			// then the mean value
+			double x = Mode();
+			if (isnan (x)) x = Mean();
 
 			// Find a solution using the Newton solve method
 			int i = NEWTON_ITERATIONS;
@@ -186,6 +187,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Mode of the distribution                                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Mode (void) const {
+		return NAN;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Standard deviation of the distribution                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double StdDev (void) const {
@@ -219,6 +227,7 @@ ostream& operator << (ostream &stream, const BaseModel &model)
 	stream << model.Domain();
 	stream << "\nStandard estimators:" << endl;
 	stream << "~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Mode\t\t\t\t= " << model.Mode() << endl;
 	stream << "    Mean\t\t\t\t= " << model.Mean() << endl;
 	stream << "    Variance\t\t\t\t= " << model.Variance() << endl;
 	stream << "    Standard deviation\t\t\t= " << model.StdDev() << endl;
