@@ -103,6 +103,25 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Mode of the distribution                                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Mode (void) const override {
+		if (shape1 < 1.0 && shape2 < 1.0)
+			return NAN;
+		else if (shape1 > 1.0 && shape2 > 1.0) {
+			const double temp1 = shape1 - 1.0;
+			const double temp2 = shape1 + shape2 - 2.0;
+			return temp1 / temp2;
+		}
+		else if (shape1 < shape2)
+			return 0.0;
+		else if (shape1 > shape2)
+			return 1.0;
+		else
+			return Mean();
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override {
