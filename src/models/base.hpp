@@ -97,6 +97,7 @@ public:
 			// then the mean value
 			double x = Mode();
 			if (isnan (x)) x = Mean();
+			if (isinf (x)) x = 0.0;
 
 			// Find a solution using the Newton solve method
 			int i = NEWTON_ITERATIONS;
