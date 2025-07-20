@@ -214,7 +214,7 @@ BOOST_PYTHON_MODULE (models) {
 		"Model for an Erlang distribution",
 		init <size_t, double> (args ("shape", "scale"),
 			"Create a new Erlang distribution"))
-		.def (init <size_t, const Observations &> (args ("shape", "data"),
+		.def (init <const Observations &> (args ("data"),
 			"Create a new Erlang distribution from empirical data"))
 
 		// Methods
