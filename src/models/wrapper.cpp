@@ -192,6 +192,8 @@ BOOST_PYTHON_MODULE (models) {
 		"Model for the Beta distribution",
 		init <double, double> (args ("shape1", "shape2"),
 			"Create a new Beta distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Beta distribution from empirical data"))
 
 		// Methods
 		BASE_CLASS_METHODS(Beta)
@@ -234,6 +236,8 @@ BOOST_PYTHON_MODULE (models) {
 		"Model for a Chi-Squared distribution",
 		init <size_t> (args ("df"),
 			"Create a new Chi-Squared distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Chi-Squared distribution from empirical data"))
 
 		// Methods
 		BASE_CLASS_METHODS(ChiSquared)
