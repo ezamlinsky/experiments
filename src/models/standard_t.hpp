@@ -23,39 +23,6 @@ private:
 	const SpecialBeta beta;			// Special beta function
 	const size_t df;				// Degrees of freedom
 
-// Extract the distribution parameters from empirical observations
-struct Params {
-
-	// Members
-	size_t df;						// Degrees of freedom
-
-	// Constructor
-	Params (
-		const Observations &data	// Empirical observations
-	){
-		// Extract parameters from the empirical observations
-		const double temp = data.Variance();
-
-		// Find degrees of freedom for these parameters
-		if (temp <= 2.0 * M_PI) {
-			const double temp1 = 2.0 * temp;
-			const double temp2 = temp - 1.0;
-			df = round (temp1 / temp2);
-		}
-		else
-			df = 1;
-	}
-};
-
-//============================================================================//
-//      Private methods                                                       //
-//============================================================================//
-private:
-	StandardT (
-		const Params &params		// Distribution parameters
-	) : StandardT (params.df)
-	{}
-
 //============================================================================//
 //      Public methods                                                        //
 //============================================================================//
@@ -69,14 +36,6 @@ public:
 	) : BaseModel (Range (-INFINITY, INFINITY)),
 		beta (SpecialBeta (0.5 * df, 0.5)),
 		df (df)
-	{}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor for empirical data                                        //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	StandardT (
-		const Observations &data	// Empirical observations
-	) : StandardT (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -124,7 +83,7 @@ public:
 		if (df > 1)
 			return 0.0;
 		else
-			return NAN;
+			return INFINITY;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -133,10 +92,8 @@ public:
 	virtual double Variance (void) const override {
 		if (df > 2)
 			return df / (df - 2.0);
-		else if (df > 1)
-			return INFINITY;
 		else
-			return NAN;
+			return INFINITY;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

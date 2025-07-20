@@ -20,9 +20,9 @@ class F final : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
-	const SpecialBeta beta;	// Special beta function
-	const size_t df1;		// The first degrees of freedom
-	const size_t df2;		// The second degrees of freedom
+	const SpecialBeta beta;			// Special beta function
+	const size_t df1;				// The first degrees of freedom
+	const size_t df2;				// The second degrees of freedom
 
 //============================================================================//
 //      Public methods                                                        //
@@ -33,8 +33,8 @@ public:
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	F (
-		size_t df1,			// The first degrees of freedom
-		size_t df2			// The second degrees of freedom
+		size_t df1,					// The first degrees of freedom
+		size_t df2					// The second degrees of freedom
 	) : BaseModel (Range (0, INFINITY)),
 		beta (SpecialBeta (0.5 * df1, 0.5 * df2)),
 		df1 (df1),
@@ -59,7 +59,7 @@ public:
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 
 		// Negative argument
@@ -93,7 +93,7 @@ public:
 //      Cumulative Distribution Function (CDF)                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 		const double arg = (df1 * x) / (df1 * x + df2);
 		return beta.RegIncompleteBeta (arg);
@@ -133,7 +133,7 @@ public:
 			return p / q;
 		}
 		else
-			return NAN;
+			return INFINITY;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -155,8 +155,8 @@ ostream& operator << (ostream &stream, const F &model)
 	stream << "==========================" << std::endl;
 	stream << "\nParameters:" << endl;
 	stream << "~~~~~~~~~~~" << endl;
-	stream << "    Degrees of freedom #1\t\t\t\t= " << model.DF1() << endl;
-	stream << "    Degrees of freedom #2\t\t\t\t= " << model.DF2() << endl;
+	stream << "    Degrees of freedom #1\t\t= " << model.DF1() << endl;
+	stream << "    Degrees of freedom #2\t\t= " << model.DF2() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
