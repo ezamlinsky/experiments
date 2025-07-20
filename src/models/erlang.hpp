@@ -17,6 +17,37 @@
 class Erlang final : public SpecialGamma
 {
 //============================================================================//
+//      Members                                                               //
+//============================================================================//
+private:
+
+// Extract the distribution parameters from empirical observations
+struct Params {
+
+	// Members
+	size_t shape;					// Shape of the distribution
+	double scale;					// Scale of the distribution
+
+	// Constructor
+	Params (
+		const Observations &data	// Empirical observations
+	){
+		const double temp = 2.0 / data.SkewnessAroundMean();
+		shape = round (temp * temp);
+		scale = data.Mean() / shape;
+	}
+};
+
+//============================================================================//
+//      Private methods                                                       //
+//============================================================================//
+private:
+	Erlang (
+		const Params &params		// Distribution parameters
+	) : Erlang (params.shape, params.scale)
+	{}
+
+//============================================================================//
 //      Public methods                                                        //
 //============================================================================//
 public:
@@ -34,9 +65,8 @@ public:
 //      Constructor for empirical data                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Erlang (
-		size_t shape,				// Shape of the distribution
 		const Observations &data	// Empirical observations
-	) : Erlang (shape, data.Mean() / shape)
+	) : Erlang (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
