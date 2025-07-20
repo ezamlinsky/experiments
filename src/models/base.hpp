@@ -12,6 +12,7 @@
 # include	<memory>
 # include	<random>
 # include	"range.hpp"
+# include	"../observations/observations.hpp"
 
 // Value of the step out of a point where the derivative is infinite
 # define	STEP_OUTSIDE		0.001

@@ -11,7 +11,6 @@
 # include	"confidence_interval.hpp"
 # include	"base.hpp"
 # include	"chi_squared.hpp"
-# include	"../observations/observations.hpp"
 
 //****************************************************************************//
 //      Class "Exponential"                                                   //

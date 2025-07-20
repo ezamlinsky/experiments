@@ -9,7 +9,6 @@
 */
 # pragma	once
 # include	"continuous.hpp"
-# include	"../observations/observations.hpp"
 
 //****************************************************************************//
 //      Class "AsymmetricLaplace"                                             //

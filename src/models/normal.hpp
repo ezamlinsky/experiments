@@ -12,7 +12,6 @@
 # include	"continuous.hpp"
 # include	"chi_squared.hpp"
 # include	"standard_t.hpp"
-# include	"../observations/observations.hpp"
 
 //****************************************************************************//
 //      Class "Normal"                                                        //
