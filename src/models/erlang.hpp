@@ -9,7 +9,6 @@
 */
 # pragma	once
 # include	"special_gamma.hpp"
-# include	"../observations/observations.hpp"
 
 //****************************************************************************//
 //      Class "Erlang"                                                        //
@@ -32,8 +31,11 @@ struct Params {
 	Params (
 		const Observations &data	// Empirical observations
 	){
-		const double temp = 2.0 / data.SkewnessAroundMean();
-		shape = round (temp * temp);
+		// Extract parameters from the empirical observations
+		const double skewness = 2.0 / data.SkewnessAroundMean();
+
+		// Find the shape and the scale for these parameters
+		shape = round (skewness * skewness);
 		scale = data.Mean() / shape;
 	}
 };
