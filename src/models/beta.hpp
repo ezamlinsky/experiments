@@ -20,9 +20,40 @@ class Beta final : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
-	const SpecialBeta beta;	// Special beta function
-	const double shape1;	// The first shape parameter
-	const double shape2;	// The second shape parameter
+	const SpecialBeta beta;			// Special beta function
+	const double shape1;			// The first shape parameter
+	const double shape2;			// The second shape parameter
+
+// Extract the distribution parameters from empirical observations
+struct Params {
+
+	// Members
+	double shape1;					// The first shape parameter
+	double shape2;					// The second shape parameter
+
+	// Constructor
+	Params (
+		const Observations &data	// Empirical observations
+	){
+		// Extract parameters from the empirical observations
+		const double mean = data.Mean();
+		const double variance = data.Variance();
+
+		// Find the shapes for these parameters
+		const double temp = 1.0 - mean;
+		shape1 = mean * mean * temp / variance - mean;
+		shape2 = mean * temp * temp / variance - temp;
+	}
+};
+
+//============================================================================//
+//      Private methods                                                       //
+//============================================================================//
+private:
+	Beta (
+		const Params &params		// Distribution parameters
+	) : Beta (params.shape1, params.shape2)
+	{}
 
 //============================================================================//
 //      Public methods                                                        //
@@ -33,12 +64,20 @@ public:
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Beta (
-		double shape1,		// The first shape parameter
-		double shape2		// The second shape parameter
+		double shape1,				// The first shape parameter
+		double shape2				// The second shape parameter
 	) : BaseModel (Range (0.0, 1.0)),
 		beta (SpecialBeta (shape1, shape2)),
 		shape1 (shape1),
 		shape2 (shape2)
+	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructor for empirical data                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Beta (
+		const Observations &data	// Empirical observations
+	) : Beta (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -59,7 +98,7 @@ public:
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 
 		// Negative argument
@@ -97,7 +136,7 @@ public:
 //      Cumulative Distribution Function (CDF)                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
-		double x			// Argument value
+		double x					// Argument value
 	) const override {
 		return beta.RegIncompleteBeta (x);
 	}
