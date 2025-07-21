@@ -37,7 +37,7 @@ struct Params {
 			const double variance = data.Variance();
 
 			// Find the degrees of freedom
-			df = round (0.5 * variance);
+			df = max (1.0, round (0.5 * variance));
 		}
 		else
 			throw invalid_argument ("Chi-squared params: The data range is outside the distribution domain");
