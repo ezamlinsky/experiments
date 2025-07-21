@@ -28,11 +28,9 @@ private:
 private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      One-sample Kolmogorov-Smirnov test                                    //
+//      Compute the value of the one-sample Kolmogorov-Smirnov test           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	bool OneSampleTest (
-		double alpha		// Rejection level of the null hypothesis
-	) const {
+	double TestValue (void) const {
 
 		// Get both CDF functions
 		const vector <double> &src = sample -> CDF();
@@ -48,14 +46,25 @@ private:
 
 		// Calculate the criteria function with the correction value
 		const double criteria = sqrt (size) * max_diff;
-		const double corrected = criteria + 1.0 / (6.0 * sqrt (size)) + 0.25 * (criteria - 1.0) / size;
+		return criteria + 1.0 / (6.0 * sqrt (size)) + 0.25 * (criteria - 1.0) / size;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      One-sample Kolmogorov-Smirnov test                                    //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool OneSampleTest (
+		double alpha		// Rejection level of the null hypothesis
+	) const {
+
+		// Compute the value of the one-sample Kolmogorov-Smirnov test
+		const double value = TestValue();
 
 		// Find the quantile of the Kolmogorov distribution
 		const Kolmogorov &dist = Kolmogorov();
 		const double quantile = dist.Quantile (alpha);
 
 		// Check if we can accept the null hypothesis about the distribution type
-		return corrected <= quantile;
+		return value <= quantile;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -191,20 +200,53 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Confidence level of the one-sample Kolmogorov-Smirnov test            //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+// Bigger confidence levels indicate we should accept the null hypothesis
+// about the distribution type
+	double ConfidenceLevel (void) const {
+
+		// Check if the sample and the reference distributions are set
+		if (sample -> Size() && reference -> Size()) {
+
+			// Check the reference type
+			if (reference -> IsTheoretical()) {
+
+				// Compute the value of the one-sample Kolmogorov-Smirnov test
+				const double value = TestValue();
+
+				// Return the confidence level
+				const Kolmogorov &dist = Kolmogorov();
+				return 1.0 - dist.CDF (value);
+			}
+			else
+				throw invalid_argument ("ConfidenceLevel: Can calculate the critical confidence level for a theoretical model only");
+		}
+		else
+			throw invalid_argument ("ConfidenceLevel: Set a sample and a reference for the confidence level");
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Do one-sample and two-sample Kolmogorov-Smirnov tests for two CDFs    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	bool KolmogorovSmirnovTest (
 		double level						// Confidence level
 	) const {
+
+		// Check if the level is correct
 		if (0.0 <= level && level <= 1.0) {
+
+			// Check if the sample and the reference distributions are set
 			if (sample -> Size() && reference -> Size()) {
+
+				// Check the test type
 				if (reference -> IsTheoretical())
 					return OneSampleTest (1.0 - level);
 				else
 					return TwoSampleTest (1.0 - level);
 			}
 			else
-				return false;
+				throw invalid_argument ("KolmogorovSmirnovTest: Set a sample and a reference for the test");
 		}
 		else
 			throw invalid_argument ("KolmogorovSmirnovTest: The confidence level must be in the range [0..1]");
