@@ -31,12 +31,18 @@ struct Params {
 	Params (
 		const Observations &data	// Empirical observations
 	){
-		// Extract parameters from the empirical observations
-		const double skewness = 2.0 / data.SkewnessAroundMean();
+		// Check if empirical data range is inside the model domain
+		if (SpecialGamma::InDomain (data.Domain())) {
 
-		// Find the shape and the scale for these parameters
-		shape = round (skewness * skewness);
-		scale = data.Mean() / shape;
+			// Extract parameters from the empirical observations
+			const double skewness = 2.0 / data.SkewnessAroundMean();
+
+			// Find the shape and the scale for these parameters
+			shape = round (skewness * skewness);
+			scale = data.Mean() / shape;
+		}
+		else
+			throw invalid_argument ("Erlang params: The data range is outside the distribution domain");
 	}
 };
 
@@ -88,28 +94,28 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override {
+	virtual double Mode (void) const override final {
 		return (gamma_shape / 2 - 1) * gamma_scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override {
+	virtual double Mean (void) const override final {
 		return gamma_shape / 2 * gamma_scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override {
+	virtual double Variance (void) const override final {
 		return gamma_shape / 2 * gamma_scale * gamma_scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const {
+	virtual unique_ptr <const BaseModel> clone (void) const override final {
 		return unique_ptr <const BaseModel> (new Erlang (*this));
 	}
 };
