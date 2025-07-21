@@ -18,9 +18,12 @@ class Continuous : public BaseModel
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
+private:
+	static const Range range;	// Function domain where the distribution exists
+
 protected:
-	const double location;	// Location of the distribution
-	const double scale;		// Scale of the distribution
+	const double location;		// Location of the distribution
+	const double scale;			// Scale of the distribution
 
 //============================================================================//
 //      Public methods                                                        //
@@ -31,10 +34,9 @@ public:
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Continuous (
-		double location,	// Location of the distribution
-		double scale		// Scale of the distribution
-	) : BaseModel (Range (-INFINITY, INFINITY)),
-		location (location),
+		double location,		// Location of the distribution
+		double scale			// Scale of the distribution
+	) : location (location),
 		scale (scale)
 	{
 		if (scale <= 0.0)
@@ -54,7 +56,28 @@ public:
 	double Scale (void) const {
 		return scale;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the range is inside the model domain                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	static bool InDomain (
+		const Range &subrange	// Testing range
+	){
+		return range.IsInside (subrange);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Function domain where the distribution exists                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const Range& Domain (void) const override final {
+		return range;
+	}
 };
+
+//****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const Range Continuous::range = Range (-INFINITY, INFINITY);
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
