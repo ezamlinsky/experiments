@@ -30,8 +30,8 @@ class Range
 //      Members                                                               //
 //============================================================================//
 protected:
-	double min;					// Min value of the range
-	double max;					// Max value of the range
+	double min;						// Min value of the range
+	double max;						// Max value of the range
 
 //============================================================================//
 //      Public methods                                                        //
@@ -50,8 +50,8 @@ public:
 //      Trivial constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Range (
-		double min,				// Min value of the range
-		double max				// Max value of the range
+		double min,					// Min value of the range
+		double max					// Max value of the range
 	) : min (min),
 		max (max)
 	{
@@ -107,7 +107,7 @@ public:
 //      Clamp the given value to be within the range [min..max]               //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double Clamp (
-		double value			// The value to fix
+		double value				// The value to fix
 	) const {
 		if (value < min) value = min;
 		if (value > max) value = max;
@@ -115,10 +115,28 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the value is inside the target range                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool IsInside (
+		double value				// The value to check
+	) const {
+		return (min <= value && value <= max);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the passed range is inside the target range                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool IsInside (
+		const Range &source			// Testing range
+	) const {
+		return IsInside (source.min) && IsInside (source.max);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Split the range into subranges (bins)                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Split (
-		size_t bins				// The number of bins to create for the range
+		size_t bins					// The number of bins to create for the range
 	) const {
 		if (bins != 0) {
 			vector <double> result;
