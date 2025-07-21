@@ -10,6 +10,7 @@
 # pragma	once
 # include	"../python_helpers.hpp"
 # include	"../models/range.hpp"
+# include	"../observations/observations.hpp"
 
 //****************************************************************************//
 //      Class "BaseDiscrete"                                                  //
@@ -20,51 +21,24 @@ class BaseDiscrete
 //      Members                                                               //
 //============================================================================//
 protected:
-	Range range;			// Values range
-	vector <double> values;	// Unique values
-	vector <double> pdf;	// Computed values of a PDF function
-	vector <double> cdf;	// Computed values of a CDF function
+	Range range;						// Values range
+	vector <double> values;				// Unique values
+	vector <double> pdf;				// Computed values of a PDF function
+	vector <double> cdf;				// Computed values of a CDF function
 
 //============================================================================//
-//      Public methods                                                        //
+//      Private methods                                                       //
 //============================================================================//
-public:
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Default constructor                                                   //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDiscrete (void) = default;
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Partial constructor                                                   //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDiscrete (
-		const Range &range,				// Values range
-		const vector <double> &values	// Unique values
-	) :	range (range),
-		values (values)
-	{}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor with full initialization                                  //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDiscrete (
-		vector <double> &&data			// Empirical data for the calculation
-	) : range (data)
-	{
-		// Check if the data vector is not empty
-		if (data.empty())
-			throw invalid_argument ("BaseDiscrete: There are no empirical observations to calculate PDF and CDF functions");
-
-		// Sort the sample
-		sort (data.begin(), data.end());
-
+private:
+	void Init (
+		const vector <double> &data		// Empirical data for the calculation
+	){
 		// Calculate empirical discrete PDF and CDF values
 		size_t count = 0;
 		size_t total = 0;
 		double last_val = data [0];
 		double last_cdf = 0.0;
-		size_t size = data.size();
+		const size_t size = data.size();
 		for (size_t i = 0; i < size; i++) {
 
 			// Get the current value to compare with the last one checked
@@ -96,6 +70,59 @@ public:
 		values.push_back (last_val);
 		pdf.push_back (curr_cdf - last_cdf);
 		cdf.push_back (curr_cdf);
+	}
+
+//============================================================================//
+//      Public methods                                                        //
+//============================================================================//
+public:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Default constructor                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	BaseDiscrete (void) = default;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Partial constructor                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	BaseDiscrete (
+		const Range &range,				// Values range
+		const vector <double> &values	// Unique values
+	) :	range (range),
+		values (values)
+	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructors with full initialization                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	BaseDiscrete (
+		const Observations &sample		// Observations of a random value
+	) : range (sample.Domain())
+	{
+		// Extract the ranked dataset
+		const vector <double> &data = sample.Data();
+
+		// Check if the dataset is not empty
+		if (data.empty())
+			throw invalid_argument ("BaseDiscrete: There are no empirical observations to calculate PDF and CDF functions");
+
+		// Calculate empirical discrete PDF and CDF values
+		Init (data);
+	}
+
+	BaseDiscrete (
+		vector <double> &&data			// Empirical data for the calculation
+	) : range (data)
+	{
+		// Check if the dataset is not empty
+		if (data.empty())
+			throw invalid_argument ("BaseDiscrete: There are no empirical observations to calculate PDF and CDF functions");
+
+		// Sort the sample
+		sort (data.begin(), data.end());
+
+		// Calculate empirical discrete PDF and CDF values
+		Init (data);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
