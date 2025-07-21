@@ -35,12 +35,12 @@ struct Params {
 		if (SpecialGamma::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
-			const double skewness = data.SkewnessAroundMean();
+			const double mean = data.Mean();
+			const double variance = data.Variance();
 
 			// Find the shape and the scale for these parameters
-			const double temp = 2.0 / skewness;
-			shape = round (temp * temp);
-			scale = data.Mean() / shape;
+			shape = max (1.0, round (mean * mean / variance));
+			scale = mean / shape;
 		}
 		else
 			throw invalid_argument ("Erlang params: The data range is outside the distribution domain");
