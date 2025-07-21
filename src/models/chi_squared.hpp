@@ -16,6 +16,44 @@
 class ChiSquared final : public SpecialGamma
 {
 //============================================================================//
+//      Members                                                               //
+//============================================================================//
+private:
+
+// Extract the distribution parameters from empirical observations
+struct Params {
+
+	// Members
+	size_t df;						// Degrees of freedom
+
+	// Constructor
+	Params (
+		const Observations &data	// Empirical observations
+	){
+		// Check if empirical data range is inside the model domain
+		if (SpecialGamma::InDomain (data.Domain())) {
+
+			// Extract parameters from the empirical observations
+			const double variance = data.Variance();
+
+			// Find the degrees of freedom
+			df = round (0.5 * variance);
+		}
+		else
+			throw invalid_argument ("Chi-squared params: The data range is outside the distribution domain");
+	}
+};
+
+//============================================================================//
+//      Private methods                                                       //
+//============================================================================//
+private:
+	ChiSquared (
+		const Params &params		// Distribution parameters
+	) : ChiSquared (params.df)
+	{}
+
+//============================================================================//
 //      Public methods                                                        //
 //============================================================================//
 public:
@@ -33,7 +71,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ChiSquared (
 		const Observations &data	// Empirical observations
-	) : ChiSquared (round (0.5 * data.Variance()))
+	) : ChiSquared (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -46,7 +84,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override {
+	virtual double Mode (void) const override final {
 		if (gamma_shape >= 2)
 			return gamma_shape - 2;
 		else
@@ -56,21 +94,21 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override {
+	virtual double Mean (void) const override final {
 		return gamma_shape;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override {
+	virtual double Variance (void) const override final {
 		return 2.0 * gamma_shape;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const {
+	virtual unique_ptr <const BaseModel> clone (void) const override final {
 		return unique_ptr <const BaseModel> (new ChiSquared (*this));
 	}
 };
