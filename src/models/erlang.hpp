@@ -35,10 +35,11 @@ struct Params {
 		if (SpecialGamma::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
-			const double skewness = 2.0 / data.SkewnessAroundMean();
+			const double skewness = data.SkewnessAroundMean();
 
 			// Find the shape and the scale for these parameters
-			shape = round (skewness * skewness);
+			const double temp = 2.0 / skewness;
+			shape = round (temp * temp);
 			scale = data.Mean() / shape;
 		}
 		else

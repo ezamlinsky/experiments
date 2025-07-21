@@ -21,8 +21,41 @@ class Exponential final : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
+	static const Range range;		// Function domain where the distribution exists
 	const double scale;				// Scale of the distribution
 
+// Extract the distribution parameters from empirical observations
+struct Params {
+
+	// Members
+	double scale;					// Scale of the distribution
+
+	// Constructor
+	Params (
+		const Observations &data	// Empirical observations
+	){
+		// Check if empirical data range is inside the model domain
+		if (Exponential::InDomain (data.Domain())) {
+
+			// Extract parameters from the empirical observations
+			const double median = data.Median();
+
+			// Find the scale for these parameters
+			scale = median / log (2);
+		}
+		else
+			throw invalid_argument ("Exponential params: The data range is outside the distribution domain");
+	}
+};
+
+//============================================================================//
+//      Private methods                                                       //
+//============================================================================//
+private:
+	Exponential (
+		const Params &params		// Distribution parameters
+	) : Exponential (params.scale)
+	{}
 
 //============================================================================//
 //      Public methods                                                        //
@@ -34,8 +67,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Exponential (
 		double scale				// Scale of the distribution
-	) : BaseModel (Range (0, INFINITY)),
-		scale (scale)
+	) : scale (scale)
 	{
 		if (scale <= 0.0)
 			throw invalid_argument ("Exponential: The scale value must be positive");
@@ -46,8 +78,17 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Exponential (
 		const Observations &data	// Empirical observations
-	) : Exponential (data.Median() / log (2))
+	) : Exponential (Params (data))
 	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the range is inside the model domain                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	static bool InDomain (
+		const Range &subrange		// Testing range
+	){
+		return range.IsInside (subrange);
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Scale of the distribution                                             //
@@ -77,11 +118,18 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Function domain where the distribution exists                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const Range& Domain (void) const override final {
+		return range;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		const double arg = x / scale;
 		if (arg >= 0.0)
 			return exp (-arg) / scale;
@@ -94,7 +142,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		const double arg = x / scale;
 		if (arg >= 0)
 			return 1.0 - exp (-arg);
@@ -105,31 +153,36 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override {
+	virtual double Mode (void) const override final {
 		return 0.0;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override {
+	virtual double Mean (void) const override final {
 		return scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override {
+	virtual double Variance (void) const override final {
 		return scale * scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const {
+	virtual unique_ptr <const BaseModel> clone (void) const override final {
 		return unique_ptr <const BaseModel> (new Exponential (*this));
 	}
 };
+
+//****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const Range Exponential::range = Range (0.0, INFINITY);
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
