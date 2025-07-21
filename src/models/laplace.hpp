@@ -18,6 +18,43 @@
 class Laplace final : public Continuous
 {
 //============================================================================//
+//      Members                                                               //
+//============================================================================//
+private:
+
+// Extract the distribution parameters from empirical observations
+struct Params {
+
+	// Members
+	double location;				// Location of the distribution
+	double scale;					// Scale of the distribution
+
+	// Constructor
+	Params (
+		const Observations &data	// Empirical observations
+	){
+		// Check if empirical data range is inside the model domain
+		if (Continuous::InDomain (data.Domain())) {
+
+			// Extract parameters from the empirical observations
+			location = data.Median();
+			scale = data.MeanAbsDevFromMedian();
+		}
+		else
+			throw invalid_argument ("Laplace params: The data range is outside the distribution domain");
+	}
+};
+
+//============================================================================//
+//      Private methods                                                       //
+//============================================================================//
+private:
+	Laplace (
+		const Params &params		// Distribution parameters
+	) : Laplace (params.location, params.scale)
+	{}
+
+//============================================================================//
 //      Public methods                                                        //
 //============================================================================//
 public:
@@ -36,7 +73,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Laplace (
 		const Observations &data	// Empirical observations
-	) : Laplace (data.Median(), data.MeanAbsDevFromMedian())
+	) : Laplace (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -71,7 +108,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		const double arg = (x - location) / scale;
 		return 0.5 * exp (-fabs (arg)) / scale;
 	}
@@ -81,7 +118,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		const double arg = (x - location) / scale;
 		if (arg < 0.0)
 			return 0.5 * exp (arg);
@@ -92,28 +129,28 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override {
+	virtual double Mode (void) const override final {
 		return location;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override {
+	virtual double Mean (void) const override final {
 		return location;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override {
+	virtual double Variance (void) const override final {
 		return 2.0 * scale * scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const {
+	virtual unique_ptr <const BaseModel> clone (void) const override final {
 		return unique_ptr <const BaseModel> (new Laplace (*this));
 	}
 };
