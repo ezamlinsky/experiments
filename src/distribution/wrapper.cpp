@@ -117,6 +117,8 @@ void (CDFs::*ReferenceSample2)(const vector <double> &data)	= &CDFs::ReferenceSa
 		.def ("Reference",				&CDFs::Reference,
 			return_value_policy <copy_const_reference> (),
 			"Return reference CDF function")
+		.def ("ConfidenceLevel",		&CDFs::ConfidenceLevel,
+			"Confidence level of the one-sample Kolmogorov-Smirnov test")
 		.def ("KolmogorovSmirnovTest",	&CDFs::KolmogorovSmirnovTest,
 			"Do one-sample and two-sample Kolmogorov-Smirnov tests for two CDFs")
 		.def (self_ns::str (self_ns::self));
