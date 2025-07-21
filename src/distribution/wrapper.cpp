@@ -93,16 +93,25 @@ void (CDFs::*ReferenceSample2)(const vector <double> &data)	= &CDFs::ReferenceSa
 		.def (init <const vector <double>&>
 			(args ("data"),
 			"Calculate CDF for empirical data"))
+		.def (init <const Observations&>
+			(args ("data"),
+			"Calculate CDF for empirical data"))
 		.def (init <const list&, const BaseModel&>
 			(args ("data", "model"),
 			"Calculate CDFs for empirical data and a theoretical model"))
 		.def (init <const vector <double>&, const BaseModel&>
 			(args ("data", "model"),
 			"Calculate CDFs for empirical data and a theoretical model"))
+		.def (init <const Observations&, const BaseModel&>
+			(args ("data", "model"),
+			"Calculate CDFs for empirical data and a theoretical model"))
 		.def (init <const list&, const list&>
 			(args ("sample", "reference"),
 			"Calculate CDFs for empirical data only (a sample and a reference)"))
 		.def (init <const vector <double>&, const vector <double>&>
+			(args ("sample", "reference"),
+			"Calculate CDFs for empirical data only (a sample and a reference)"))
+		.def (init <const Observations&, const Observations&>
 			(args ("sample", "reference"),
 			"Calculate CDFs for empirical data only (a sample and a reference)"))
 		.def ("ReferenceSample",		ReferenceSample1,		args ("data"),
