@@ -19,6 +19,7 @@ class SpecialGamma : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
+	static const Range range;	// Function domain where the distribution exists
 	const double gamma_log;		// Logarithm of the gamma function
 
 protected:
@@ -36,8 +37,7 @@ public:
 	SpecialGamma (
 		size_t shape,			// Shape of the gamma distribution
 		double scale			// Scale of the gamma distribution
-	) : BaseModel (Range (0, INFINITY)),
-		gamma_log (lgamma (0.5 * shape)),
+	) : gamma_log (lgamma (0.5 * shape)),
 		gamma_shape (shape),
 		gamma_scale (scale)
 	{
@@ -45,6 +45,22 @@ public:
 			throw invalid_argument ("SpecialGamma: The shape value must be positive");
 		if (scale <= 0.0)
 			throw invalid_argument ("SpecialGamma: The scale value must be positive");
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the range is inside the model domain                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	static bool InDomain (
+		const Range &subrange	// Testing range
+	){
+		return range.IsInside (subrange);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Function domain where the distribution exists                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const Range& Domain (void) const override final {
+		return range;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -122,6 +138,11 @@ public:
 		}
 	}
 };
+
+//****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const Range SpecialGamma::range = Range (0.0, INFINITY);
 /*
 ################################################################################
 #                                 END OF FILE                                  #
