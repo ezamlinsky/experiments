@@ -115,6 +115,12 @@ public:
 //      Constructors for empirical data                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	CDFs (
+		const Observations &sample			// Observations of a random value
+	) : sample (new CDFValues (sample)),
+		reference (new CDFValues())
+	{}
+
+	CDFs (
 		const vector <double> &data			// Empirical data
 	) : sample (new CDFValues (data)),
 		reference (new CDFValues())
@@ -128,6 +134,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors for empirical data and a theoretical model               //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	CDFs (
+		const Observations &sample,			// Observations of a random value
+		const BaseModel &model				// Theoretical model of the CDF
+	) : CDFs (sample)
+	{
+		ReferenceModel (model);
+	}
+
 	CDFs (
 		const vector <double> &data,		// Empirical data
 		const BaseModel &model				// Theoretical model of the CDF
@@ -146,12 +160,18 @@ public:
 //      Constructors for empirical data only (a sample and a reference)       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	CDFs (
+		const Observations &sample,			// Sample observations
+		const Observations &reference		// Reference observations
+	) : sample (new CDFValues (sample)),
+		reference (new CDFValues (reference))
+	{}
+
+	CDFs (
 		const vector <double> &sample,		// Empirical sample data
 		const vector <double> &reference	// Empirical reference data
-	) : CDFs (sample)
-	{
-		ReferenceSample (reference);
-	}
+	) : sample (new CDFValues (sample)),
+		reference (new CDFValues (reference))
+	{}
 
 	CDFs (
 		const list &sample,					// Empirical sample data
