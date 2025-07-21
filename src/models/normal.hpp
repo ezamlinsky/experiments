@@ -25,6 +25,38 @@ private:
 	static const double sqrt_2;		// Square root of 2
 	static const double sqrt_pi;	// Square root of PI
 
+// Extract the distribution parameters from empirical observations
+struct Params {
+
+	// Members
+	double location;				// Location of the distribution
+	double scale;					// Scale of the distribution
+
+	// Constructor
+	Params (
+		const Observations &data	// Empirical observations
+	){
+		// Check if empirical data range is inside the model domain
+		if (Continuous::InDomain (data.Domain())) {
+
+			// Extract parameters from the empirical observations
+			location = data.Median();
+			scale = data.StdDev();
+		}
+		else
+			throw invalid_argument ("Normal params: The data range is outside the distribution domain");
+	}
+};
+
+//============================================================================//
+//      Private methods                                                       //
+//============================================================================//
+private:
+	Normal (
+		const Params &params		// Distribution parameters
+	) : Normal (params.location, params.scale)
+	{}
+
 //============================================================================//
 //      Public methods                                                        //
 //============================================================================//
@@ -44,7 +76,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Normal (
 		const Observations &data	// Empirical observations
-	) : Normal (data.Median(), data.StdDev())
+	) : Normal (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -91,7 +123,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		const double arg = (x - location) / scale;
 		return exp (-0.5 * arg * arg) / (scale * sqrt_2 * sqrt_pi);
 	}
@@ -101,7 +133,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		const double arg = (x - location) / scale;
 		return 0.5 * (1.0 + erf (arg / sqrt_2));
 	}
@@ -109,28 +141,28 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override {
+	virtual double Mode (void) const override final {
 		return location;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override {
+	virtual double Mean (void) const override final {
 		return location;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override {
+	virtual double Variance (void) const override final {
 		return scale * scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const {
+	virtual unique_ptr <const BaseModel> clone (void) const override final {
 		return unique_ptr <const BaseModel> (new Normal (*this));
 	}
 };
