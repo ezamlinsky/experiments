@@ -20,6 +20,7 @@ class F final : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
+	static const Range range;		// Function domain where the distribution exists
 	const SpecialBeta beta;			// Special beta function
 	const size_t df1;				// The first degrees of freedom
 	const size_t df2;				// The second degrees of freedom
@@ -35,8 +36,7 @@ public:
 	F (
 		size_t df1,					// The first degrees of freedom
 		size_t df2					// The second degrees of freedom
-	) : BaseModel (Range (0, INFINITY)),
-		beta (SpecialBeta (0.5 * df1, 0.5 * df2)),
+	) : beta (SpecialBeta (0.5 * df1, 0.5 * df2)),
 		df1 (df1),
 		df2 (df2)
 	{}
@@ -56,11 +56,18 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Function domain where the distribution exists                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const Range& Domain (void) const override final {
+		return range;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 
 		// Negative argument
 		if (x < 0.0)
@@ -94,7 +101,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		const double arg = (df1 * x) / (df1 * x + df2);
 		return beta.RegIncompleteBeta (arg);
 	}
@@ -102,7 +109,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override {
+	virtual double Mode (void) const override final {
 		if (df1 > 2) {
 			const double temp1 = df2 * (df1 - 2);
 			const double temp2 = df1 * (df2 + 2);
@@ -115,7 +122,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override {
+	virtual double Mean (void) const override final {
 		if (df2 > 2)
 			return df2 / (df2 - 2.0);
 		else
@@ -125,7 +132,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override {
+	virtual double Variance (void) const override final {
 		if (df2 > 4) {
 			const double temp = df2 - 2.0;
 			const double p = 2.0 * df2 * df2 * (df1 + temp);
@@ -139,10 +146,15 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const {
+	virtual unique_ptr <const BaseModel> clone (void) const override final {
 		return unique_ptr <const BaseModel> (new F (*this));
 	}
 };
+
+//****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const Range F::range = Range (0.0, INFINITY);
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
