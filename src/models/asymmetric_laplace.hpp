@@ -33,42 +33,48 @@ struct Params {
 	Params (
 		const Observations &data	// Empirical observations
 	){
-		// Extract parameters from the empirical observations
-		const double mean = data.Mean();
-		const double variance = data.Variance();
-		const double skewness = data.SkewnessAroundMean();
+		// Check if empirical data range is inside the model domain
+		if (Continuous::InDomain (data.Domain())) {
 
-		// The first approximation is the standard coefficient of asymmetry
-		asymmetry = 1.0;
-		for (int i = 0; i < 8; i++) {
+			// Extract parameters from the empirical observations
+			const double mean = data.Mean();
+			const double variance = data.Variance();
+			const double skewness = data.SkewnessAroundMean();
 
-			// Temporary variables for effective computation
-			const double pow2 = asymmetry * asymmetry;
-			const double pow3 = pow2 * asymmetry;
-			const double pow4 = pow2 * pow2;
-			const double temp1 = 1.0 + pow4;
+			// The first approximation is the standard coefficient of asymmetry
+			asymmetry = 1.0;
+			for (int i = 0; i < 8; i++) {
+
+				// Temporary variables for effective computation
+				const double pow2 = asymmetry * asymmetry;
+				const double pow3 = pow2 * asymmetry;
+				const double pow4 = pow2 * pow2;
+				const double temp1 = 1.0 + pow4;
+				const double temp2 = temp1 * temp1;
+				const double temp3 = sqrt (temp1);
+
+				// Calculate the function and its derivative
+				const double func = 2.0 * (1.0 - pow3) * (1.0 + pow3) / (temp1 * temp3);
+				const double der = -12.0 * pow3 * (1.0 + pow2) / (temp2 * temp3);
+
+				// Check the distance between the function and the target value
+				const double diff = func - skewness;
+
+				// Calculate a step value to move for the next point
+				double step = diff / der;
+
+				// A new approximation
+				asymmetry -= step;
+			}
+
+			// Compute location and scale of the distribution
+			const double temp1 = asymmetry * asymmetry;
 			const double temp2 = temp1 * temp1;
-			const double temp3 = sqrt (temp1);
-
-			// Calculate the function and its derivative
-			const double func = 2.0 * (1.0 - pow3) * (1.0 + pow3) / (temp1 * temp3);
-			const double der = -12.0 * pow3 * (1.0 + pow2) / (temp2 * temp3);
-
-			// Check the distance between the function and the target value
-			const double diff = func - skewness;
-
-			// Calculate a step value to move for the next point
-			double step = diff / der;
-
-			// A new approximation
-			asymmetry -= step;
+			scale = sqrt ((variance * temp1) / (1.0 + temp2));
+			location = mean - (1.0 - temp1) * scale / asymmetry;
 		}
-
-		// Compute location and scale of the distribution
-		const double temp1 = asymmetry * asymmetry;
-		const double temp2 = temp1 * temp1;
-		scale = sqrt ((variance * temp1) / (1.0 + temp2));
-		location = mean - (1.0 - temp1) * scale / asymmetry;
+		else
+			throw invalid_argument ("Asymmetric Laplace params: The data range is outside the distribution domain");
 	}
 };
 
@@ -120,7 +126,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		const double arg = (x - location) / scale;
 		const double temp = asymmetry * asymmetry;
 		const double coeff = asymmetry / (1.0 + temp);
@@ -135,7 +141,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		const double arg = (x - location) / scale;
 		const double temp = asymmetry * asymmetry;
 		if (x < location) {
@@ -151,14 +157,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override {
+	virtual double Mode (void) const override final {
 		return location;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override {
+	virtual double Mean (void) const override final {
 		const double temp = asymmetry * asymmetry;
 		return location + (1.0 - temp) / asymmetry * scale;
 	}
@@ -166,7 +172,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override {
+	virtual double Variance (void) const override final {
 		const double temp = asymmetry * asymmetry;
 		const double sqr = temp * temp;
 		const double coeff = scale * scale;
@@ -176,7 +182,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const {
+	virtual unique_ptr <const BaseModel> clone (void) const override final {
 		return unique_ptr <const BaseModel> (new AsymmetricLaplace (*this));
 	}
 };
