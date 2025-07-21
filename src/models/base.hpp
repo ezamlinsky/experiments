@@ -26,12 +26,6 @@
 class BaseModel
 {
 //============================================================================//
-//      Members                                                               //
-//============================================================================//
-private:
-	const Range range;		// Function domain where the distribution exists
-
-//============================================================================//
 //      Public methods                                                        //
 //============================================================================//
 public:
@@ -39,10 +33,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseModel (
-		const Range &range	// Function domain where the distribution exists
-	) : range (range)
-	{}
+	BaseModel (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Destructor                                                            //
@@ -50,17 +41,10 @@ public:
 	virtual ~BaseModel (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Function domain where the distribution exists                         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const Range& Domain (void) const {
-		return range;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Generate random values from the distribution                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Generate (
-		size_t count		// Size of the sample to generate
+		size_t count			// Size of the sample to generate
 	){
 		// The accumulator for random values
 		vector <double> result;
@@ -88,11 +72,14 @@ public:
 //      Quantile value for the target level                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double Quantile (
-		double level		// Quantile level to estimate
+		double level			// Quantile level to estimate
 	) const {
 
 		// Check if the level is correct
 		if (0.0 <= level and level <= 1.0) {
+
+			// Get the distribution domain to clamp the argument value
+			const Range &range = Domain();
 
 			// The first approximation is the mode value (if it exists),
 			// then the mean value
@@ -189,13 +176,6 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Mode of the distribution                                              //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const {
-		return NAN;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Standard deviation of the distribution                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double StdDev (void) const {
@@ -212,8 +192,10 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const Range& Domain (void) const = 0;
 	virtual double PDF (double x) const = 0;
 	virtual double CDF (double x) const = 0;
+	virtual double Mode (void) const = 0;
 	virtual double Mean (void) const = 0;
 	virtual double Variance (void) const = 0;
 	virtual unique_ptr <const BaseModel> clone (void) const = 0;
