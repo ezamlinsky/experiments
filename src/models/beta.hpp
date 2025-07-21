@@ -20,6 +20,7 @@ class Beta final : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
+	static const Range range;		// Function domain where the distribution exists
 	const SpecialBeta beta;			// Special beta function
 	const double shape1;			// The first shape parameter
 	const double shape2;			// The second shape parameter
@@ -35,14 +36,20 @@ struct Params {
 	Params (
 		const Observations &data	// Empirical observations
 	){
-		// Extract parameters from the empirical observations
-		const double mean = data.Mean();
-		const double variance = data.Variance();
+		// Check if empirical data range is inside the model domain
+		if (Beta::InDomain (data.Domain())) {
 
-		// Find the shapes for these parameters
-		const double temp = 1.0 - mean;
-		shape1 = mean * mean * temp / variance - mean;
-		shape2 = mean * temp * temp / variance - temp;
+			// Extract parameters from the empirical observations
+			const double mean = data.Mean();
+			const double variance = data.Variance();
+
+			// Find the shapes for these parameters
+			const double temp = 1.0 - mean;
+			shape1 = mean * mean * temp / variance - mean;
+			shape2 = mean * temp * temp / variance - temp;
+		}
+		else
+			throw invalid_argument ("Beta params: The data range is outside the distribution domain");
 	}
 };
 
@@ -66,8 +73,7 @@ public:
 	Beta (
 		double shape1,				// The first shape parameter
 		double shape2				// The second shape parameter
-	) : BaseModel (Range (0.0, 1.0)),
-		beta (SpecialBeta (shape1, shape2)),
+	) : beta (SpecialBeta (shape1, shape2)),
 		shape1 (shape1),
 		shape2 (shape2)
 	{}
@@ -79,6 +85,15 @@ public:
 		const Observations &data	// Empirical observations
 	) : Beta (Params (data))
 	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the range is inside the model domain                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	static bool InDomain (
+		const Range &subrange	// Testing range
+	){
+		return range.IsInside (subrange);
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      The first shape parameter of the distribution                         //
@@ -95,11 +110,18 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Function domain where the distribution exists                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const Range& Domain (void) const override final {
+		return range;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 
 		// Negative argument
 		if (x < 0.0)
@@ -137,14 +159,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
 		double x					// Argument value
-	) const override {
+	) const override final {
 		return beta.RegIncompleteBeta (x);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override {
+	virtual double Mode (void) const override final {
 		if (shape1 < 1.0 && shape2 < 1.0)
 			return NAN;
 		else if (shape1 > 1.0 && shape2 > 1.0) {
@@ -163,14 +185,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override {
+	virtual double Mean (void) const override final {
 		return shape1 / (shape1 + shape2);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override {
+	virtual double Variance (void) const override final {
 		const double temp = shape1 + shape2;
 		return shape1 * shape2 / (temp * temp * (temp + 1.0));
 	}
@@ -178,10 +200,15 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const {
+	virtual unique_ptr <const BaseModel> clone (void) const override final {
 		return unique_ptr <const BaseModel> (new Beta (*this));
 	}
 };
+
+//****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const Range Beta::range = Range (0.0, 1.0);
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
