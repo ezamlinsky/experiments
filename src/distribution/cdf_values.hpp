@@ -36,8 +36,14 @@ public:
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor for empirical data                                        //
+//      Constructors for empirical data                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	CDFValues (
+		const Observations &sample		// Observations of a random value
+	) : BaseDiscrete (sample),
+		theoretical (false)
+	{}
+
 	CDFValues (
 		const vector <double> &data		// Empirical dataset
 	) : BaseDiscrete (move (vector <double> (data))),
