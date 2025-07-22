@@ -8,9 +8,9 @@
 ################################################################################
 */
 # pragma	once
-# include	"../models/range.hpp"
 # include	"../templates/array.hpp"
 # include	"../templates/statistics.hpp"
+# include   "../models/range.hpp"
 
 //****************************************************************************//
 //      Class "Observations"                                                  //
