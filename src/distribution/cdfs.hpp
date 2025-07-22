@@ -7,6 +7,7 @@
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
+# pragma	once
 # include	<cmath>
 # include	"cdf_values.hpp"
 
