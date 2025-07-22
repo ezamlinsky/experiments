@@ -60,30 +60,6 @@ public:
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Find a value for the CDF function for an arbitrary Х                  //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double GetCDF (
-		double x						// Argument value
-	) const {
-
-		// The argument is less than the minimum value
-		if (x < values[0])
-			return 0.0;
-
-		// Binary search for the greater value: v[i] <= x
-		size_t left = 0;
-		size_t right = values.size();
-		while (left < right) {
-			const size_t mid = (left + right) / 2;
-			if (values [mid] <= x)
-				left = mid + 1;
-			else
-				right = mid;
-		}
-		return cdf [left - 1];
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Indicate that the CDF function has been calculated theoretically      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	bool IsTheoretical (void) const {

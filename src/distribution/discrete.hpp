@@ -105,7 +105,7 @@ public:
 //      Constructors for empirical data                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	DiscreteDistribution (
-		const Observations &sample		/// Empirical dataset
+		const Observations &sample		// Empirical dataset
 	) : range (sample.Domain())
 	{
 		// Extract the ranked dataset
@@ -182,6 +182,30 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	const vector <double>& CDF (void) const {
 		return cdf;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Find a value of the PDF function for an arbitrary Х                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double GetPDF (
+		double x						// Argument value
+	) const {
+
+		 // Find the greatest element that is still less than the target value
+		const size_t index = Array::BinSearchLess (values.data(), values.size(), x);
+		return index != static_cast <size_t> (-1) ? pdf [index] : 0.0;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Find a value of the CDF function for an arbitrary Х                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double GetCDF (
+		double x						// Argument value
+	) const {
+
+		 // Find the greatest element that is still less than the target value
+		const size_t index = Array::BinSearchLess (values.data(), values.size(), x);
+		return index != static_cast <size_t> (-1) ? cdf [index] : 0.0;
 	}
 };
 
