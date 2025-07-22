@@ -8,12 +8,12 @@
 ################################################################################
 */
 # pragma	once
-# include	"base_discrete.hpp"
+# include	"base.hpp"
 
 //****************************************************************************//
 //      Class "DiscreteDistribution"                                          //
 //****************************************************************************//
-class DiscreteDistribution : public BaseDiscrete
+class DiscreteDistribution : public BaseDistribution
 {
 //============================================================================//
 //      Public methods                                                        //
@@ -30,7 +30,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	DiscreteDistribution (
 		const vector <double> &data		// Empirical dataset
-	) :	BaseDiscrete (move (vector <double> (data)))
+	) :	BaseDistribution (move (vector <double> (data)))
 	{}
 
 	DiscreteDistribution (

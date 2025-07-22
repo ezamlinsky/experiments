@@ -8,14 +8,14 @@
 ################################################################################
 */
 # pragma	once
-# include	"base_discrete.hpp"
+# include	"base.hpp"
 # include	"../models/base.hpp"
 # include	"../models/kolmogorov.hpp"
 
 //****************************************************************************//
 //      Class "CDFValues"                                                     //
 //****************************************************************************//
-class CDFValues : public BaseDiscrete
+class CDFValues : public BaseDistribution
 {
 //============================================================================//
 //      Members                                                               //
@@ -40,13 +40,13 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	CDFValues (
 		const Observations &sample		// Observations of a random value
-	) : BaseDiscrete (sample),
+	) : BaseDistribution (sample),
 		theoretical (false)
 	{}
 
 	CDFValues (
 		const vector <double> &data		// Empirical dataset
-	) : BaseDiscrete (move (vector <double> (data))),
+	) : BaseDistribution (move (vector <double> (data))),
 		theoretical (false)
 	{}
 
@@ -57,7 +57,7 @@ public:
 		const Range &range,				// Values range
 		const vector <double> &values,	// Unique values
 		const BaseModel &model			// Theoretical model of the CDF
-	) :	BaseDiscrete (range, values),
+	) :	BaseDistribution (range, values),
 		theoretical (true)
 	{
 		// Fill the theoretical CDF table

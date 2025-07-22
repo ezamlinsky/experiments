@@ -8,7 +8,7 @@
 ################################################################################
 */
 # pragma	once
-# include	"base_discrete.hpp"
+# include	"base.hpp"
 # include	"../filters/smooth.hpp"
 
 //****************************************************************************//
@@ -47,7 +47,7 @@ public:
 		values = range.Split (bins);
 
 		// Compute raw CDF
-		BaseDiscrete cdf_data (move (vector <double> (data)));
+		BaseDistribution cdf_data (move (vector <double> (data)));
 		const vector <double> &raw_values = cdf_data.Values();
 		const vector <double> &raw_cdf = cdf_data.CDF();
 
