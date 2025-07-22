@@ -13,9 +13,9 @@
 # include	"../observations/observations.hpp"
 
 //****************************************************************************//
-//      Class "BaseDiscrete"                                                  //
+//      Class "BaseDistribution"                                              //
 //****************************************************************************//
-class BaseDiscrete
+class BaseDistribution
 {
 //============================================================================//
 //      Members                                                               //
@@ -80,12 +80,12 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Default constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDiscrete (void) = default;
+	BaseDistribution (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Partial constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDiscrete (
+	BaseDistribution (
 		const Range &range,				// Values range
 		const vector <double> &values	// Unique values
 	) :	range (range),
@@ -95,7 +95,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors with full initialization                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDiscrete (
+	BaseDistribution (
 		const Observations &sample		// Observations of a random value
 	) : range (sample.Domain())
 	{
@@ -110,7 +110,7 @@ public:
 		Init (data);
 	}
 
-	BaseDiscrete (
+	BaseDistribution (
 		vector <double> &&data			// Empirical data for the calculation
 	) : range (data)
 	{
@@ -128,7 +128,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Destructor                                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual ~BaseDiscrete (void) = default;
+	virtual ~BaseDistribution (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Domain of the CDF                                                     //
