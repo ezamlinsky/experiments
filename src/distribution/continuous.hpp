@@ -47,7 +47,7 @@ public:
 		values = range.Split (bins);
 
 		// Compute raw CDF
-		DiscreteDistribution cdf_data (move (vector <double> (data)));
+		DiscreteDistribution cdf_data (data);
 		const vector <double> &raw_values = cdf_data.Values();
 		const vector <double> &raw_cdf = cdf_data.CDF();
 
