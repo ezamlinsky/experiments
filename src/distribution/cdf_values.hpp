@@ -8,14 +8,13 @@
 ################################################################################
 */
 # pragma	once
-# include	"base.hpp"
-# include	"../models/base.hpp"
+# include	"discrete.hpp"
 # include	"../models/kolmogorov.hpp"
 
 //****************************************************************************//
 //      Class "CDFValues"                                                     //
 //****************************************************************************//
-class CDFValues : public BaseDistribution
+class CDFValues : public DiscreteDistribution
 {
 //============================================================================//
 //      Members                                                               //
@@ -36,34 +35,29 @@ public:
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructor for a theoretical model                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	CDFValues (
+		const vector <double> &values,	// Unique values
+		const BaseModel &model			// Theoretical model of the CDF
+	) :	DiscreteDistribution (values, model),
+		theoretical (true)
+	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors for empirical data                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	CDFValues (
 		const Observations &sample		// Observations of a random value
-	) : BaseDistribution (sample),
+	) : DiscreteDistribution (sample),
 		theoretical (false)
 	{}
 
 	CDFValues (
 		const vector <double> &data		// Empirical dataset
-	) : BaseDistribution (move (vector <double> (data))),
+	) : DiscreteDistribution (vector <double> (data)),
 		theoretical (false)
 	{}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor for a theoretical model                                   //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	CDFValues (
-		const Range &range,				// Values range
-		const vector <double> &values,	// Unique values
-		const BaseModel &model			// Theoretical model of the CDF
-	) :	BaseDistribution (range, values),
-		theoretical (true)
-	{
-		// Fill the theoretical CDF table
-		for (const auto x : values)
-			cdf.push_back (model.CDF (x));
-	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Find a value for the CDF function for an arbitrary Х                  //

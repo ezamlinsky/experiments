@@ -201,9 +201,8 @@ public:
 	void ReferenceModel (
 		const BaseModel &model				// Theoretical model of the CDF
 	){
-		const Range& range = sample -> Domain();
 		const vector <double> &values = sample -> Values();
-		reference = shared_ptr <const CDFValues> (new CDFValues (range, values, model));
+		reference = shared_ptr <const CDFValues> (new CDFValues (values, model));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
