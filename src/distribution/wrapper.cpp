@@ -12,8 +12,8 @@
 # include	"bins.hpp"
 # include	"cdf_values.hpp"
 # include	"cdfs.hpp"
-# include	"discrete_distribution.hpp"
-# include	"continuous_distribution.hpp"
+# include	"discrete.hpp"
+# include	"continuous.hpp"
 # include	"distributions.hpp"
 # include	"kolmogorov_score.hpp"
 
@@ -155,9 +155,12 @@ void (CDFs::*ReferenceSample2)(const vector <double> &data)	= &CDFs::ReferenceSa
 		init <> ())
 		.def (init <const list&> (args ("data"),
 			"Calculate a distribution for empirical data"))
-		.def (init <const vector <double>&>
-			(args ("data"),
+		.def (init <const vector <double>&> (args ("data"),
 			"Calculate a distribution for empirical data"))
+		.def ("GetPDF",	&DiscreteDistribution::GetPDF, args ("x"),
+			"Find a value of the PDF function for an arbitrary Х")
+		.def ("GetCDF",	&DiscreteDistribution::GetCDF, args ("x"),
+			"Find a value of the CDF function for an arbitrary Х")
 		DISTRIBUTIONS_COMMON (DiscreteDistribution)
 
 //============================================================================//
