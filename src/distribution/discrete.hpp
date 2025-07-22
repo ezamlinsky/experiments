@@ -2,20 +2,20 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#          BASE CLASS TO CALCULATE THE DISCRETE PDF AND CDF FUNCTIONS          #
+#        CALCULATE PDF AND CDF FOR A DISCRETE PROBABILITY DISTRIBUTION         #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
 # pragma	once
 # include	"../python_helpers.hpp"
-# include	"../models/range.hpp"
+# include	"../models/base.hpp"
 # include	"../observations/observations.hpp"
 
 //****************************************************************************//
-//      Class "BaseDistribution"                                              //
+//      Class "DiscreteDistribution"                                          //
 //****************************************************************************//
-class BaseDistribution
+class DiscreteDistribution
 {
 //============================================================================//
 //      Members                                                               //
@@ -80,23 +80,32 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Default constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDistribution (void) = default;
+	DiscreteDistribution (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Partial constructor                                                   //
+//      Constructor for a theoretical model                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDistribution (
-		const Range &range,				// Values range
-		const vector <double> &values	// Unique values
-	) :	range (range),
+	DiscreteDistribution (
+		const vector <double> &values,	// Unique values
+		const BaseModel &model			// Theoretical model
+	) :	range (values),
 		values (values)
-	{}
+	{
+		// Fill the theoretical CDF table
+		double last_cdf = model.CDF (range.Min());
+		for (const auto x : values) {
+			const double cur_cdf = model.CDF (x);
+			pdf.push_back (cur_cdf - last_cdf);
+			cdf.push_back (cur_cdf);
+			last_cdf = cur_cdf;
+		}
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructors with full initialization                                 //
+//      Constructors for empirical data                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDistribution (
-		const Observations &sample		// Observations of a random value
+	DiscreteDistribution (
+		const Observations &sample		/// Empirical dataset
 	) : range (sample.Domain())
 	{
 		// Extract the ranked dataset
@@ -110,8 +119,8 @@ public:
 		Init (data);
 	}
 
-	BaseDistribution (
-		vector <double> &&data			// Empirical data for the calculation
+	DiscreteDistribution (
+		vector <double> &&data			// Empirical dataset
 	) : range (data)
 	{
 		// Check if the dataset is not empty
@@ -125,10 +134,20 @@ public:
 		Init (data);
 	}
 
+	DiscreteDistribution (
+		const vector <double> &data		// Empirical dataset
+	) :	DiscreteDistribution (vector <double> (data))
+	{}
+
+	DiscreteDistribution (
+		const list &py_list				// Empirical dataset
+	) : DiscreteDistribution (to_vector (py_list))
+	{}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Destructor                                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual ~BaseDistribution (void) = default;
+	virtual ~DiscreteDistribution (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Domain of the CDF                                                     //
@@ -165,6 +184,21 @@ public:
 		return cdf;
 	}
 };
+
+//****************************************************************************//
+//      Translate the object to a string                                      //
+//****************************************************************************//
+ostream& operator << (ostream &stream, const DiscreteDistribution &object)
+{
+	auto restore = stream.precision();
+	stream.precision (PRECISION);
+	stream << "\nDISCRETE DISTRIBUTION:" << endl;
+	stream << "======================" << endl;
+	stream << "Bins\t\t\t\t\t= " << object.Size() << endl;
+	stream << object.Domain();
+	stream.precision (restore);
+	return stream;
+}
 /*
 ################################################################################
 #                                 END OF FILE                                  #
