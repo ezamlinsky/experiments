@@ -8,12 +8,14 @@
 ################################################################################
 */
 # include	<boost/python.hpp>
+# include	<boost/python/suite/indexing/vector_indexing_suite.hpp>
 # include	"bins.hpp"
 # include	"cdf_values.hpp"
 # include	"cdfs.hpp"
 # include	"discrete_distribution.hpp"
 # include	"continuous_distribution.hpp"
 # include	"distributions.hpp"
+# include	"kolmogorov_score.hpp"
 
 //****************************************************************************//
 //      Common methods for discrete and continuous distributions class        //
@@ -42,6 +44,19 @@ BOOST_PYTHON_MODULE (distribution) {
 
 	// Use shortenings
 	using namespace boost::python;
+
+//============================================================================//
+//      Expose "ModelScore" to Python                                         //
+//============================================================================//
+	class_ <ModelTest> ("ModelScore")
+		.def_readwrite ("first", &ModelTest::first)
+		.def_readwrite ("second", &ModelTest::second);
+
+//============================================================================//
+//      Expose vector <ModelTest> to Python                                   //
+//============================================================================//
+	class_ <vector <ModelTest> > ("ScoreVector")
+		.def (vector_indexing_suite <vector <ModelTest> > ());
 
 //============================================================================//
 //      Expose Bins class to Python                                           //
@@ -201,6 +216,18 @@ void (CDFs::*ReferenceSample2)(const vector <double> &data)	= &CDFs::ReferenceSa
 		.def ("Get",			&Distributions::Get,	args("index"),
 			return_value_policy <copy_const_reference> (),
 			"Get a continuous distribution by its index in the set")
+		.def (self_ns::str (self_ns::self));
+
+//============================================================================//
+//      Expose "KolmogorovScore" class to Python                              //
+//============================================================================//
+	class_ <KolmogorovScore> ("KolmogorovScore",
+		"Rank results of one-sample kolmogorov-smirnov tests",
+		init <const Observations&> (args ("data"),
+			"Test different theoretical distribution models for the empirical observations to find the best one fit"))
+		.def ("ScoreTable",	&KolmogorovScore::ScoreTable,
+			return_internal_reference <> (),
+			"Score table (confidence level) for different models")
 		.def (self_ns::str (self_ns::self));
 }
 /*
