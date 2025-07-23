@@ -91,6 +91,9 @@ BOOST_PYTHON_MODULE (distribution) {
 		.def ("Values",	&CDFValues::Values,
 			return_internal_reference <> (),
 			"Unique values in the dataset")
+		.def ("PDF",	&CDFValues::PDF,
+			return_internal_reference <> (),
+			"Values of the PDF function for the dataset")
 		.def ("CDF",	&CDFValues::CDF,
 			return_internal_reference <> (),
 			"Values of the CDF function for the dataset")
