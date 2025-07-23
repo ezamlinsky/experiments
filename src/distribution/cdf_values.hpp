@@ -9,7 +9,7 @@
 */
 # pragma	once
 # include	"discrete.hpp"
-# include	"../models/kolmogorov.hpp"
+# include	"../models/continuous/kolmogorov.hpp"
 
 //****************************************************************************//
 //      Class "CDFValues"                                                     //

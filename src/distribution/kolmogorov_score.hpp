@@ -10,13 +10,13 @@
 # pragma	once
 # include	<string>
 # include	"cdfs.hpp"
-# include	"../models/beta.hpp"
-# include	"../models/exponential.hpp"
-# include	"../models/erlang.hpp"
-# include	"../models/chi_squared.hpp"
-# include	"../models/normal.hpp"
-# include	"../models/laplace.hpp"
-# include	"../models/asymmetric_laplace.hpp"
+# include	"../models/continuous/beta.hpp"
+# include	"../models/continuous/exponential.hpp"
+# include	"../models/continuous/erlang.hpp"
+# include	"../models/continuous/chi_squared.hpp"
+# include	"../models/continuous/normal.hpp"
+# include	"../models/continuous/laplace.hpp"
+# include	"../models/continuous/asymmetric_laplace.hpp"
 
 //****************************************************************************//
 //      Run a test for a distribution model                                   //
