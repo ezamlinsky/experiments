@@ -10,16 +10,17 @@
 # include	<boost/python.hpp>
 # include	<boost/python/suite/indexing/vector_indexing_suite.hpp>
 # include	"confidence_interval.hpp"
-# include	"kolmogorov.hpp"
-# include	"standard_t.hpp"
-# include	"fisher_snedecor.hpp"
-# include	"beta.hpp"
-# include	"erlang.hpp"
-# include	"chi_squared.hpp"
-# include	"exponential.hpp"
-# include	"normal.hpp"
-# include	"laplace.hpp"
-# include	"asymmetric_laplace.hpp"
+# include	"discrete/uniform.hpp"
+# include	"continuous/kolmogorov.hpp"
+# include	"continuous/standard_t.hpp"
+# include	"continuous/fisher_snedecor.hpp"
+# include	"continuous/beta.hpp"
+# include	"continuous/erlang.hpp"
+# include	"continuous/chi_squared.hpp"
+# include	"continuous/exponential.hpp"
+# include	"continuous/normal.hpp"
+# include	"continuous/laplace.hpp"
+# include	"continuous/asymmetric_laplace.hpp"
 
 //****************************************************************************//
 //      Methods are inherited from the base distribution class                //
@@ -131,7 +132,27 @@ BOOST_PYTHON_MODULE (models) {
 			"Relative error of the value");
 
 //============================================================================//
-//      Non-parameterized distributions                                       //
+//      Discrete distributions                                                //
+//============================================================================//
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "DiscreteUniform" class to Python                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <DiscreteUniform> ("DiscreteUniform",
+		"Model for a Discrete Uniform distribution",
+		init <int64_t, int64_t> (args ("min", "max"),
+			"Create a new Discrete Uniform distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Discrete Uniform distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS(DiscreteUniform)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (DiscreteUniform);
+
+//============================================================================//
+//      Continuous distributions                                              //
 //============================================================================//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -146,10 +167,6 @@ BOOST_PYTHON_MODULE (models) {
 
 		// Properties
 		BASE_CLASS_PROPERTIES(Kolmogorov);
-
-//============================================================================//
-//      Beta related distributions                                            //
-//============================================================================//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "StandardT" class to Python                                    //
@@ -205,10 +222,6 @@ BOOST_PYTHON_MODULE (models) {
 		.add_property ("Shape2",	&Beta::Shape2,
 			"The second shape parameter of the distribution");
 
-//============================================================================//
-//      Gamma related distributions                                           //
-//============================================================================//
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Erlang" class to Python                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -246,10 +259,6 @@ BOOST_PYTHON_MODULE (models) {
 		BASE_CLASS_PROPERTIES(ChiSquared)
 		.add_property ("DF",	&ChiSquared::DF,
 			"Degrees of freedom of the distribution");
-
-//============================================================================//
-//      Continuous distributions                                              //
-//============================================================================//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Exponential" class to Python                                  //
