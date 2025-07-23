@@ -11,8 +11,6 @@
 # include	<cstdint>
 # include	"discrete.hpp"
 
-Distribution model for discrete uniform distribution
-
 //****************************************************************************//
 //      Class "DiscreteUniform"                                               //
 //****************************************************************************//
