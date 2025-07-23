@@ -8,12 +8,12 @@
 ################################################################################
 */
 # pragma	once
-# include	"base.hpp"
+# include	"continuous.hpp"
 
 //****************************************************************************//
 //      Special class for PDF and CDF for gamma-related distributions         //
 //****************************************************************************//
-class SpecialGamma : public BaseModel
+class SpecialGamma : public BaseContinuous
 {
 //============================================================================//
 //      Members                                                               //

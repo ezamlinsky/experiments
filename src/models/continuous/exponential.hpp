@@ -2,34 +2,32 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#            DISTRIBUTION MODEL FOR NORMAL (GAUSSIAN) DISTRIBUTION             #
+#               DISTRIBUTION MODEL FOR EXPONENTIAL DISTRIBUTION                #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
 # pragma	once
-# include	"confidence_interval.hpp"
+# include	"../confidence_interval.hpp"
 # include	"continuous.hpp"
 # include	"chi_squared.hpp"
-# include	"standard_t.hpp"
 
 //****************************************************************************//
-//      Class "Normal"                                                        //
+//      Class "Exponential"                                                   //
 //****************************************************************************//
-class Normal final : public Continuous
+class Exponential final : public BaseContinuous
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 private:
-	static const double sqrt_2;		// Square root of 2
-	static const double sqrt_pi;	// Square root of PI
+	static const Range range;		// Function domain where the distribution exists
+	const double scale;				// Scale of the distribution
 
 // Extract the distribution parameters from empirical observations
 struct Params {
 
 	// Members
-	double location;				// Location of the distribution
 	double scale;					// Scale of the distribution
 
 	// Constructor
@@ -37,14 +35,16 @@ struct Params {
 		const Observations &data	// Empirical observations
 	){
 		// Check if empirical data range is inside the model domain
-		if (Continuous::InDomain (data.Domain())) {
+		if (Exponential::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
-			location = data.Median();
-			scale = data.StdDev();
+			const double median = data.Median();
+
+			// Find the scale for these parameters
+			scale = median / log (2);
 		}
 		else
-			throw invalid_argument ("Normal params: The data range is outside the distribution domain");
+			throw invalid_argument ("Exponential params: The data range is outside the distribution domain");
 	}
 };
 
@@ -52,9 +52,9 @@ struct Params {
 //      Private methods                                                       //
 //============================================================================//
 private:
-	Normal (
+	Exponential (
 		const Params &params		// Distribution parameters
-	) : Normal (params.location, params.scale)
+	) : Exponential (params.scale)
 	{}
 
 //============================================================================//
@@ -65,57 +65,63 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Normal (
-		double location,			// Location of the distribution
+	Exponential (
 		double scale				// Scale of the distribution
-	) : Continuous (location, scale)
-	{}
+	) : scale (scale)
+	{
+		if (scale <= 0.0)
+			throw invalid_argument ("Exponential: The scale value must be positive");
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor for empirical data                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Normal (
+	Exponential (
 		const Observations &data	// Empirical observations
-	) : Normal (Params (data))
+	) : Exponential (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Confidence interval of the mean                                       //
+//      Check if the range is inside the model domain                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	static bool InDomain (
+		const Range &subrange		// Testing range
+	){
+		return range.IsInside (subrange);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Scale of the distribution                                             //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double Scale (void) const {
+		return scale;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Confidence interval of the mean value                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval Mean_ConfidenceInterval (
 		double level,				// Confidence level
 		size_t size					// Sample size
 	){
-		if (0.0 <= level && level <= 1.0) {
-			const auto dist = StandardT (size);
-			const double temp = scale / sqrt (size);
+		if (0.0 <= level && level <= 1.0)
+		{
+			const auto dist = ChiSquared (2 * size);
+			const double temp = 2 * scale * size;
 			const double alpha = 1.0 - level;
-			const double quantile = dist.Quantile (1.0 - 0.5 * alpha);
-			const double lower = location - temp * quantile;
-			const double upper = location + temp * quantile;
-			return ConfidenceInterval (level, location, Range (lower, upper));
+			const double lower = temp / dist.Quantile (1.0 - 0.5 * alpha);
+			const double upper = temp / dist.Quantile (0.5 * alpha);
+			return ConfidenceInterval (level, scale, Range (lower, upper));
 		}
 		else
 			throw invalid_argument ("Mean_ConfidenceInterval: The confidence level must be in the range [0..1]");
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Confidence interval of the variance                                   //
+//      Function domain where the distribution exists                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ConfidenceInterval Variance_ConfidenceInterval (
-		double level,				// Confidence level
-		size_t size					// Sample size
-	){
-		if (0.0 <= level && level <= 1.0) {
-			const auto dist = ChiSquared (size);
-			const double temp = scale * scale * size;
-			const double alpha = 1.0 - level;
-			const double lower = temp / dist.Quantile (1.0 - 0.5 * alpha);
-			const double upper = temp / dist.Quantile (0.5 * alpha);
-			return ConfidenceInterval (level, scale * scale, Range (lower, upper));
-		}
-		else
-			throw invalid_argument ("Variance_ConfidenceInterval: The confidence level must be in the range [0..1]");
+	virtual const Range& Domain (void) const override final {
+		return range;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -124,8 +130,11 @@ public:
 	virtual double PDF (
 		double x					// Argument value
 	) const override final {
-		const double arg = (x - location) / scale;
-		return exp (-0.5 * arg * arg) / (scale * sqrt_2 * sqrt_pi);
+		const double arg = x / scale;
+		if (arg >= 0.0)
+			return exp (-arg) / scale;
+		else
+			return NAN;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -134,22 +143,25 @@ public:
 	virtual double CDF (
 		double x					// Argument value
 	) const override final {
-		const double arg = (x - location) / scale;
-		return 0.5 * (1.0 + erf (arg / sqrt_2));
+		const double arg = x / scale;
+		if (arg >= 0)
+			return 1.0 - exp (-arg);
+		else
+			return 0.0;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mode (void) const override final {
-		return location;
+		return 0.0;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override final {
-		return location;
+		return scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -163,26 +175,27 @@ public:
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new Normal (*this));
+		return unique_ptr <const BaseModel> (new Exponential (*this));
 	}
 };
 
 //****************************************************************************//
 //      Internal constants used by the class                                  //
 //****************************************************************************//
-const double Normal::sqrt_2 = sqrt (2);
-const double Normal::sqrt_pi = sqrt (M_PI);
+const Range Exponential::range = Range (0.0, INFINITY);
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Normal &model)
+ostream& operator << (ostream &stream, const Exponential &model)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << "\nNORMAL (GAUSSIAN) DISTRIBUTION:" << std::endl;
-	stream << "===============================" << std::endl;
-	stream << static_cast <const Continuous&> (model);
+	stream << "\nEXPONENTIAL DISTRIBUTION:" << std::endl;
+	stream << "=========================" << std::endl;
+	stream << "\nParameters:" << endl;
+	stream << "~~~~~~~~~~~" << endl;
+	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;

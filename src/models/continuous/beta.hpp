@@ -2,79 +2,54 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#            DISTRIBUTION MODEL FOR ASYMMETRIC LAPLACE DISTRIBUTION            #
+#                 DISTRIBUTION MODEL FOR THE BETA DISTRIBUTION                 #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
 # pragma	once
+# include	"special_beta.hpp"
 # include	"continuous.hpp"
 
 //****************************************************************************//
-//      Class "AsymmetricLaplace"                                             //
+//      Class "Beta"                                                          //
 //****************************************************************************//
-class AsymmetricLaplace final : public Continuous
+class Beta final : public BaseContinuous
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 private:
-	const double asymmetry;			// Asymmetry of the distribution
+	static const Range range;		// Function domain where the distribution exists
+	const SpecialBeta beta;			// Special beta function
+	const double shape1;			// The first shape parameter
+	const double shape2;			// The second shape parameter
 
 // Extract the distribution parameters from empirical observations
 struct Params {
 
 	// Members
-	double location;				// Location of the distribution
-	double scale;					// Scale of the distribution
-	double asymmetry;				// Asymmetry of the distribution
+	double shape1;					// The first shape parameter
+	double shape2;					// The second shape parameter
 
 	// Constructor
 	Params (
 		const Observations &data	// Empirical observations
 	){
 		// Check if empirical data range is inside the model domain
-		if (Continuous::InDomain (data.Domain())) {
+		if (Beta::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
 			const double mean = data.Mean();
 			const double variance = data.Variance();
-			const double skewness = data.SkewnessAroundMean();
 
-			// The first approximation is the standard coefficient of asymmetry
-			asymmetry = 1.0;
-			for (int i = 0; i < 8; i++) {
-
-				// Temporary variables for effective computation
-				const double pow2 = asymmetry * asymmetry;
-				const double pow3 = pow2 * asymmetry;
-				const double pow4 = pow2 * pow2;
-				const double temp1 = 1.0 + pow4;
-				const double temp2 = temp1 * temp1;
-				const double temp3 = sqrt (temp1);
-
-				// Calculate the function and its derivative
-				const double func = 2.0 * (1.0 - pow3) * (1.0 + pow3) / (temp1 * temp3);
-				const double der = -12.0 * pow3 * (1.0 + pow2) / (temp2 * temp3);
-
-				// Check the distance between the function and the target value
-				const double diff = func - skewness;
-
-				// Calculate a step value to move for the next point
-				double step = diff / der;
-
-				// A new approximation
-				asymmetry -= step;
-			}
-
-			// Compute location and scale of the distribution
-			const double temp1 = asymmetry * asymmetry;
-			const double temp2 = temp1 * temp1;
-			scale = sqrt ((variance * temp1) / (1.0 + temp2));
-			location = mean - (1.0 - temp1) * scale / asymmetry;
+			// Find the shapes for these parameters
+			const double temp = 1.0 - mean;
+			shape1 = mean * mean * temp / variance - mean;
+			shape2 = mean * temp * temp / variance - temp;
 		}
 		else
-			throw invalid_argument ("Asymmetric Laplace params: The data range is outside the distribution domain");
+			throw invalid_argument ("Beta params: The data range is outside the distribution domain");
 	}
 };
 
@@ -82,9 +57,9 @@ struct Params {
 //      Private methods                                                       //
 //============================================================================//
 private:
-	AsymmetricLaplace (
+	Beta (
 		const Params &params		// Distribution parameters
-	) : AsymmetricLaplace (params.location, params.scale, params.asymmetry)
+	) : Beta (params.shape1, params.shape2)
 	{}
 
 //============================================================================//
@@ -95,30 +70,50 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	AsymmetricLaplace (
-		double location,			// Location of the distribution
-		double scale,				// Scale of the distribution
-		double asymmetry			// Asymmetry of the distribution
-	) : Continuous (location, scale),
-		asymmetry (asymmetry)
-	{
-		if (asymmetry <= 0.0)
-			throw invalid_argument ("AsymmetricLaplace: The asymmetry value must be positive");
-	}
+	Beta (
+		double shape1,				// The first shape parameter
+		double shape2				// The second shape parameter
+	) : beta (SpecialBeta (shape1, shape2)),
+		shape1 (shape1),
+		shape2 (shape2)
+	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor for empirical data                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	AsymmetricLaplace (
+	Beta (
 		const Observations &data	// Empirical observations
-	) : AsymmetricLaplace (Params (data))
+	) : Beta (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Asymmetry of the distrsibution                                        //
+//      Check if the range is inside the model domain                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double Asymmetry (void) const {
-		return asymmetry;
+	static bool InDomain (
+		const Range &subrange	// Testing range
+	){
+		return range.IsInside (subrange);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      The first shape parameter of the distribution                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double Shape1 (void) const {
+		return shape1;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      The second shape parameter of the distribution                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double Shape2 (void) const {
+		return shape2;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Function domain where the distribution exists                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const Range& Domain (void) const override final {
+		return range;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -127,13 +122,36 @@ public:
 	virtual double PDF (
 		double x					// Argument value
 	) const override final {
-		const double arg = (x - location) / scale;
-		const double temp = asymmetry * asymmetry;
-		const double coeff = asymmetry / (1.0 + temp);
-		if (x < location)
-			return coeff / scale * exp (arg / asymmetry);
-		else
-			return coeff / scale * exp (-arg * asymmetry);
+
+		// Negative argument
+		if (x < 0.0)
+			return NAN;
+
+		// Handle cases where log(0) would occur
+		else if (x == 0.0) {
+			if (shape1 < 1.0)
+				return INFINITY;
+			else if (shape1 > 1.0)
+				return 0.0;
+			else
+				return shape2;
+		}
+		else if (x == 1.0) {
+			if (shape2 < 1.0)
+				return INFINITY;
+			else if (shape2 > 1.0)
+				return 0.0;
+			else
+				return shape1;
+		}
+
+		// Common case
+		else {
+			const double t1 = (shape1 - 1.0) * log (x) + (shape2 - 1.0) * log (1.0 - x);
+			const double t2 = beta.BetaLog();
+			const double temp = t1 - t2;
+			return exp (temp);
+		}
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -142,62 +160,69 @@ public:
 	virtual double CDF (
 		double x					// Argument value
 	) const override final {
-		const double arg = (x - location) / scale;
-		const double temp = asymmetry * asymmetry;
-		if (x < location) {
-			const double coeff = temp / (1.0 + temp);
-			return coeff * exp (arg / asymmetry);
-		}
-		else {
-			const double coeff = 1.0 / (1.0 + temp);
-			return 1.0 - coeff * exp (-arg * asymmetry);
-		}
+		return beta.RegIncompleteBeta (x);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mode (void) const override final {
-		return location;
+		if (shape1 < 1.0 && shape2 < 1.0)
+			return NAN;
+		else if (shape1 > 1.0 && shape2 > 1.0) {
+			const double temp1 = shape1 - 1.0;
+			const double temp2 = shape1 + shape2 - 2.0;
+			return temp1 / temp2;
+		}
+		else if (shape1 < shape2)
+			return 0.0;
+		else if (shape1 > shape2)
+			return 1.0;
+		else
+			return NAN;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override final {
-		const double temp = asymmetry * asymmetry;
-		return location + (1.0 - temp) / asymmetry * scale;
+		return shape1 / (shape1 + shape2);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {
-		const double temp = asymmetry * asymmetry;
-		const double sqr = temp * temp;
-		const double coeff = scale * scale;
-		return (1.0 + sqr) / temp * coeff;
+		const double temp = shape1 + shape2;
+		return shape1 * shape2 / (temp * temp * (temp + 1.0));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new AsymmetricLaplace (*this));
+		return unique_ptr <const BaseModel> (new Beta (*this));
 	}
 };
 
 //****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const Range Beta::range = Range (0.0, 1.0);
+
+//****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const AsymmetricLaplace &model)
+ostream& operator << (ostream &stream, const Beta &model)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << "\nASYMMETRIC LAPLACE DISTRIBUTION:" << std::endl;
-	stream << "================================" << std::endl;
-	stream << static_cast <const Continuous&> (model);
-	stream << "    Asymmetry\t\t\t\t= " << model.Asymmetry() << endl;
+	stream << "\nBETA DISTRIBUTION:" << std::endl;
+	stream << "==================" << std::endl;
+	stream << "\nParameters:" << endl;
+	stream << "~~~~~~~~~~~" << endl;
+	stream << "    Shape #1\t\t\t\t= " << model.Shape1() << endl;
+	stream << "    Shape #2\t\t\t\t= " << model.Shape2() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;

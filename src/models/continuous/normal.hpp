@@ -2,54 +2,49 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#                 DISTRIBUTION MODEL FOR THE BETA DISTRIBUTION                 #
+#            DISTRIBUTION MODEL FOR NORMAL (GAUSSIAN) DISTRIBUTION             #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
 # pragma	once
-# include	"special_beta.hpp"
-# include	"base.hpp"
+# include	"../confidence_interval.hpp"
+# include	"continuous_distribution.hpp"
+# include	"chi_squared.hpp"
+# include	"standard_t.hpp"
 
 //****************************************************************************//
-//      Class "Beta"                                                          //
+//      Class "Normal"                                                        //
 //****************************************************************************//
-class Beta final : public BaseModel
+class Normal final : public Continuous
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 private:
-	static const Range range;		// Function domain where the distribution exists
-	const SpecialBeta beta;			// Special beta function
-	const double shape1;			// The first shape parameter
-	const double shape2;			// The second shape parameter
+	static const double sqrt_2;		// Square root of 2
+	static const double sqrt_pi;	// Square root of PI
 
 // Extract the distribution parameters from empirical observations
 struct Params {
 
 	// Members
-	double shape1;					// The first shape parameter
-	double shape2;					// The second shape parameter
+	double location;				// Location of the distribution
+	double scale;					// Scale of the distribution
 
 	// Constructor
 	Params (
 		const Observations &data	// Empirical observations
 	){
 		// Check if empirical data range is inside the model domain
-		if (Beta::InDomain (data.Domain())) {
+		if (Continuous::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
-			const double mean = data.Mean();
-			const double variance = data.Variance();
-
-			// Find the shapes for these parameters
-			const double temp = 1.0 - mean;
-			shape1 = mean * mean * temp / variance - mean;
-			shape2 = mean * temp * temp / variance - temp;
+			location = data.Median();
+			scale = data.StdDev();
 		}
 		else
-			throw invalid_argument ("Beta params: The data range is outside the distribution domain");
+			throw invalid_argument ("Normal params: The data range is outside the distribution domain");
 	}
 };
 
@@ -57,9 +52,9 @@ struct Params {
 //      Private methods                                                       //
 //============================================================================//
 private:
-	Beta (
+	Normal (
 		const Params &params		// Distribution parameters
-	) : Beta (params.shape1, params.shape2)
+	) : Normal (params.location, params.scale)
 	{}
 
 //============================================================================//
@@ -70,50 +65,57 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Beta (
-		double shape1,				// The first shape parameter
-		double shape2				// The second shape parameter
-	) : beta (SpecialBeta (shape1, shape2)),
-		shape1 (shape1),
-		shape2 (shape2)
+	Normal (
+		double location,			// Location of the distribution
+		double scale				// Scale of the distribution
+	) : Continuous (location, scale)
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor for empirical data                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Beta (
+	Normal (
 		const Observations &data	// Empirical observations
-	) : Beta (Params (data))
+	) : Normal (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Check if the range is inside the model domain                         //
+//      Confidence interval of the mean                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	static bool InDomain (
-		const Range &subrange	// Testing range
+	ConfidenceInterval Mean_ConfidenceInterval (
+		double level,				// Confidence level
+		size_t size					// Sample size
 	){
-		return range.IsInside (subrange);
+		if (0.0 <= level && level <= 1.0) {
+			const auto dist = StandardT (size);
+			const double temp = scale / sqrt (size);
+			const double alpha = 1.0 - level;
+			const double quantile = dist.Quantile (1.0 - 0.5 * alpha);
+			const double lower = location - temp * quantile;
+			const double upper = location + temp * quantile;
+			return ConfidenceInterval (level, location, Range (lower, upper));
+		}
+		else
+			throw invalid_argument ("Mean_ConfidenceInterval: The confidence level must be in the range [0..1]");
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      The first shape parameter of the distribution                         //
+//      Confidence interval of the variance                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double Shape1 (void) const {
-		return shape1;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      The second shape parameter of the distribution                        //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double Shape2 (void) const {
-		return shape2;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Function domain where the distribution exists                         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual const Range& Domain (void) const override final {
-		return range;
+	ConfidenceInterval Variance_ConfidenceInterval (
+		double level,				// Confidence level
+		size_t size					// Sample size
+	){
+		if (0.0 <= level && level <= 1.0) {
+			const auto dist = ChiSquared (size);
+			const double temp = scale * scale * size;
+			const double alpha = 1.0 - level;
+			const double lower = temp / dist.Quantile (1.0 - 0.5 * alpha);
+			const double upper = temp / dist.Quantile (0.5 * alpha);
+			return ConfidenceInterval (level, scale * scale, Range (lower, upper));
+		}
+		else
+			throw invalid_argument ("Variance_ConfidenceInterval: The confidence level must be in the range [0..1]");
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -122,36 +124,8 @@ public:
 	virtual double PDF (
 		double x					// Argument value
 	) const override final {
-
-		// Negative argument
-		if (x < 0.0)
-			return NAN;
-
-		// Handle cases where log(0) would occur
-		else if (x == 0.0) {
-			if (shape1 < 1.0)
-				return INFINITY;
-			else if (shape1 > 1.0)
-				return 0.0;
-			else
-				return shape2;
-		}
-		else if (x == 1.0) {
-			if (shape2 < 1.0)
-				return INFINITY;
-			else if (shape2 > 1.0)
-				return 0.0;
-			else
-				return shape1;
-		}
-
-		// Common case
-		else {
-			const double t1 = (shape1 - 1.0) * log (x) + (shape2 - 1.0) * log (1.0 - x);
-			const double t2 = beta.BetaLog();
-			const double temp = t1 - t2;
-			return exp (temp);
-		}
+		const double arg = (x - location) / scale;
+		return exp (-0.5 * arg * arg) / (scale * sqrt_2 * sqrt_pi);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -160,69 +134,55 @@ public:
 	virtual double CDF (
 		double x					// Argument value
 	) const override final {
-		return beta.RegIncompleteBeta (x);
+		const double arg = (x - location) / scale;
+		return 0.5 * (1.0 + erf (arg / sqrt_2));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mode (void) const override final {
-		if (shape1 < 1.0 && shape2 < 1.0)
-			return NAN;
-		else if (shape1 > 1.0 && shape2 > 1.0) {
-			const double temp1 = shape1 - 1.0;
-			const double temp2 = shape1 + shape2 - 2.0;
-			return temp1 / temp2;
-		}
-		else if (shape1 < shape2)
-			return 0.0;
-		else if (shape1 > shape2)
-			return 1.0;
-		else
-			return Mean();
+		return location;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override final {
-		return shape1 / (shape1 + shape2);
+		return location;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {
-		const double temp = shape1 + shape2;
-		return shape1 * shape2 / (temp * temp * (temp + 1.0));
+		return scale * scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new Beta (*this));
+		return unique_ptr <const BaseModel> (new Normal (*this));
 	}
 };
 
 //****************************************************************************//
 //      Internal constants used by the class                                  //
 //****************************************************************************//
-const Range Beta::range = Range (0.0, 1.0);
+const double Normal::sqrt_2 = sqrt (2);
+const double Normal::sqrt_pi = sqrt (M_PI);
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Beta &model)
+ostream& operator << (ostream &stream, const Normal &model)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << "\nBETA DISTRIBUTION:" << std::endl;
-	stream << "==================" << std::endl;
-	stream << "\nParameters:" << endl;
-	stream << "~~~~~~~~~~~" << endl;
-	stream << "    Shape #1\t\t\t\t= " << model.Shape1() << endl;
-	stream << "    Shape #2\t\t\t\t= " << model.Shape2() << endl;
+	stream << "\nNORMAL (GAUSSIAN) DISTRIBUTION:" << std::endl;
+	stream << "===============================" << std::endl;
+	stream << static_cast <const Continuous&> (model);
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;

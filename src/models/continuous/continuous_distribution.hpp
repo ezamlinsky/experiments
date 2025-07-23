@@ -8,12 +8,12 @@
 ################################################################################
 */
 # pragma	once
-# include	"base.hpp"
+# include	"continuous.hpp"
 
 //****************************************************************************//
 //      Special class to encapsulate a distribution location and scale        //
 //****************************************************************************//
-class Continuous : public BaseModel
+class Continuous : public BaseContinuous
 {
 //============================================================================//
 //      Members                                                               //

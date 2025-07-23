@@ -2,57 +2,31 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#                 DISTRIBUTION MODEL FOR LAPLACE DISTRIBUTION                  #
+#                DISTRIBUTION MODEL FOR KOLMOGOROV DISTRIBUTION                #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
 # pragma	once
-# include	"confidence_interval.hpp"
 # include	"continuous.hpp"
-# include	"chi_squared.hpp"
+
+// TS elements to compute for PDF and CDF approximation
+# define	KOLMOGOROV_N	100	// TODO: Check this threshold
 
 //****************************************************************************//
-//      Class "Laplace"                                                       //
+//      Class "Kolmogorov"                                                    //
 //****************************************************************************//
-class Laplace final : public Continuous
+class Kolmogorov final : public BaseContinuous
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 private:
-
-// Extract the distribution parameters from empirical observations
-struct Params {
-
-	// Members
-	double location;				// Location of the distribution
-	double scale;					// Scale of the distribution
-
-	// Constructor
-	Params (
-		const Observations &data	// Empirical observations
-	){
-		// Check if empirical data range is inside the model domain
-		if (Continuous::InDomain (data.Domain())) {
-
-			// Extract parameters from the empirical observations
-			location = data.Median();
-			scale = data.MeanAbsDevFromMedian();
-		}
-		else
-			throw invalid_argument ("Laplace params: The data range is outside the distribution domain");
-	}
-};
-
-//============================================================================//
-//      Private methods                                                       //
-//============================================================================//
-private:
-	Laplace (
-		const Params &params		// Distribution parameters
-	) : Laplace (params.location, params.scale)
-	{}
+	static const Range range;		// Function domain where the distribution exists
+	static const double mode;		// Mode of the distribution
+	static const double mean;		// Mean of the distribution
+	static const double variance;	// Variance of the distribution
+	static const double threshold;	// The threshold value to improve precision
 
 //============================================================================//
 //      Public methods                                                        //
@@ -62,109 +36,146 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Laplace (
-		double location,			// Location of the distribution
-		double scale				// Scale of the distribution
-	) : Continuous (location, scale)
-	{}
+	Kolmogorov (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor for empirical data                                        //
+//      Function domain where the distribution exists                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Laplace (
-		const Observations &data	// Empirical observations
-	) : Laplace (Params (data))
-	{}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Mean Absolute Deviation (MAD) of the distribution                     //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double MAD (void) const {
-		return scale;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Confidence interval of the Mean Absolute Deviation (MAD)              //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ConfidenceInterval MAD_ConfidenceInterval (
-		double level,				// Confidence level
-		size_t size					// Sample size
-	){
-		if (0.0 <= level && level <= 1.0)
-		{
-			const auto dist = ChiSquared (2 * size);
-			const double temp = 2 * scale * size;
-			const double alpha = 1 - level;
-			const double lower = temp / dist.Quantile (1.0 - 0.5 * alpha);
-			const double upper = temp / dist.Quantile (0.5 * alpha);
-			return ConfidenceInterval (level, scale, Range (lower, upper));
-		}
-		else
-			throw invalid_argument ("MAD_ConfidenceInterval: The confidence level must be in the range [0..1]");
+	virtual const Range& Domain (void) const override final {
+		return range;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
-		double x					// Argument value
+		double x			// Argument value
 	) const override final {
-		const double arg = (x - location) / scale;
-		return 0.5 * exp (-fabs (arg)) / scale;
+
+		// Non positive argument
+		if (x <= 0.0)
+			return 0.0;
+
+		// Common case
+		else {
+			double sum = 0.0;
+
+			// Calculate the PDF function when x is big
+			if (x >= threshold) {
+				for (int i = 1; i < KOLMOGOROV_N; i++) {
+					const double temp = i * x;
+					const double exponent = -2.0 * temp * temp;
+					if (i % 2)
+						sum += i * i * exp (exponent);
+					else
+						sum -= i * i * exp (exponent);
+				}
+				return 8.0 * x * sum;
+			}
+
+			// Calculate the PDF function when x is small
+			else {
+				for (int i = 1; i < KOLMOGOROV_N; i++) {
+					const double p = (2.0 * i - 1.0) * M_PI;
+					const double q = 2.0 * x;
+					const double temp = p / q;
+					const double exponent = -0.5 * temp * temp;
+					sum += (temp * temp - 1.0) * exp (exponent);
+				}
+				return sqrt (2.0 * M_PI) * sum / (x * x);
+			}
+		}
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Cumulative Distribution Function (CDF)                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
-		double x					// Argument value
+		double x			// Argument value
 	) const override final {
-		const double arg = (x - location) / scale;
-		if (arg < 0.0)
-			return 0.5 * exp (arg);
-		else
-			return 1 - 0.5 * exp (-arg);
+
+		// Non positive argument
+		if (x <= 0.0)
+			return 0.0;
+
+		// Common case
+		else {
+			double sum = 0.0;
+
+			// Calculate the CDF function when x is big
+			if (x >= threshold) {
+				for (int i = 1; i < KOLMOGOROV_N; i++) {
+					const double temp = i * x;
+					const double exponent = -2.0 * temp * temp;
+					if (i % 2)
+						sum += exp (exponent);
+					else
+						sum -= exp (exponent);
+				}
+				return 1.0 - 2.0 * sum;
+			}
+
+			// Calculate the CDF function when x is small
+			else {
+				for (int i = 1; i < KOLMOGOROV_N; i++) {
+					const double p = (2.0 * i - 1.0) * M_PI;
+					const double q = 2.0 * x;
+					const double temp = p / q;
+					const double exponent = -0.5 * temp * temp;
+					sum += exp (exponent);
+				}
+				return sqrt (2.0 * M_PI) * sum / x;
+			}
+		}
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mode (void) const override final {
-		return location;
+		return mode;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override final {
-		return location;
+		return mean;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {
-		return 2.0 * scale * scale;
+		return variance;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new Laplace (*this));
+		return unique_ptr <const BaseModel> (new Kolmogorov (*this));
 	}
 };
 
 //****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const Range Kolmogorov::range = Range (-INFINITY, INFINITY);
+const double Kolmogorov::mode = 0.735467907916572;
+const double Kolmogorov::mean = sqrt (0.5 * M_PI) * log (2.0);
+const double Kolmogorov::variance = 0.5 * M_PI * (M_PI / 6.0 - log (2.0) * log (2.0));
+const double Kolmogorov::threshold = sqrt (log (2.0));
+
+//****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Laplace &model)
+ostream& operator << (ostream &stream, const Kolmogorov &model)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << "\nLAPLACE DISTRIBUTION:" << std::endl;
-	stream << "=====================" << std::endl;
-	stream << static_cast <const Continuous&> (model);
+	stream << "\nKOLMOGOROV DISTRIBUTION:" << std::endl;
+	stream << "========================" << std::endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;

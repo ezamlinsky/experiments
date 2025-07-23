@@ -9,12 +9,12 @@
 */
 # pragma	once
 # include	"special_beta.hpp"
-# include	"base.hpp"
+# include	"continuous.hpp"
 
 //****************************************************************************//
 //      Class "F"                                                             //
 //****************************************************************************//
-class F final : public BaseModel
+class F final : public BaseContinuous
 {
 //============================================================================//
 //      Members                                                               //

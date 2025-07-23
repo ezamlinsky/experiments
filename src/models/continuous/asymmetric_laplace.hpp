@@ -2,49 +2,79 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#               DISTRIBUTION MODEL FOR EXPONENTIAL DISTRIBUTION                #
+#            DISTRIBUTION MODEL FOR ASYMMETRIC LAPLACE DISTRIBUTION            #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
 # pragma	once
-# include	"confidence_interval.hpp"
-# include	"base.hpp"
-# include	"chi_squared.hpp"
+# include	"continuous_distribution.hpp"
 
 //****************************************************************************//
-//      Class "Exponential"                                                   //
+//      Class "AsymmetricLaplace"                                             //
 //****************************************************************************//
-class Exponential final : public BaseModel
+class AsymmetricLaplace final : public Continuous
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 private:
-	static const Range range;		// Function domain where the distribution exists
-	const double scale;				// Scale of the distribution
+	const double asymmetry;			// Asymmetry of the distribution
 
 // Extract the distribution parameters from empirical observations
 struct Params {
 
 	// Members
+	double location;				// Location of the distribution
 	double scale;					// Scale of the distribution
+	double asymmetry;				// Asymmetry of the distribution
 
 	// Constructor
 	Params (
 		const Observations &data	// Empirical observations
 	){
 		// Check if empirical data range is inside the model domain
-		if (Exponential::InDomain (data.Domain())) {
+		if (Continuous::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
-			const double median = data.Median();
+			const double mean = data.Mean();
+			const double variance = data.Variance();
+			const double skewness = data.SkewnessAroundMean();
 
-			// Find the scale for these parameters
-			scale = median / log (2);
+			// The first approximation is the standard coefficient of asymmetry
+			asymmetry = 1.0;
+			for (int i = 0; i < 8; i++) {
+
+				// Temporary variables for effective computation
+				const double pow2 = asymmetry * asymmetry;
+				const double pow3 = pow2 * asymmetry;
+				const double pow4 = pow2 * pow2;
+				const double temp1 = 1.0 + pow4;
+				const double temp2 = temp1 * temp1;
+				const double temp3 = sqrt (temp1);
+
+				// Calculate the function and its derivative
+				const double func = 2.0 * (1.0 - pow3) * (1.0 + pow3) / (temp1 * temp3);
+				const double der = -12.0 * pow3 * (1.0 + pow2) / (temp2 * temp3);
+
+				// Check the distance between the function and the target value
+				const double diff = func - skewness;
+
+				// Calculate a step value to move for the next point
+				double step = diff / der;
+
+				// A new approximation
+				asymmetry -= step;
+			}
+
+			// Compute location and scale of the distribution
+			const double temp1 = asymmetry * asymmetry;
+			const double temp2 = temp1 * temp1;
+			scale = sqrt ((variance * temp1) / (1.0 + temp2));
+			location = mean - (1.0 - temp1) * scale / asymmetry;
 		}
 		else
-			throw invalid_argument ("Exponential params: The data range is outside the distribution domain");
+			throw invalid_argument ("Asymmetric Laplace params: The data range is outside the distribution domain");
 	}
 };
 
@@ -52,9 +82,9 @@ struct Params {
 //      Private methods                                                       //
 //============================================================================//
 private:
-	Exponential (
+	AsymmetricLaplace (
 		const Params &params		// Distribution parameters
-	) : Exponential (params.scale)
+	) : AsymmetricLaplace (params.location, params.scale, params.asymmetry)
 	{}
 
 //============================================================================//
@@ -65,63 +95,30 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Exponential (
-		double scale				// Scale of the distribution
-	) : scale (scale)
+	AsymmetricLaplace (
+		double location,			// Location of the distribution
+		double scale,				// Scale of the distribution
+		double asymmetry			// Asymmetry of the distribution
+	) : Continuous (location, scale),
+		asymmetry (asymmetry)
 	{
-		if (scale <= 0.0)
-			throw invalid_argument ("Exponential: The scale value must be positive");
+		if (asymmetry <= 0.0)
+			throw invalid_argument ("AsymmetricLaplace: The asymmetry value must be positive");
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor for empirical data                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	Exponential (
+	AsymmetricLaplace (
 		const Observations &data	// Empirical observations
-	) : Exponential (Params (data))
+	) : AsymmetricLaplace (Params (data))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Check if the range is inside the model domain                         //
+//      Asymmetry of the distrsibution                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	static bool InDomain (
-		const Range &subrange		// Testing range
-	){
-		return range.IsInside (subrange);
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Scale of the distribution                                             //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double Scale (void) const {
-		return scale;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Confidence interval of the mean value                                 //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ConfidenceInterval Mean_ConfidenceInterval (
-		double level,				// Confidence level
-		size_t size					// Sample size
-	){
-		if (0.0 <= level && level <= 1.0)
-		{
-			const auto dist = ChiSquared (2 * size);
-			const double temp = 2 * scale * size;
-			const double alpha = 1.0 - level;
-			const double lower = temp / dist.Quantile (1.0 - 0.5 * alpha);
-			const double upper = temp / dist.Quantile (0.5 * alpha);
-			return ConfidenceInterval (level, scale, Range (lower, upper));
-		}
-		else
-			throw invalid_argument ("Mean_ConfidenceInterval: The confidence level must be in the range [0..1]");
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Function domain where the distribution exists                         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual const Range& Domain (void) const override final {
-		return range;
+	double Asymmetry (void) const {
+		return asymmetry;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -130,11 +127,13 @@ public:
 	virtual double PDF (
 		double x					// Argument value
 	) const override final {
-		const double arg = x / scale;
-		if (arg >= 0.0)
-			return exp (-arg) / scale;
+		const double arg = (x - location) / scale;
+		const double temp = asymmetry * asymmetry;
+		const double coeff = asymmetry / (1.0 + temp);
+		if (x < location)
+			return coeff / scale * exp (arg / asymmetry);
 		else
-			return NAN;
+			return coeff / scale * exp (-arg * asymmetry);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -143,59 +142,62 @@ public:
 	virtual double CDF (
 		double x					// Argument value
 	) const override final {
-		const double arg = x / scale;
-		if (arg >= 0)
-			return 1.0 - exp (-arg);
-		else
-			return 0.0;
+		const double arg = (x - location) / scale;
+		const double temp = asymmetry * asymmetry;
+		if (x < location) {
+			const double coeff = temp / (1.0 + temp);
+			return coeff * exp (arg / asymmetry);
+		}
+		else {
+			const double coeff = 1.0 / (1.0 + temp);
+			return 1.0 - coeff * exp (-arg * asymmetry);
+		}
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mode (void) const override final {
-		return 0.0;
+		return location;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override final {
-		return scale;
+		const double temp = asymmetry * asymmetry;
+		return location + (1.0 - temp) / asymmetry * scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {
-		return scale * scale;
+		const double temp = asymmetry * asymmetry;
+		const double sqr = temp * temp;
+		const double coeff = scale * scale;
+		return (1.0 + sqr) / temp * coeff;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Clone the distribution model                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new Exponential (*this));
+		return unique_ptr <const BaseModel> (new AsymmetricLaplace (*this));
 	}
 };
 
 //****************************************************************************//
-//      Internal constants used by the class                                  //
-//****************************************************************************//
-const Range Exponential::range = Range (0.0, INFINITY);
-
-//****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Exponential &model)
+ostream& operator << (ostream &stream, const AsymmetricLaplace &model)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << "\nEXPONENTIAL DISTRIBUTION:" << std::endl;
-	stream << "=========================" << std::endl;
-	stream << "\nParameters:" << endl;
-	stream << "~~~~~~~~~~~" << endl;
-	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
+	stream << "\nASYMMETRIC LAPLACE DISTRIBUTION:" << std::endl;
+	stream << "================================" << std::endl;
+	stream << static_cast <const Continuous&> (model);
+	stream << "    Asymmetry\t\t\t\t= " << model.Asymmetry() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
