@@ -92,7 +92,7 @@ public:
 		values (values)
 	{
 		// Fill the theoretical CDF table
-		double last_cdf = model.CDF (range.Min());
+		double last_cdf = 0.0;
 		for (const auto x : values) {
 			const double cur_cdf = model.CDF (x);
 			pdf.push_back (cur_cdf - last_cdf);
@@ -191,8 +191,8 @@ public:
 		double x						// Argument value
 	) const {
 
-		 // Find the greatest element that is still less than the target value
-		const size_t index = Array::BinSearchLess (values.data(), values.size(), x);
+		// Find the greatest element that is still less than or equal to the target value
+		const size_t index = Array::BinSearchLessOrEqual (values.data(), values.size(), x);
 		return index != static_cast <size_t> (-1) ? pdf [index] : 0.0;
 	}
 
@@ -203,8 +203,8 @@ public:
 		double x						// Argument value
 	) const {
 
-		 // Find the greatest element that is still less than the target value
-		const size_t index = Array::BinSearchLess (values.data(), values.size(), x);
+		// Find the greatest element that is still less than or equal to the target value
+		const size_t index = Array::BinSearchLessOrEqual (values.data(), values.size(), x);
 		return index != static_cast <size_t> (-1) ? cdf [index] : 0.0;
 	}
 };
