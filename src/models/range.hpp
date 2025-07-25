@@ -138,14 +138,22 @@ public:
 	vector <double> Split (
 		size_t bins					// The number of bins to create for the range
 	) const {
-		if (bins != 0) {
+
+		// Check bins count
+		if (bins) {
+
+			// Store the min value as well
 			vector <double> result;
 			result.push_back (min);
+
+			// Store all the intermediate points
 			for (size_t i = 0; i < bins; i++) {
 				const size_t index = i + 1;
 				const double x = ((bins - index) * min + index * max) / bins;
 				result.push_back (x);
 			}
+
+			// Return all the created points
 			return result;
 		}
 		else
