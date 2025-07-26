@@ -21,6 +21,7 @@ class Beta final : public BaseContinuous
 //============================================================================//
 private:
 	static const Range range;		// Function domain where the distribution exists
+	static const size_t params;		// Count of distribution parameters
 	const SpecialBeta beta;			// Special beta function
 	const double shape1;			// The first shape parameter
 	const double shape2;			// The second shape parameter
@@ -117,6 +118,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Number of distribution parameters to describe the population          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual size_t Parameters (void) const override final {
+		return params;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
@@ -209,6 +217,7 @@ public:
 //      Internal constants used by the class                                  //
 //****************************************************************************//
 const Range Beta::range = Range (0.0, 1.0);
+const size_t Beta::params = 2;
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
@@ -219,8 +228,9 @@ ostream& operator << (ostream &stream, const Beta &model)
 	stream.precision (PRECISION);
 	stream << "\nBETA DISTRIBUTION:" << std::endl;
 	stream << "==================" << std::endl;
-	stream << "\nParameters:" << endl;
-	stream << "~~~~~~~~~~~" << endl;
+	stream << "\nContinuous distribution:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
 	stream << "    Shape #1\t\t\t\t= " << model.Shape1() << endl;
 	stream << "    Shape #2\t\t\t\t= " << model.Shape2() << endl;
 	stream << static_cast <const BaseModel&> (model);

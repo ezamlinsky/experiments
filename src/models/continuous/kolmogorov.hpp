@@ -23,6 +23,7 @@ class Kolmogorov final : public BaseContinuous
 //============================================================================//
 private:
 	static const Range range;		// Function domain where the distribution exists
+	static const size_t params;		// Count of distribution parameters
 	static const double mode;		// Mode of the distribution
 	static const double mean;		// Mean of the distribution
 	static const double variance;	// Variance of the distribution
@@ -43,6 +44,13 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual const Range& Domain (void) const override final {
 		return range;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Number of distribution parameters to describe the population          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual size_t Parameters (void) const override final {
+		return params;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -162,6 +170,7 @@ public:
 //      Internal constants used by the class                                  //
 //****************************************************************************//
 const Range Kolmogorov::range = Range (-INFINITY, INFINITY);
+const size_t Kolmogorov::params = 0;
 const double Kolmogorov::mode = 0.735467907916572;
 const double Kolmogorov::mean = sqrt (0.5 * M_PI) * log (2.0);
 const double Kolmogorov::variance = 0.5 * M_PI * (M_PI / 6.0 - log (2.0) * log (2.0));
@@ -176,6 +185,9 @@ ostream& operator << (ostream &stream, const Kolmogorov &model)
 	stream.precision (PRECISION);
 	stream << "\nKOLMOGOROV DISTRIBUTION:" << std::endl;
 	stream << "========================" << std::endl;
+	stream << "\nContinuous distribution:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;

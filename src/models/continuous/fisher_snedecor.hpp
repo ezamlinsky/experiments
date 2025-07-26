@@ -21,6 +21,7 @@ class F final : public BaseContinuous
 //============================================================================//
 private:
 	static const Range range;		// Function domain where the distribution exists
+	static const size_t params;		// Count of distribution parameters
 	const SpecialBeta beta;			// Special beta function
 	const size_t df1;				// The first degrees of freedom
 	const size_t df2;				// The second degrees of freedom
@@ -60,6 +61,13 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual const Range& Domain (void) const override final {
 		return range;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Number of distribution parameters to describe the population          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual size_t Parameters (void) const override final {
+		return params;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -155,6 +163,7 @@ public:
 //      Internal constants used by the class                                  //
 //****************************************************************************//
 const Range F::range = Range (0.0, INFINITY);
+const size_t F::params = 2;
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
@@ -165,8 +174,9 @@ ostream& operator << (ostream &stream, const F &model)
 	stream.precision (PRECISION);
 	stream << "\nSNEDECOR'S F-DISTRIBUTION:" << std::endl;
 	stream << "==========================" << std::endl;
-	stream << "\nParameters:" << endl;
-	stream << "~~~~~~~~~~~" << endl;
+	stream << "\nContinuous distribution:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
 	stream << "    Degrees of freedom #1\t\t= " << model.DF1() << endl;
 	stream << "    Degrees of freedom #2\t\t= " << model.DF2() << endl;
 	stream << static_cast <const BaseModel&> (model);

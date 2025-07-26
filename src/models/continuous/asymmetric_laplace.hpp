@@ -19,6 +19,7 @@ class AsymmetricLaplace final : public Continuous
 //      Members                                                               //
 //============================================================================//
 private:
+	static const size_t params;		// Count of distribution parameters
 	const double asymmetry;			// Asymmetry of the distribution
 
 // Extract the distribution parameters from empirical observations
@@ -122,6 +123,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Number of distribution parameters to describe the population          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual size_t Parameters (void) const override final {
+		return params;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
@@ -188,6 +196,11 @@ public:
 };
 
 //****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const size_t AsymmetricLaplace::params = 3;
+
+//****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
 ostream& operator << (ostream &stream, const AsymmetricLaplace &model)
@@ -196,6 +209,9 @@ ostream& operator << (ostream &stream, const AsymmetricLaplace &model)
 	stream.precision (PRECISION);
 	stream << "\nASYMMETRIC LAPLACE DISTRIBUTION:" << std::endl;
 	stream << "================================" << std::endl;
+	stream << "\nContinuous distribution:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
 	stream << static_cast <const Continuous&> (model);
 	stream << "    Asymmetry\t\t\t\t= " << model.Asymmetry() << endl;
 	stream << static_cast <const BaseModel&> (model);

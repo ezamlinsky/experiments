@@ -84,13 +84,8 @@ const Range Continuous::range = Range (-INFINITY, INFINITY);
 //****************************************************************************//
 ostream& operator << (ostream &stream, const Continuous &model)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nParameters:" << endl;
-	stream << "~~~~~~~~~~~" << endl;
 	stream << "    Location\t\t\t\t= " << model.Location() << endl;
 	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
-	stream.precision (restore);
 	return stream;
 }
 /*

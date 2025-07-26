@@ -22,6 +22,7 @@ class Normal final : public Continuous
 //      Members                                                               //
 //============================================================================//
 private:
+	static const size_t params;		// Count of distribution parameters
 	static const double sqrt_2;		// Square root of 2
 	static const double sqrt_pi;	// Square root of PI
 
@@ -119,6 +120,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Number of distribution parameters to describe the population          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual size_t Parameters (void) const override final {
+		return params;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
@@ -170,6 +178,7 @@ public:
 //****************************************************************************//
 //      Internal constants used by the class                                  //
 //****************************************************************************//
+const size_t Normal::params = 2;
 const double Normal::sqrt_2 = sqrt (2);
 const double Normal::sqrt_pi = sqrt (M_PI);
 
@@ -182,6 +191,9 @@ ostream& operator << (ostream &stream, const Normal &model)
 	stream.precision (PRECISION);
 	stream << "\nNORMAL (GAUSSIAN) DISTRIBUTION:" << std::endl;
 	stream << "===============================" << std::endl;
+	stream << "\nContinuous distribution:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
 	stream << static_cast <const Continuous&> (model);
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);

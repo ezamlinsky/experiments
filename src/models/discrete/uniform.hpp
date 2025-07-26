@@ -20,6 +20,7 @@ class DiscreteUniform final : public BaseDiscrete
 //      Members                                                               //
 //============================================================================//
 private:
+	static const size_t params;		// Count of distribution parameters
 	const Range range;				// Function domain where the distribution exists
 
 //============================================================================//
@@ -49,6 +50,13 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual const Range& Domain (void) const override final {
 		return range;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Number of distribution parameters to describe the population          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual size_t Parameters (void) const override final {
+		return params;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -110,14 +118,22 @@ public:
 };
 
 //****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const size_t DiscreteUniform::params = 2;
+
+//****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
 ostream& operator << (ostream &stream, const DiscreteUniform &model)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << "\nDISCRETE UNIFORM DISTRIBUTION:" << std::endl;
-	stream << "==============================" << std::endl;
+	stream << "\nUNIFORM DISTRIBUTION:" << std::endl;
+	stream << "=====================" << std::endl;
+	stream << "\nDiscrete distribution:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;

@@ -22,6 +22,7 @@ class Exponential final : public BaseContinuous
 //============================================================================//
 private:
 	static const Range range;		// Function domain where the distribution exists
+	static const size_t params;		// Count of distribution parameters
 	const double scale;				// Scale of the distribution
 
 // Extract the distribution parameters from empirical observations
@@ -125,6 +126,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Number of distribution parameters to describe the population          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual size_t Parameters (void) const override final {
+		return params;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
@@ -183,6 +191,7 @@ public:
 //      Internal constants used by the class                                  //
 //****************************************************************************//
 const Range Exponential::range = Range (0.0, INFINITY);
+const size_t Exponential::params = 1;
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
@@ -193,8 +202,9 @@ ostream& operator << (ostream &stream, const Exponential &model)
 	stream.precision (PRECISION);
 	stream << "\nEXPONENTIAL DISTRIBUTION:" << std::endl;
 	stream << "=========================" << std::endl;
-	stream << "\nParameters:" << endl;
-	stream << "~~~~~~~~~~~" << endl;
+	stream << "\nContinuous distribution:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
 	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);

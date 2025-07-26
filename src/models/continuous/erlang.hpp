@@ -19,6 +19,7 @@ class Erlang final : public SpecialGamma
 //      Members                                                               //
 //============================================================================//
 private:
+	static const size_t params;		// Count of distribution parameters
 
 // Extract the distribution parameters from empirical observations
 struct Params {
@@ -93,6 +94,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Number of distribution parameters to describe the population          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual size_t Parameters (void) const override final {
+		return params;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mode (void) const override final {
@@ -122,6 +130,11 @@ public:
 };
 
 //****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const size_t Erlang::params = 2;
+
+//****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
 ostream& operator << (ostream &stream, const Erlang &model)
@@ -130,8 +143,9 @@ ostream& operator << (ostream &stream, const Erlang &model)
 	stream.precision (PRECISION);
 	stream << "\nERLANG DISTRIBUTION:" << std::endl;
 	stream << "====================" << std::endl;
-	stream << "\nParameters:" << endl;
-	stream << "~~~~~~~~~~~" << endl;
+	stream << "\nContinuous distribution:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
 	stream << "    Shape\t\t\t\t= " << model.Shape() << endl;
 	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
 	stream << static_cast <const BaseModel&> (model);
