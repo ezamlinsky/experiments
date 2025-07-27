@@ -26,10 +26,9 @@ public:
 // Distribution type
 enum DistType {
 	NONE,
+	EMPIRICAL,							// Empirical distribution
 	THEORETICAL_DISCRETE,				// Theoretical discrete distribution
 	THEORETICAL_CONTINUOUS,				// Theoretical continuous distribution
-	EMPIRICAL_DISCRETE,					// Empirical discrete distribution
-	EMPIRICAL_CONTINUOUS				// Empirical continuous distribution
 };
 
 private:
@@ -201,7 +200,7 @@ public:
 	// Discrete distribution
 	Distribution (
 		const Observations &data		// Observations of a random value
-	) :	type (EMPIRICAL_DISCRETE),
+	) :	type (EMPIRICAL),
 		range (data.Domain())
 	{
 		// Extract the ranked dataset
@@ -218,7 +217,7 @@ public:
 	// Discrete distribution
 	Distribution (
 		vector <double> &&data			// Empirical dataset
-	) :	type (EMPIRICAL_DISCRETE),
+	) :	type (EMPIRICAL),
 		range (data)
 	{
 		// Check if the dataset is not empty
@@ -248,7 +247,7 @@ public:
 	Distribution (
 		const Observations &data,		// Observations of a random value
 		size_t bins						// Bins count for a histogram
-	) :	type (EMPIRICAL_CONTINUOUS),
+	) :	type (EMPIRICAL),
 		range (data.Domain()),
 		values (range.Split (bins))
 	{
@@ -263,7 +262,7 @@ public:
 	Distribution (
 		const vector <double> &data,	// Empirical dataset
 		size_t bins						// Bins count for a histogram
-	) :	type (EMPIRICAL_CONTINUOUS),
+	) :	type (EMPIRICAL),
 		range (data),
 		values (range.Split (bins))
 	{
@@ -368,10 +367,13 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const Distribution &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
 	switch (object.Type())
 	{
+		case Distribution::EMPIRICAL:
+			stream << "\nEMPIRICAL DISTRIBUTION:" << endl;
+			stream << "=======================" << endl;
+			break;
+
 		case Distribution::THEORETICAL_DISCRETE:
 			stream << "\nTHEORETICAL DISCRETE DISTRIBUTION:" << endl;
 			stream << "==================================" << endl;
@@ -382,16 +384,6 @@ ostream& operator << (ostream &stream, const Distribution &object)
 			stream << "====================================" << endl;
 			break;
 
-		case Distribution::EMPIRICAL_DISCRETE:
-			stream << "\nEMPIRICAL DISCRETE DISTRIBUTION:" << endl;
-			stream << "================================" << endl;
-			break;
-
-		case Distribution::EMPIRICAL_CONTINUOUS:
-			stream << "\nEMPIRICAL CONTINUOUS DISTRIBUTION:" << endl;
-			stream << "==================================" << endl;
-			break;
-
 		default:
 			stream << "\nDISTRIBUTION:" << endl;
 			stream << "=============" << endl;
@@ -399,7 +391,6 @@ ostream& operator << (ostream &stream, const Distribution &object)
 	}
 	stream << "    Bins\t\t\t\t= " << object.Bins() << endl;
 	stream << object.Domain();
-	stream.precision (restore);
 	return stream;
 }
 /*
