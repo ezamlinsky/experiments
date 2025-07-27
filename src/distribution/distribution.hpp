@@ -45,33 +45,20 @@ private:
 private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Calculate theoretical PDF and CDF values for a discrete distribution  //
+//      Calculate theoretical PDF and CDF values for a distribution           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	void InitDicreteModel (
+	void InitModel (
 		const BaseModel &model,			// Theoretical model
-		const vector <double> &data		// Points to calculate the model values for
+		const vector <double> &data,	// Points to calculate the model values for
+		double last_cdf					// Initial point of the CDF function
 	){
 		// Fill the theoretical CDF table
-		double last_cdf = 0.0;
 		for (const auto x : data) {
 			const double cur_cdf = model.CDF (x);
 			pdf.push_back (cur_cdf - last_cdf);
 			cdf.push_back (cur_cdf);
 			last_cdf = cur_cdf;
 		}
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Calculate theoretical PDF and CDF values for a continuous distribution//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	void InitContinuousModel (
-		const BaseModel &model,			// Theoretical model
-		const vector <double> &data		// Points to calculate the model values for
-	){
-		// Fill the theoretical CDF table
-		pdf.push_back (NAN);
-		cdf.push_back (0.0);
-		InitDicreteModel (model, vector <double> (data.begin() + 1, data.end()));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -125,11 +112,13 @@ private:
 		const vector <double> &data,	// Empirical data for the calculation
 		const vector <double> &dcdf		// Empirical discrete CDF values
 	){
+		// The first value is trivial because we have the fixed minimum value
+		pdf.push_back (NAN);
+		cdf.push_back (0.0);
+
 		// Compute the PDF and CDF functions using created bins
 		// We do linear interpolation when a value resides between
 		// two empirical points
-		pdf.push_back (NAN);
-		cdf.push_back (0.0);
 		double last_cdf = 0.0;
 		size_t j = 0;
 		const size_t size = values.size();
@@ -177,29 +166,19 @@ public:
 	// Universal constructor
 	Distribution (
 		const BaseModel &model,			// Theoretical model
-		const vector <double> &values,	// Unique values
-		DistType type					// Distribution type
-	) :	type (type),
-		range (values),
+		const vector <double> &values	// Unique values
+	) :	range (values),
 		values (values)
 	{
 		// Calculate theoretical PDF and CDF values depending on the distribution type
-		if (type == Distribution::THEORETICAL_DISCRETE)
-			InitDicreteModel (model, values);
-		else
-			InitContinuousModel (model, values);
-	}
-
-	// Discrete distribution
-	Distribution (
-		const BaseModel &model,			// Theoretical model
-		const vector <double> &values	// Unique values
-	) :	type (THEORETICAL_DISCRETE),
-		range (values),
-		values (values)
-	{
-		// Calculate theoretical PDF and CDF values for a discrete model
-		InitDicreteModel (model, values);
+		if (model.Type() == BaseModel::DISCRETE) {
+			type = THEORETICAL_DISCRETE;
+			InitModel (model, values, 0.0);
+		}
+		else {
+			type = THEORETICAL_CONTINUOUS;
+			InitModel (model, values, NAN);
+		}
 	}
 
 	// Continuous distribution
@@ -212,7 +191,7 @@ public:
 		values (range.Split (bins))
 	{
 		// Calculate theoretical PDF and CDF values for a Continuous model
-		InitContinuousModel (model, values);
+		InitModel (model, values, NAN);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -322,9 +301,9 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Count of stored CDF data points                                       //
+//      Bins count the distribution function is split into                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	size_t Size (void) const {
+	size_t Bins (void) const {
 		return cdf.size();
 	}
 
@@ -418,7 +397,7 @@ ostream& operator << (ostream &stream, const Distribution &object)
 			stream << "=============" << endl;
 			break;
 	}
-	stream << "Bins\t\t\t\t\t= " << object.Size() << endl;
+	stream << "    Bins\t\t\t\t= " << object.Bins() << endl;
 	stream << object.Domain();
 	stream.precision (restore);
 	return stream;
