@@ -9,7 +9,6 @@
 */
 # pragma	once
 # include	"base.hpp"
-# include	"../models/continuous/kolmogorov.hpp"
 # include	"../models/discrete/uniform.hpp"
 # include	"../models/continuous/kolmogorov.hpp"
 # include	"../models/continuous/beta.hpp"
@@ -20,9 +19,19 @@
 # include	"../models/continuous/laplace.hpp"
 # include	"../models/continuous/asymmetric_laplace.hpp"
 
-// Use shortenings
-using namespace std;
-using ModelTest = pair <string, double>;
+//****************************************************************************//
+//      Class "KolmogorovScore"                                               //
+//****************************************************************************//
+struct KolmogorovScore
+{
+	string name;							// Distribution model name
+	double score;							// Score points
+
+	// Check two instances for equality (required by the vector template)
+	bool operator== (const KolmogorovScore &obj) const {
+		return (name == obj.name && score == obj.score);
+	}
+};
 
 //****************************************************************************//
 //      Class "CDF"                                                           //
@@ -39,7 +48,7 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	template <typename T>
 	void TestModel (
-		vector <ModelTest> &table,			// Score table
+		vector <KolmogorovScore> &table,	// Score table
 		const Observations &data,			// Observations of a random value
 		const string name					// Distribution model name
 	)
@@ -47,7 +56,7 @@ private:
 		if (T::InDomain (data.Domain())) {
 			T model (data);
 			ReferenceModel (model);
-			table.push_back (ModelTest (name, KolmogorovConfidenceLevel()));
+			table.push_back (KolmogorovScore {name, KolmogorovConfidenceLevel()});
 		}
 	} catch (const invalid_argument &exception) {}
 
@@ -298,13 +307,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Score table (confidence level) for different distribution models      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	static const vector <ModelTest> ScoreTable (
+	static const vector <KolmogorovScore> ScoreTable (
 		const Observations &data			// Observations of a random value
 	){
+		// Distribution comparator
 		CDF temp (data);
 
 		// Score table
-		vector <ModelTest> table;
+		vector <KolmogorovScore> table;
 
 		// Test available distribution models
 		temp.TestModel <Beta> (table, data, "Beta\t\t\t= ");
@@ -316,8 +326,8 @@ public:
 		temp.TestModel <AsymmetricLaplace> (table, data, "Asymmetric Laplace\t= ");
 
 		// Compare function to sort the scores in descending order
-		auto comp = [] (ModelTest a, ModelTest b) {
-			return a.second > b.second;
+		auto comp = [] (KolmogorovScore a, KolmogorovScore b) {
+			return a.score > b.score;
 		};
 
 		// Rank the scores
@@ -329,7 +339,7 @@ public:
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-string vector_to_string (const vector <ModelTest> &table)
+const string kolmogorov_score_to_string (const vector <KolmogorovScore> &table)
 {
 	stringstream stream;
 	stream.precision (PRECISION);
@@ -338,7 +348,7 @@ string vector_to_string (const vector <ModelTest> &table)
 	stream << "Distribution name\tScore value (%)" << std::endl;
 	stream << "~~~~~~~~~~~~~~~~~~~~~~~\t~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 	for (const auto &item : table)
-		stream << item.first << fixed << setprecision (3) << item.second * 100 <<endl;
+		stream << item.name << fixed << setprecision (3) << item.score * 100 <<endl;
 	return stream.str();
 }
 /*

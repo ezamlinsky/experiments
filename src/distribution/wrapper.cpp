@@ -23,18 +23,32 @@ BOOST_PYTHON_MODULE (distribution) {
 	using namespace boost::python;
 
 //============================================================================//
-//      Expose "ModelScore" to Python                                         //
+//      Expose "KolmogorovScore" to Python                                    //
 //============================================================================//
-	class_ <ModelTest> ("ModelScore")
-		.def_readwrite ("first", &ModelTest::first)
-		.def_readwrite ("second", &ModelTest::second);
+	class_ <KolmogorovScore> ("KolmogorovScore")
+		.def_readonly ("name", &KolmogorovScore::name)
+		.def_readonly ("score", &KolmogorovScore::score);
 
 //============================================================================//
-//      Expose vector <ModelTest> to Python                                   //
+//      Expose "PearsonScore" to Python                                       //
 //============================================================================//
-	class_ <vector <ModelTest> > ("ScoreVector")
-		.def (vector_indexing_suite <vector <ModelTest> > ())
-		.def ("__str__", vector_to_string);
+	class_ <PearsonScore> ("PearsonScore")
+		.def_readonly ("name", &PearsonScore::name)
+		.def_readonly ("score", &PearsonScore::score);
+
+//============================================================================//
+//      Expose vector <KolmogorovScoreVector> to Python                       //
+//============================================================================//
+	class_ <vector <KolmogorovScore>> ("KolmogorovScoreVector")
+		.def (vector_indexing_suite <vector <KolmogorovScore> > ())
+		.def ("__str__", kolmogorov_score_to_string);
+
+//============================================================================//
+//      Expose vector <PearsonScoreVector> to Python                          //
+//============================================================================//
+	class_ <vector <PearsonScore>> ("PearsonScoreVector")
+		.def (vector_indexing_suite <vector <PearsonScore> > ())
+		.def ("__str__", pearson_score_to_string);
 
 //============================================================================//
 //      Expose Bins class to Python                                           //
@@ -219,7 +233,12 @@ void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample
 			"Confidence level of Pearson's chi-squared test")
 		.def ("PearsonChiSquaredTest",		&DistComparator::PearsonChiSquaredTest,
 			"Perform the Pearson's chi-squared test")
-		.def (self_ns::str (self_ns::self));
+		.def ("ScoreTable",					&DistComparator::ScoreTable,
+			"Score table (confidence level) for different distribution models")
+		.def (self_ns::str (self_ns::self))
+
+		// Static methods
+        .staticmethod ("ScoreTable");
 }
 /*
 ################################################################################

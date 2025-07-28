@@ -9,7 +9,28 @@
 */
 # pragma	once
 # include	"base.hpp"
+# include	"../models/discrete/uniform.hpp"
+# include	"../models/continuous/beta.hpp"
+# include	"../models/continuous/erlang.hpp"
 # include	"../models/continuous/chi_squared.hpp"
+# include	"../models/continuous/exponential.hpp"
+# include	"../models/continuous/normal.hpp"
+# include	"../models/continuous/laplace.hpp"
+# include	"../models/continuous/asymmetric_laplace.hpp"
+
+//****************************************************************************//
+//      Class "PearsonScore"                                                  //
+//****************************************************************************//
+struct PearsonScore
+{
+	string name;							// Distribution model name
+	double score;							// Score points
+
+	// Check two instances for equality (required by the vector template)
+	bool operator== (const PearsonScore &obj) const {
+		return (name == obj.name && score == obj.score);
+	}
+};
 
 //****************************************************************************//
 //      Class "DistComparator"                                                //
@@ -27,6 +48,23 @@ private:
 //      Private methods                                                       //
 //============================================================================//
 private:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Perform a test of a continuous distribution model                     //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	template <typename T>
+	void TestModel (
+		vector <PearsonScore> &table,		// Score table
+		const Observations &data,			// Observations of a random value
+		const string name					// Distribution model name
+	)
+	try {
+		if (T::InDomain (data.Domain())) {
+			T model (data);
+			ReferenceModel (model);
+			table.push_back (PearsonScore {name, PearsonConfidenceLevel()});
+		}
+	} catch (const invalid_argument &exception) {}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Compute the value of the Pearson's chi-squared test                   //
@@ -257,7 +295,55 @@ public:
 		else
 			throw invalid_argument ("PearsonTest: The confidence level must be in the range [0..1]");
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Score table (confidence level) for different distribution models      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	static const vector <PearsonScore> ScoreTable (
+		const Observations &data,			// Observations of a random value
+		size_t bins							// Bins count for a histogram
+	){
+		// Distribution comparator
+		DistComparator temp (data, bins);
+
+		// Score table
+		vector <PearsonScore> table;
+
+		// Test available distribution models
+		temp.TestModel <Beta> (table, data, "Beta\t\t\t= ");
+		temp.TestModel <Erlang> (table, data, "Erlang\t\t\t= ");
+		temp.TestModel <ChiSquared> (table, data, "Chi-squared\t\t= ");
+		temp.TestModel <Exponential> (table, data, "Exponential\t\t= ");
+		temp.TestModel <Normal> (table, data, "Normal\t\t\t= ");
+		temp.TestModel <Laplace> (table, data, "Laplace\t\t\t= ");
+		temp.TestModel <AsymmetricLaplace> (table, data, "Asymmetric Laplace\t= ");
+
+		// Compare function to sort the scores in descending order
+		auto comp = [] (PearsonScore a, PearsonScore b) {
+			return a.score > b.score;
+		};
+
+		// Rank the scores
+		sort (table.begin(), table.end(), comp);
+		return table;
+	}
 };
+
+//****************************************************************************//
+//      Translate the object to a string                                      //
+//****************************************************************************//
+const string pearson_score_to_string (const vector <PearsonScore> &table)
+{
+	stringstream stream;
+	stream.precision (PRECISION);
+	stream << "PEARSON CHI-SQUARED SCORE TABLE:" << std::endl;
+	stream << "===============================================" << std::endl;
+	stream << "Distribution name\tScore value (%)" << std::endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~\t~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+	for (const auto &item : table)
+		stream << item.name << fixed << setprecision (3) << item.score * 100 <<endl;
+	return stream.str();
+}
 /*
 ################################################################################
 #                                 END OF FILE                                  #
