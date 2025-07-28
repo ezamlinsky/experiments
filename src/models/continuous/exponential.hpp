@@ -39,10 +39,7 @@ struct Params {
 		if (Exponential::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
-			const double median = data.Median();
-
-			// Find the scale for these parameters
-			scale = median / log (2);
+			scale = data.Median() / log (2);
 		}
 		else
 			throw invalid_argument ("Exponential params: The data range is outside the distribution domain");
