@@ -10,6 +10,19 @@
 # pragma	once
 # include	"base.hpp"
 # include	"../models/continuous/kolmogorov.hpp"
+# include	"../models/discrete/uniform.hpp"
+# include	"../models/continuous/kolmogorov.hpp"
+# include	"../models/continuous/beta.hpp"
+# include	"../models/continuous/erlang.hpp"
+# include	"../models/continuous/chi_squared.hpp"
+# include	"../models/continuous/exponential.hpp"
+# include	"../models/continuous/normal.hpp"
+# include	"../models/continuous/laplace.hpp"
+# include	"../models/continuous/asymmetric_laplace.hpp"
+
+// Use shortenings
+using namespace std;
+using ModelTest = pair <string, double>;
 
 //****************************************************************************//
 //      Class "CDF"                                                           //
@@ -20,6 +33,23 @@ class CDF : public BaseComparator
 //      Private methods                                                       //
 //============================================================================//
 private:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Perform a test of a continuous distribution model                     //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	template <typename T>
+	void TestModel (
+		vector <ModelTest> &table,			// Score table
+		const Observations &data,			// Observations of a random value
+		const string name					// Distribution model name
+	)
+	try {
+		if (T::InDomain (data.Domain())) {
+			T model (data);
+			ReferenceModel (model);
+			table.push_back (ModelTest (name, KolmogorovConfidenceLevel()));
+		}
+	} catch (const invalid_argument &exception) {}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Compute the value of the one-sample Kolmogorov-Smirnov test           //
@@ -264,7 +294,53 @@ public:
 		else
 			throw invalid_argument ("KolmogorovSmirnovTest: The confidence level must be in the range [0..1]");
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Score table (confidence level) for different distribution models      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	static const vector <ModelTest> ScoreTable (
+		const Observations &data			// Observations of a random value
+	){
+		CDF temp (data);
+
+		// Score table
+		vector <ModelTest> table;
+
+		// Test available distribution models
+		temp.TestModel <Beta> (table, data, "Beta\t\t\t= ");
+		temp.TestModel <Erlang> (table, data, "Erlang\t\t\t= ");
+		temp.TestModel <ChiSquared> (table, data, "Chi-squared\t\t= ");
+		temp.TestModel <Exponential> (table, data, "Exponential\t\t= ");
+		temp.TestModel <Normal> (table, data, "Normal\t\t\t= ");
+		temp.TestModel <Laplace> (table, data, "Laplace\t\t\t= ");
+		temp.TestModel <AsymmetricLaplace> (table, data, "Asymmetric Laplace\t= ");
+
+		// Compare function to sort the scores in descending order
+		auto comp = [] (ModelTest a, ModelTest b) {
+			return a.second > b.second;
+		};
+
+		// Rank the scores
+		sort (table.begin(), table.end(), comp);
+		return table;
+	}
 };
+
+//****************************************************************************//
+//      Translate the object to a string                                      //
+//****************************************************************************//
+string vector_to_string (const vector <ModelTest> &table)
+{
+	stringstream stream;
+	stream.precision (PRECISION);
+	stream << "\nKOLMOGOROV SCORE TABLE:" << std::endl;
+	stream << "===============================================" << std::endl;
+	stream << "Distribution name\tScore value (%)" << std::endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~\t~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+	for (const auto &item : table)
+		stream << item.first << fixed << setprecision (3) << item.second * 100 <<endl;
+	return stream.str();
+}
 /*
 ################################################################################
 #                                 END OF FILE                                  #
