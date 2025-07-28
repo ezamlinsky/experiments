@@ -8,6 +8,7 @@
 ################################################################################
 */
 # pragma	once
+# include	<boost/math/special_functions/erf.hpp>
 # include	"../confidence_interval.hpp"
 # include	"continuous_distribution.hpp"
 # include	"chi_squared.hpp"
@@ -42,7 +43,7 @@ struct Params {
 
 			// Extract parameters from the empirical observations
 			location = data.Median();
-			scale = data.StdDev();
+			scale = data.MedianAbsDevFromMedian() / (sqrt (2.0) * boost::math::erf_inv (0.5));
 		}
 		else
 			throw invalid_argument ("Normal params: The data range is outside the distribution domain");
