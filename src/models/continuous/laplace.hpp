@@ -39,7 +39,7 @@ struct Params {
 
 			// Extract parameters from the empirical observations
 			location = data.Median();
-			scale = data.MeanAbsDevFromMedian();
+			scale = data.MedianAbsDevFromMedian() / log (2);
 		}
 		else
 			throw invalid_argument ("Laplace params: The data range is outside the distribution domain");
