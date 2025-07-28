@@ -10,32 +10,9 @@
 # include	<boost/python.hpp>
 # include	<boost/python/suite/indexing/vector_indexing_suite.hpp>
 # include	"bins.hpp"
-# include	"cdf_values.hpp"
-# include	"cdfs.hpp"
-# include	"discrete.hpp"
-# include	"continuous.hpp"
-# include	"distributions.hpp"
-# include	"kolmogorov_score.hpp"
-
-//****************************************************************************//
-//      Common methods for discrete and continuous distributions class        //
-//****************************************************************************//
-# define	DISTRIBUTIONS_COMMON(class) 										\
-	.add_property ("Size",	&class::Size, 										\
-		"Count of stored CDF data points") 										\
-	.def ("Domain",			&class::Domain, 									\
-		return_internal_reference <> (), 										\
-		"Domain of the CDF") 													\
-	.def ("Values",			&class::Values, 									\
-		return_internal_reference <> (), 										\
-		"Unique values in the dataset") 										\
-	.def ("PDF",			&class::PDF, 										\
-		return_internal_reference <> (), 										\
-		"Values of the PDF function for the dataset") 							\
-	.def ("CDF",			&class::CDF, 										\
-		return_internal_reference <> (), 										\
-		"Values of the CDF function for the dataset") 							\
-	.def (self_ns::str (self_ns::self));
+# include	"distribution.hpp"
+# include	"cdf.hpp"
+# include	"comparator.hpp"
 
 //****************************************************************************//
 //      Python module initialization functions                                //
@@ -56,7 +33,8 @@ BOOST_PYTHON_MODULE (distribution) {
 //      Expose vector <ModelTest> to Python                                   //
 //============================================================================//
 	class_ <vector <ModelTest> > ("ScoreVector")
-		.def (vector_indexing_suite <vector <ModelTest> > ());
+		.def (vector_indexing_suite <vector <ModelTest> > ())
+		.def ("__str__", vector_to_string);
 
 //============================================================================//
 //      Expose Bins class to Python                                           //
@@ -78,162 +56,169 @@ BOOST_PYTHON_MODULE (distribution) {
 		.def (self_ns::str (self_ns::self));
 
 //============================================================================//
-//      Expose "CDFValues" class to Python                                    //
+//      Expose "Distribution" class to Python                                 //
 //============================================================================//
-	class_ <CDFValues> ("CDFValues",
-		"Calculate a CDF using empirical data or a theoretical model",
-		init <> ())
-		.add_property ("Size",	&CDFValues::Size,
-			"Count of CDF data points for which we have values")
-		.def ("Domain",	&CDFValues::Domain,
-			return_internal_reference <> (),
-			"Domain of the CDF")
-		.def ("Values",	&CDFValues::Values,
-			return_internal_reference <> (),
-			"Unique values in the dataset")
-		.def ("PDF",	&CDFValues::PDF,
-			return_internal_reference <> (),
-			"Values of the PDF function for the dataset")
-		.def ("CDF",	&CDFValues::CDF,
-			return_internal_reference <> (),
-			"Values of the CDF function for the dataset")
-		.def (self_ns::str (self_ns::self));
-
-//============================================================================//
-//      Expose "CDFs" class to Python                                         //
-//============================================================================//
-void (CDFs::*ReferenceSample1)(const list &py_list)			= &CDFs::ReferenceSample;
-void (CDFs::*ReferenceSample2)(const vector <double> &data)	= &CDFs::ReferenceSample;
-	class_ <CDFs> ("CDFs",
-		"Compare two CDF functions with one another",
-		init <const list&> (args ("data"),
-			"Calculate CDF for empirical data"))
-		.def (init <const vector <double>&>
-			(args ("data"),
-			"Calculate CDF for empirical data"))
-		.def (init <const Observations&>
-			(args ("data"),
-			"Calculate CDF for empirical data"))
-		.def (init <const list&, const BaseModel&>
-			(args ("data", "model"),
-			"Calculate CDFs for empirical data and a theoretical model"))
-		.def (init <const vector <double>&, const BaseModel&>
-			(args ("data", "model"),
-			"Calculate CDFs for empirical data and a theoretical model"))
-		.def (init <const Observations&, const BaseModel&>
-			(args ("data", "model"),
-			"Calculate CDFs for empirical data and a theoretical model"))
-		.def (init <const list&, const list&>
-			(args ("sample", "reference"),
-			"Calculate CDFs for empirical data only (a sample and a reference)"))
-		.def (init <const vector <double>&, const vector <double>&>
-			(args ("sample", "reference"),
-			"Calculate CDFs for empirical data only (a sample and a reference)"))
-		.def (init <const Observations&, const Observations&>
-			(args ("sample", "reference"),
-			"Calculate CDFs for empirical data only (a sample and a reference)"))
-		.def ("ReferenceSample",		ReferenceSample1,		args ("data"),
-			"Load another sample as a reference for the distribution test")
-		.def ("ReferenceSample",		ReferenceSample2,		args ("data"),
-			"Load another sample as a reference for the distribution test")
-		.def ("ReferenceModel",			&CDFs::ReferenceModel,	args ("model"),
-			"Load a distribution model as a reference for the distribution test")
-		.def ("Sample",					&CDFs::Sample,
-			return_value_policy <copy_const_reference> (),
-			"Return sample CDF function")
-		.def ("Reference",				&CDFs::Reference,
-			return_value_policy <copy_const_reference> (),
-			"Return reference CDF function")
-		.def ("ConfidenceLevel",		&CDFs::ConfidenceLevel,
-			"Confidence level of the one-sample Kolmogorov-Smirnov test")
-		.def ("KolmogorovSmirnovTest",	&CDFs::KolmogorovSmirnovTest,
-			"Do one-sample and two-sample Kolmogorov-Smirnov tests for two CDFs")
-		.def (self_ns::str (self_ns::self));
-
-//============================================================================//
-//      Expose "DiscreteDistribution" class to Python                         //
-//============================================================================//
-	class_ <DiscreteDistribution> ("DiscreteDistribution",
+	class_ <Distribution> ("Distribution",
 		"Calculate pdf and cdf for a discrete distribution",
 		init <> ())
-		.def (init <const list&> (args ("data"),
-			"Calculate a distribution for empirical data"))
-		.def (init <const vector <double>&> (args ("data"),
-			"Calculate a distribution for empirical data"))
-		.def ("GetPDF",	&DiscreteDistribution::GetPDF, args ("x"),
-			"Find a value of the PDF function for an arbitrary Х")
-		.def ("GetCDF",	&DiscreteDistribution::GetCDF, args ("x"),
-			"Find a value of the CDF function for an arbitrary Х")
-		DISTRIBUTIONS_COMMON (DiscreteDistribution)
 
-//============================================================================//
-//      Expose "ContinuousDistribution" class to Python                       //
-//============================================================================//
-	class_ <ContinuousDistribution> ("ContinuousDistribution",
-		"Calculate pdf and cdf for a continuous distribution",
-		init <> ())
-		.def (init <const list&, size_t>
-			(args ("data", "bins"),
-			"Calculate a distribution for empirical data"))
-		.def (init <const vector <double>&, size_t>
-			(args ("data", "bins"),
-			"Calculate a distribution for empirical data"))
-		.def (init <const BaseModel&, const Range&, size_t>
-			(args ("model", "range", "bins"),
-			"Calculate a distribution for a theoretical model"))
-		.def ("SmoothedPDF",	&ContinuousDistribution::SmoothedPDF,
-			args ("points"),
-			"Smoothed values of the CDF function for the dataset")
-		DISTRIBUTIONS_COMMON (ContinuousDistribution)
-
-//============================================================================//
-//      Expose "Distributions" class to Python                                //
-//============================================================================//
-	class_ <Distributions> ("Distributions",
-		"Aggregate multiple statistical distributions in one set",
-		init <> ())
-		.def (init <const ContinuousDistribution&>	(args ("dist"),
-			"Appends a continuous distribution to the set"))
-		.def (init <const list&, size_t>
-			(args ("data", "bins"),
-			"Calculate a continuous distribution for empirical data"))
-		.def (init <const vector <double>&, size_t>
-			(args ("data", "bins"),
-			"Calculate a continuous distribution for empirical data"))
+		// Constructor from a theoretical model
+		.def (init <const BaseModel&, const vector <double>&>
+			(args ("model", "values"),
+			"Calculate a discrete distribution for a theoretical model"))
 		.def (init <const BaseModel&, const Range&, size_t>
 			(args ("model", "range", "bins"),
 			"Calculate a continuous distribution for a theoretical model"))
-		.def (init <const vector <double>&, const BaseModel&, size_t>
-			(args ("data", "model", "bins"),
-			"Calculate continuous distributions for empirical data and a model"))
-		.def (init <const list&, const BaseModel&, size_t>
-			(args ("data", "model", "bins"),
-			"Calculate continuous distribution for empirical data and a model"))
-		.def (init <const list&, const list&, size_t>
-			(args ("sample", "reference", "bins"),
-			"Calculate continuous distributions for empirical data only (a sample and a reference)"))
-		.def (init <const vector <double>&, const vector <double>&, size_t>
-			(args ("sample", "reference", "bins"),
-			"Calculate continuous distributions for empirical data only (a sample and a reference)"))
-		.add_property ("Size",	&Distributions::Size,
-			"Count of stored distribution in the set")
-		.def ("Add",			&Distributions::Add,
-			"Add a continuous distribution to the set")
-		.def ("Get",			&Distributions::Get,	args("index"),
-			return_value_policy <copy_const_reference> (),
-			"Get a continuous distribution by its index in the set")
-		.def (self_ns::str (self_ns::self));
+
+		// Constructors from empirical data
+		.def (init <const list&> (args ("data"),
+			"Calculate a discrete distribution from empirical data"))
+		.def (init <const vector <double>&> (args ("data"),
+			"Calculate a discrete distribution from empirical data"))
+		.def (init <const Observations&> (args ("data"),
+			"Calculate a discrete distribution from empirical data"))
+		.def (init <const list&, size_t> (args ("data", "bins"),
+			"Calculate a continuous distribution from empirical data"))
+		.def (init <const vector <double>&, size_t> (args ("data", "bins"),
+			"Calculate a continuous distribution from empirical data"))
+		.def (init <const Observations&, size_t> (args ("data", "bins"),
+			"Calculate a continuous distribution from empirical data"))
+
+		// Methods
+		.def ("Domain",			&Distribution::Domain,	return_internal_reference <> (),
+			"Domain of the distribution")
+		.def ("Values",			&Distribution::Values,	return_internal_reference <> (),
+			"Unique values in the dataset")
+		.def ("CDF",			&Distribution::CDF,		return_internal_reference <> (),
+			"Values of the CDF function for the dataset")
+		.def ("PDF",			&Distribution::PDF,		return_internal_reference <> (),
+			"Values of the PDF function for the dataset")
+		.def ("SmoothedPDF",	&Distribution::SmoothedPDF,	args ("points"),
+			"Smoothed values of the CDF function for the dataset")
+		.def ("GetCDF",			&Distribution::GetCDF, args ("x"),
+			"Find a value of the CDF function for an arbitrary Х")
+		.def ("GetPDF",			&Distribution::GetPDF, args ("x"),
+			"Find a value of the PDF function for an arbitrary Х")
+		.def (self_ns::str (self_ns::self))
+
+		// Properties
+		.add_property ("Bins",	&Distribution::Bins,
+			"Bins count the distribution function is split into");
 
 //============================================================================//
-//      Expose "KolmogorovScore" class to Python                              //
+//      Expose "CDF" class to Python                                          //
 //============================================================================//
-	class_ <KolmogorovScore> ("KolmogorovScore",
-		"Rank results of one-sample kolmogorov-smirnov tests",
-		init <const Observations&> (args ("data"),
-			"Test different theoretical distribution models for the empirical observations to find the best one fit"))
-		.def ("ScoreTable",	&KolmogorovScore::ScoreTable,
-			return_internal_reference <> (),
-			"Score table (confidence level) for different models")
+void (CDF::*ReferenceSample1)(const list &py_list)			= &CDF::ReferenceSample;
+void (CDF::*ReferenceSample2)(const vector <double> &data)	= &CDF::ReferenceSample;
+void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample;
+	class_ <CDF> ("CDF",
+		"Compare two cdf functions with one another",
+		init <const list&> (args ("data"),
+			"Init the sample from empirical data"))
+		.def (init <const vector <double>&> (args ("data"),
+			"Init the sample from empirical data"))
+		.def (init <const Observations&> (args ("data"),
+			"Init the sample from empirical data"))
+
+		// Constructors from empirical data and a theoretical model
+		.def (init <const list&, const BaseModel&>
+			(args ("data", "model"),
+			"Init distributions from empirical data and a theoretical model"))
+		.def (init <const vector <double>&, const BaseModel&>
+			(args ("data", "model"),
+			"Init distributions from empirical data and a theoretical model"))
+		.def (init <const Observations&, const BaseModel&>
+			(args ("data", "model"),
+			"Init distributions from empirical data and a theoretical model"))
+
+		// Constructors from empirical data only (a sample and a reference)
+		.def (init <const list&, const list&>
+			(args ("sample", "reference"),
+			"Init distributions from empirical data only (a sample and a reference)"))
+		.def (init <const vector <double>&, const vector <double>&>
+			(args ("sample", "reference"),
+			"Init distributions from empirical data only (a sample and a reference)"))
+		.def (init <const Observations&, const Observations&>
+			(args ("sample", "reference"),
+			"Init distributions from empirical data only (a sample and a reference)"))
+
+		// Methods
+		.def ("ReferenceSample",			ReferenceSample1,		args ("data"),
+			"Load another sample as a reference for the distribution test")
+		.def ("ReferenceSample",			ReferenceSample2,		args ("data"),
+			"Load another sample as a reference for the distribution test")
+		.def ("ReferenceSample",			ReferenceSample3,		args ("data"),
+			"Load another sample as a reference for the distribution test")
+		.def ("ReferenceModel",				&CDF::ReferenceModel,	args ("model"),
+			"Load a distribution model as a reference for the distribution test")
+		.def ("Sample",						&CDF::Sample,
+			return_value_policy <copy_const_reference> (),
+			"Return sample distribution")
+		.def ("Reference",					&CDF::Reference,
+			return_value_policy <copy_const_reference> (),
+			"Return reference distribution")
+		.def ("KolmogorovConfidenceLevel",	&CDF::KolmogorovConfidenceLevel,
+			"Confidence level of the one-sample Kolmogorov-Smirnov test")
+		.def ("KolmogorovSmirnovTest",		&CDF::KolmogorovSmirnovTest,
+			"Perform the one-sample or two-sample Kolmogorov-Smirnov test")
+		.def ("ScoreTable",					&CDF::ScoreTable,
+			"Score table (confidence level) for different distribution models")
+		.def (self_ns::str (self_ns::self))
+
+		// Static methods
+        .staticmethod ("ScoreTable");
+
+//============================================================================//
+//      Expose "DistComparator" class to Python                               //
+//============================================================================//
+	class_ <DistComparator> ("DistComparator",
+		"Compare two distributions functions with one another",
+		init <const list&> (args ("data"),
+			"Init the sample as a discrete distribution from empirical data"))
+		.def (init <const vector <double>&> (args ("data"),
+			"Init the sample as a discrete distribution from empirical data"))
+		.def (init <const Observations&> (args ("data"),
+			"Init the sample as a discrete distribution from empirical data"))
+		.def (init <const list&, size_t> (args ("data", "bins"),
+			"Init the sample as a continuous distribution from empirical data"))
+		.def (init <const vector <double>&, size_t> (args ("data", "bins"),
+			"Init the sample as a continuous distribution from empirical data"))
+		.def (init <const Observations&, size_t> (args ("data", "bins"),
+			"Init the sample as a continuous distribution from empirical data"))
+
+		// Constructors from empirical data and a theoretical model
+		.def (init <const list&, const BaseModel&>
+			(args ("data", "model"),
+			"Init discrete distributions from empirical data and a theoretical model"))
+		.def (init <const vector <double>&, const BaseModel&>
+			(args ("data", "model"),
+			"Init discrete distributions from empirical data and a theoretical model"))
+		.def (init <const Observations&, const BaseModel&>
+			(args ("data", "model"),
+			"Init discrete distributions from empirical data and a theoretical model"))
+		.def (init <const list&, const BaseModel&, size_t>
+			(args ("data", "model", "bins"),
+			"Init continuous distributions from empirical data and a theoretical model"))
+		.def (init <const vector <double>&, const BaseModel&, size_t>
+			(args ("data", "model", "bins"),
+			"Init continuous distributions from empirical data and a theoretical model"))
+		.def (init <const Observations&, const BaseModel&, size_t>
+			(args ("data", "model", "bins"),
+			"Init continuous distributions from empirical data and a theoretical model"))
+
+		// Methods
+		.def ("ReferenceModel",				&DistComparator::ReferenceModel,	args ("model"),
+			"Load a distribution model as a reference for the distribution test")
+		.def ("Sample",						&DistComparator::Sample,
+			return_value_policy <copy_const_reference> (),
+			"Return sample distribution")
+		.def ("Reference",					&DistComparator::Reference,
+			return_value_policy <copy_const_reference> (),
+			"Return reference distribution")
+		.def ("PearsonConfidenceLevel",		&DistComparator::PearsonConfidenceLevel,
+			"Confidence level of Pearson's chi-squared test")
+		.def ("PearsonChiSquaredTest",		&DistComparator::PearsonChiSquaredTest,
+			"Perform the Pearson's chi-squared test")
 		.def (self_ns::str (self_ns::self));
 }
 /*
