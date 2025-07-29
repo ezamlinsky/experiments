@@ -131,9 +131,7 @@ ostream& operator << (ostream &stream, const DiscreteUniform &model)
 	stream.precision (PRECISION);
 	stream << "\nUNIFORM DISTRIBUTION:" << std::endl;
 	stream << "=====================" << std::endl;
-	stream << "\nDiscrete distribution:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
+	stream << static_cast <const BaseDiscrete&> (model);
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
