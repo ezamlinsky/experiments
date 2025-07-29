@@ -8,7 +8,6 @@
 ################################################################################
 */
 # pragma	once
-# include	<cstdint>
 # include	"discrete.hpp"
 
 //****************************************************************************//
@@ -80,7 +79,7 @@ public:
 			return 0.0;
 
 		// Greater than or equal to max value
-		if (range.Max() <= x)
+		if (range.Max() < x)
 			return 1.0;
 
 		// Common case
@@ -106,7 +105,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {
 		const double temp = (range.Length() + 1);
-		return (temp * temp - 1.0)  / 12.0;
+		return (temp * temp - 1.0) / 12.0;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
