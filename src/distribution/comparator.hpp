@@ -10,13 +10,7 @@
 # pragma	once
 # include	"base.hpp"
 # include	"../models/discrete/uniform.hpp"
-# include	"../models/continuous/beta.hpp"
-# include	"../models/continuous/erlang.hpp"
 # include	"../models/continuous/chi_squared.hpp"
-# include	"../models/continuous/exponential.hpp"
-# include	"../models/continuous/normal.hpp"
-# include	"../models/continuous/laplace.hpp"
-# include	"../models/continuous/asymmetric_laplace.hpp"
 
 //****************************************************************************//
 //      Class "PearsonScore"                                                  //
@@ -50,28 +44,44 @@ private:
 private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Perform a test of a continuous distribution model                     //
+//      Perform a test of a distribution model                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	template <typename T>
 	void TestModel (
-		vector <PearsonScore> &table,		// Score table
+		vector <PearsonScore> &table,	// Score table
+		const Observations &data,			// Observations of a random value
+		const string name					// Distribution model name
+	)
+	try {
+		// Set the distribution model
+		ReferenceModel (T (data));
+
+		// Try to estimate the confidence level of Pearson's chi-squared test
+		const double level = PearsonConfidenceLevel();
+		if (!isnan (level))
+			table.push_back (PearsonScore {name, level});
+
+	} catch (const invalid_argument &exception) {}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Perform a test of a distribution model with the range validation      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	template <typename T>
+	void TestModelWithRange (
+		vector <PearsonScore> &table,	// Score table
 		const Observations &data,			// Observations of a random value
 		const string name					// Distribution model name
 	)
 	try {
 		if (T::InDomain (data.Domain())) {
-			T model (data);
-			ReferenceModel (model);
-			table.push_back (PearsonScore {name, PearsonConfidenceLevel()});
+			TestModel <T> (table, data, name);
 		}
 	} catch (const invalid_argument &exception) {}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Compute the value of the Pearson's chi-squared test                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double PearsonCriteria (
-		size_t start_index					// The first index to start from
-	) const {
+	double PearsonCriteria (void) const {
 
 		// Get both PDF functions
 		const vector <double> &src = sample.PDF();
@@ -80,7 +90,7 @@ private:
 		// Find the relative error between them
 		double sum = 0.0;
 		const size_t size = src.size();
-		for (size_t i = start_index; i < size; i++) {
+		for (size_t i = 0; i < size; i++) {
 			const double diff = abs (src[i] - ref[i]);
 			sum += diff * diff / ref[i];
 		}
@@ -92,37 +102,50 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Compute the confidence level of Pearson's chi-squared test            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double PearsonLevel (
-		size_t start_index					// The first index to start from
-	) const {
+	double PearsonLevel (void) const {
 
 		// Compute the value of the Pearson's chi-squared test
-		const double criteria = PearsonCriteria (start_index);
+		const double criteria = PearsonCriteria();
 
-		// Return the confidence level
-		size_t correction = params + start_index + 1;
-		const ChiSquared &dist = ChiSquared (sample.Bins() - correction);
-		return 1.0 - dist.CDF (criteria);
+		// Calculate the degrees of freedom of the Chi-squared distribution
+		size_t bins = sample.Bins();
+		size_t correction = params + 1;
+		if (bins > correction) {
+
+			// Return the confidence level
+			const ChiSquared &dist = ChiSquared (bins - correction);
+			return 1.0 - dist.CDF (criteria);
+		}
+
+		// The test criteria are malformed
+		throw invalid_argument ("PearsonLevel: Degrees of freedom of the Chi-squared distribution are malformed");
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Pearson's chi-squared test                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	bool PearsonTest (
-		double alpha,				// Rejection level of the null hypothesis
-		size_t start_index			// The first index to start from
+		double alpha				// Rejection level of the null hypothesis
 	) const {
 
 		// Compute the value of the Pearson's chi-squared test
-		const double criteria = PearsonCriteria (start_index);
+		const double criteria = PearsonCriteria();
 
-		// Find the quantile of the Chi-squared distribution
-		size_t correction = params + start_index + 1;
-		const ChiSquared &dist = ChiSquared (sample.Bins() - correction);
-		const double quantile = dist.Quantile (alpha);
+		// Calculate the degrees of freedom of the Chi-squared distribution
+		size_t bins = sample.Bins();
+		size_t correction = params + 1;
+		if (bins > correction) {
 
-		// Check if we can accept the null hypothesis about the distribution type
-		return criteria <= quantile;
+			// Find the quantile of the Chi-squared distribution
+			const ChiSquared &dist = ChiSquared (bins - correction);
+			const double quantile = dist.Quantile (alpha);
+
+			// Check if we can accept the null hypothesis about the distribution type
+			return criteria <= quantile;
+		}
+
+		// The test criteria are malformed
+		throw invalid_argument ("PearsonTest: Degrees of freedom of the Chi-squared distribution are malformed");
 	}
 
 //============================================================================//
@@ -257,9 +280,9 @@ public:
 			// Check type of the reference distribution
 			Distribution::DistType type = reference.Type();
 			if (type == Distribution::THEORETICAL_DISCRETE)
-				return PearsonLevel (0);
+				return PearsonLevel();
 			else if (type == Distribution::THEORETICAL_CONTINUOUS)
-				return PearsonLevel (1);
+				throw invalid_argument ("PearsonConfidenceLevel: Only discrete distribution models can be tested");
 			else
 				throw invalid_argument ("PearsonConfidenceLevel: Can calculate the critical confidence level for a theoretical model only");
 		}
@@ -283,9 +306,9 @@ public:
 				// Check type of the reference distribution
 				Distribution::DistType type = reference.Type();
 				if (type == Distribution::THEORETICAL_DISCRETE)
-					return PearsonTest (1.0 - level, 0);
+					return PearsonTest (1.0 - level);
 				else if (type == Distribution::THEORETICAL_CONTINUOUS)
-					return PearsonTest (1.0 - level, 1);
+					throw invalid_argument ("PearsonTest: Only discrete distribution models can be tested");
 				else
 					throw invalid_argument ("PearsonTest: Pearson's chi-squared test is available for a theoretical model only");
 			}
@@ -300,23 +323,16 @@ public:
 //      Score table (confidence level) for different distribution models      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	static const vector <PearsonScore> ScoreTable (
-		const Observations &data,			// Observations of a random value
-		size_t bins							// Bins count for a histogram
+		const Observations &data			// Observations of a random value
 	){
 		// Distribution comparator
-		DistComparator temp (data, bins);
+		DistComparator temp (data);
 
 		// Score table
 		vector <PearsonScore> table;
 
 		// Test available distribution models
-		temp.TestModel <Beta> (table, data, "Beta\t\t\t= ");
-		temp.TestModel <Erlang> (table, data, "Erlang\t\t\t= ");
-		temp.TestModel <ChiSquared> (table, data, "Chi-squared\t\t= ");
-		temp.TestModel <Exponential> (table, data, "Exponential\t\t= ");
-		temp.TestModel <Normal> (table, data, "Normal\t\t\t= ");
-		temp.TestModel <Laplace> (table, data, "Laplace\t\t\t= ");
-		temp.TestModel <AsymmetricLaplace> (table, data, "Asymmetric Laplace\t= ");
+		temp.TestModel <DiscreteUniform> (table, data, "Discrete Uniform\t= ");
 
 		// Compare function to sort the scores in descending order
 		auto comp = [] (PearsonScore a, PearsonScore b) {
