@@ -9,7 +9,7 @@
 */
 # pragma	once
 # include	"base.hpp"
-# include	"../models/discrete/uniform.hpp"
+# include	"../models/continuous/uniform.hpp"
 # include	"../models/continuous/kolmogorov.hpp"
 # include	"../models/continuous/beta.hpp"
 # include	"../models/continuous/erlang.hpp"
@@ -44,7 +44,7 @@ class CDF : public BaseComparator
 private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Perform a test of a continuous distribution model                     //
+//      Perform a test of a distribution model                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	template <typename T>
 	void TestModel (
@@ -53,10 +53,28 @@ private:
 		const string name					// Distribution model name
 	)
 	try {
+		// Set the distribution model
+		ReferenceModel (T (data));
+
+		// Try to estimate the confidence level of the one-sample Kolmogorov-Smirnov test
+		const double level = KolmogorovConfidenceLevel();
+		if (!isnan (level))
+			table.push_back (KolmogorovScore {name, level});
+
+	} catch (const invalid_argument &exception) {}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Perform a test of a distribution model with the range validation      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	template <typename T>
+	void TestModelWithRange (
+		vector <KolmogorovScore> &table,	// Score table
+		const Observations &data,			// Observations of a random value
+		const string name					// Distribution model name
+	)
+	try {
 		if (T::InDomain (data.Domain())) {
-			T model (data);
-			ReferenceModel (model);
-			table.push_back (KolmogorovScore {name, KolmogorovConfidenceLevel()});
+			TestModel <T> (table, data, name);
 		}
 	} catch (const invalid_argument &exception) {}
 
@@ -268,8 +286,10 @@ public:
 
 			// Check type of the reference distribution
 			Distribution::DistType type = reference.Type();
-			if (type == Distribution::THEORETICAL_DISCRETE || type == Distribution::THEORETICAL_CONTINUOUS)
+			if (type == Distribution::THEORETICAL_CONTINUOUS)
 				return KolmogorovLevel();
+			else if (type == Distribution::THEORETICAL_DISCRETE)
+				throw invalid_argument ("KolmogorovConfidenceLevel: Only continuous distribution models can be tested");
 			else
 				throw invalid_argument ("KolmogorovConfidenceLevel: Can calculate the critical confidence level for a theoretical model only");
 		}
@@ -292,10 +312,12 @@ public:
 
 				// Check type of the reference distribution
 				Distribution::DistType type = reference.Type();
-				if (type == Distribution::THEORETICAL_DISCRETE || type == Distribution::THEORETICAL_CONTINUOUS)
+				if (type == Distribution::THEORETICAL_CONTINUOUS)
 					return OneSampleTest (1.0 - level);
-				else
+				else if (type == Distribution::EMPIRICAL)
 					return TwoSampleTest (1.0 - level);
+				else
+					throw invalid_argument ("KolmogorovSmirnovTest: Only continuous distribution models can be tested");
 			}
 			else
 				throw invalid_argument ("KolmogorovSmirnovTest: Set a sample and a reference for the test");
@@ -317,13 +339,14 @@ public:
 		vector <KolmogorovScore> table;
 
 		// Test available distribution models
-		temp.TestModel <Beta> (table, data, "Beta\t\t\t= ");
-		temp.TestModel <Erlang> (table, data, "Erlang\t\t\t= ");
-		temp.TestModel <ChiSquared> (table, data, "Chi-squared\t\t= ");
-		temp.TestModel <Exponential> (table, data, "Exponential\t\t= ");
-		temp.TestModel <Normal> (table, data, "Normal\t\t\t= ");
-		temp.TestModel <Laplace> (table, data, "Laplace\t\t\t= ");
-		temp.TestModel <AsymmetricLaplace> (table, data, "Asymmetric Laplace\t= ");
+		temp.TestModel <ContinuousUniform> (table, data, "Continuous Uniform\t= ");
+		temp.TestModelWithRange <Beta> (table, data, "Beta\t\t\t= ");
+		temp.TestModelWithRange <Erlang> (table, data, "Erlang\t\t\t= ");
+		temp.TestModelWithRange <ChiSquared> (table, data, "Chi-squared\t\t= ");
+		temp.TestModelWithRange <Exponential> (table, data, "Exponential\t\t= ");
+		temp.TestModelWithRange <Normal> (table, data, "Normal\t\t\t= ");
+		temp.TestModelWithRange <Laplace> (table, data, "Laplace\t\t\t= ");
+		temp.TestModelWithRange <AsymmetricLaplace> (table, data, "Asymmetric Laplace\t= ");
 
 		// Compare function to sort the scores in descending order
 		auto comp = [] (KolmogorovScore a, KolmogorovScore b) {
