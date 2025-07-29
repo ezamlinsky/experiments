@@ -12,6 +12,7 @@
 # include	"confidence_interval.hpp"
 # include	"discrete/uniform.hpp"
 # include	"continuous/kolmogorov.hpp"
+# include	"continuous/uniform.hpp"
 # include	"continuous/standard_t.hpp"
 # include	"continuous/fisher_snedecor.hpp"
 # include	"continuous/beta.hpp"
@@ -44,6 +45,8 @@
 //      Properties are inherited from the base distribution class             //
 //****************************************************************************//
 # define	BASE_CLASS_PROPERTIES(class) 										\
+	.add_property ("Mode",					&class::Mean,						\
+		"Mode of the distribution")												\
 	.add_property ("Mean",					&class::Mean,						\
 		"Mean of the distribution")												\
 	.add_property ("Variance",				&class::Variance,					\
@@ -167,6 +170,22 @@ BOOST_PYTHON_MODULE (models) {
 
 		// Properties
 		BASE_CLASS_PROPERTIES(Kolmogorov);
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "DiscreteUniform" class to Python                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <ContinuousUniform> ("ContinuousUniform",
+		"Model for a Continuous Uniform distribution",
+		init <double, double> (args ("min", "max"),
+			"Create a new Continuous Uniform distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Continuous Uniform distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS(ContinuousUniform)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (ContinuousUniform);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "StandardT" class to Python                                    //
