@@ -228,9 +228,7 @@ ostream& operator << (ostream &stream, const Beta &model)
 	stream.precision (PRECISION);
 	stream << "\nBETA DISTRIBUTION:" << std::endl;
 	stream << "==================" << std::endl;
-	stream << "\nContinuous distribution:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
+	stream << static_cast <const BaseContinuous&> (model);
 	stream << "    Shape #1\t\t\t\t= " << model.Shape1() << endl;
 	stream << "    Shape #2\t\t\t\t= " << model.Shape2() << endl;
 	stream << static_cast <const BaseModel&> (model);

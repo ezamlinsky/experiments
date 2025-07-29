@@ -143,9 +143,7 @@ ostream& operator << (ostream &stream, const Erlang &model)
 	stream.precision (PRECISION);
 	stream << "\nERLANG DISTRIBUTION:" << std::endl;
 	stream << "====================" << std::endl;
-	stream << "\nContinuous distribution:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
+	stream << static_cast <const BaseContinuous&> (model);
 	stream << "    Shape\t\t\t\t= " << model.Shape() << endl;
 	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
 	stream << static_cast <const BaseModel&> (model);

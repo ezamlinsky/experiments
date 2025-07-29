@@ -185,9 +185,7 @@ ostream& operator << (ostream &stream, const Kolmogorov &model)
 	stream.precision (PRECISION);
 	stream << "\nKOLMOGOROV DISTRIBUTION:" << std::endl;
 	stream << "========================" << std::endl;
-	stream << "\nContinuous distribution:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
+	stream << static_cast <const BaseContinuous&> (model);
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;

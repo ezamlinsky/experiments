@@ -199,9 +199,7 @@ ostream& operator << (ostream &stream, const Exponential &model)
 	stream.precision (PRECISION);
 	stream << "\nEXPONENTIAL DISTRIBUTION:" << std::endl;
 	stream << "=========================" << std::endl;
-	stream << "\nContinuous distribution:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
+	stream << static_cast <const BaseContinuous&> (model);
 	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);

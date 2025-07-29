@@ -174,9 +174,7 @@ ostream& operator << (ostream &stream, const F &model)
 	stream.precision (PRECISION);
 	stream << "\nSNEDECOR'S F-DISTRIBUTION:" << std::endl;
 	stream << "==========================" << std::endl;
-	stream << "\nContinuous distribution:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
+	stream << static_cast <const BaseContinuous&> (model);
 	stream << "    Degrees of freedom #1\t\t= " << model.DF1() << endl;
 	stream << "    Degrees of freedom #2\t\t= " << model.DF2() << endl;
 	stream << static_cast <const BaseModel&> (model);

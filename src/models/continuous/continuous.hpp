@@ -104,6 +104,17 @@ public:
 			throw invalid_argument ("Quantile: Level must be in the range [0..1]");
 	}
 };
+
+//****************************************************************************//
+//      Translate the object to a string                                      //
+//****************************************************************************//
+ostream& operator << (ostream &stream, const BaseContinuous &model)
+{
+	stream << "\nContinuous distribution:" << endl;
+	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
+	return stream;
+}
 /*
 ################################################################################
 #                                 END OF FILE                                  #

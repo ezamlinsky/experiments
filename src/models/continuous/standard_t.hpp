@@ -134,9 +134,7 @@ ostream& operator << (ostream &stream, const StandardT &model)
 	stream.precision (PRECISION);
 	stream << "\nSTUDENT’S T-DISTRIBUTION:" << std::endl;
 	stream << "=========================" << std::endl;
-	stream << "\nContinuous distribution:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
+	stream << static_cast <const BaseContinuous&> (model);
 	stream << "    Degrees of freedom\t\t\t= " << model.DF() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
