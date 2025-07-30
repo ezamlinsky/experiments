@@ -103,6 +103,13 @@ public:
 		else
 			throw invalid_argument ("Quantile: Level must be in the range [0..1]");
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Convert an instance of a derived class to the base class              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const BaseContinuous& data (void) const override final {
+		return *this;
+	}
 };
 
 //****************************************************************************//
