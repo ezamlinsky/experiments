@@ -68,11 +68,17 @@ struct Params {
 				asymmetry -= step;
 			}
 
-			// Compute location and scale of the distribution
-			const double temp1 = asymmetry * asymmetry;
-			const double temp2 = temp1 * temp1;
-			scale = sqrt ((variance * temp1) / (1.0 + temp2));
-			location = mean - (1.0 - temp1) * scale / asymmetry;
+			// Check if the found asymmetry coefficient is correct
+			if (asymmetry > 0) {
+
+				// Compute location and scale of the distribution
+				const double temp1 = asymmetry * asymmetry;
+				const double temp2 = temp1 * temp1;
+				scale = sqrt ((variance * temp1) / (1.0 + temp2));
+				location = mean - (1.0 - temp1) * scale / asymmetry;
+			}
+			else
+				throw invalid_argument ("Asymmetric Laplace params: Can not estimate the asymmetry coefficient for the dataset");
 		}
 		else
 			throw invalid_argument ("Asymmetric Laplace params: The data range is outside the distribution domain");
