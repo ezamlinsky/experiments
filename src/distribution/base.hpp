@@ -66,8 +66,7 @@ protected:
 		const T &model						// Theoretical model
 	){
 		// Check if empirical data range is inside the model domain
-		const Range &model_range = model.Domain();
-		if (model_range.IsInside (sample.Domain())) {
+		if (model.Domain() >= sample.Domain()) {
 
 			// Set the distribution model
 			reference = Distribution (model, sample.Values());
