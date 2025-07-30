@@ -115,24 +115,6 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Check if the value is inside the target range                         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	bool IsInside (
-		double value				// The value to check
-	) const {
-		return (min <= value && value <= max);
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Check if the passed range is inside the target range                  //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	bool IsInside (
-		const Range &source			// Testing range
-	) const {
-		return IsInside (source.min) && IsInside (source.max);
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Split the range into subranges (bins)                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Split (
@@ -159,6 +141,111 @@ public:
 		else
 			throw invalid_argument ("Split: The number of bins must be positive");
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the value is inside the target range                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool operator == (
+		double value				// The value to check
+	) const {
+		return min <= value && value <= max;
+	}
+    friend bool operator == (
+		double value,				// The value to check
+		const Range &range			// The range to compare with
+    ){
+		return range == value;
+    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the value is outside the target range                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool operator != (
+		double value				// The value to check
+	) const {
+		return min > value || value > max;
+	}
+    friend bool operator != (
+		double value,				// The value to check
+		const Range &range			// The range to compare with
+    ){
+		return range != value;
+    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the value is less than the target range                      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool operator > (
+		double value				// The value to check
+	) const {
+		return min > value;
+	}
+    friend bool operator < (
+		double value,				// The value to check
+		const Range &range			// The range to compare with
+    ){
+		return range > value;
+    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the value is less than or equal to the target range          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool operator >= (
+		double value				// The value to check
+	) const {
+		return min >= value;
+	}
+    friend bool operator <= (
+		double value,				// The value to check
+		const Range &range			// The range to compare with
+    ){
+		return range >= value;
+    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the value is greater than the target range                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool operator < (
+		double value				// The value to check
+	) const {
+		return max < value;
+	}
+    friend bool operator > (
+		double value,				// The value to check
+		const Range &range			// The range to compare with
+    ){
+		return range < value;
+    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the value is greater than or equal to the target range       //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool operator <= (
+		double value				// The value to check
+	) const {
+		return max <= value;
+	}
+    friend bool operator >= (
+		double value,				// The value to check
+		const Range &range			// The range to compare with
+    ){
+		return range <= value;
+    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the source range resides in the target range                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool operator >= (
+		const Range &source			// Source range
+	) const {
+		return *this == source.min && *this == source.max;
+	}
+    friend bool operator <= (
+		const Range &source,		// Source range
+		const Range &target			// Target range
+    ){
+		return target >= source;
+    }
 };
 
 //****************************************************************************//
