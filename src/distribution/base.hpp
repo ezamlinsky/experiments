@@ -58,20 +58,16 @@ protected:
 	) : sample (data, bins)
 	{}
 
-//============================================================================//
-//      Public methods                                                        //
-//============================================================================//
-public:
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Load a distribution model as a reference for the distribution test    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	template <typename T>
 	void ReferenceModel (
-		const BaseModel &model				// Theoretical model
+		const T &model						// Theoretical model
 	){
 		// Check if empirical data range is inside the model domain
-		const Range &range =  model.Domain();
-		if (range.IsInside (sample.Domain())) {
+		const Range &model_range = model.Domain();
+		if (model_range.IsInside (sample.Domain())) {
 
 			// Set the distribution model
 			reference = Distribution (model, sample.Values());
@@ -79,6 +75,11 @@ public:
 		else
 			throw invalid_argument ("ReferenceModel: The sample data range is outside the distribution model domain");
 	}
+
+//============================================================================//
+//      Public methods                                                        //
+//============================================================================//
+public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Return sample distribution                                            //
