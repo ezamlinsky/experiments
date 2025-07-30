@@ -207,7 +207,7 @@ public:
 	// Discrete distribution
 	DistComparator (
 		const Observations &data,			// Observations of a random value
-		const BaseModel &model				// Theoretical model
+		const BaseDiscrete &model			// Theoretical model
 	) : DistComparator (data)
 	{
 		ReferenceModel (model);
@@ -216,7 +216,7 @@ public:
 	// Discrete distribution
 	DistComparator (
 		const vector <double> &data,		// Empirical data
-		const BaseModel &model				// Theoretical model
+		const BaseDiscrete &model			// Theoretical model
 	) : DistComparator (data)
 	{
 		ReferenceModel (model);
@@ -225,14 +225,14 @@ public:
 	// Discrete distribution
 	DistComparator (
 		const list &py_list,				// Empirical data
-		const BaseModel &model				// Theoretical model
+		const BaseDiscrete &model			// Theoretical model
 	) : DistComparator (to_vector (py_list), model)
 	{}
 
 	// Continuous distribution
 	DistComparator (
 		const Observations &data,			// Observations of a random value
-		const BaseModel &model,				// Theoretical model
+		const BaseContinuous &model,		// Theoretical model
 		size_t bins							// Bins count for a histogram
 	) : DistComparator (data, bins)
 	{
@@ -242,7 +242,7 @@ public:
 	// Continuous distribution
 	DistComparator (
 		const vector <double> &data,		// Empirical data
-		const BaseModel &model,				// Theoretical model
+		const BaseContinuous &model,		// Theoretical model
 		size_t bins							// Bins count for a histogram
 	) : DistComparator (data, bins)
 	{
@@ -252,7 +252,7 @@ public:
 	// Continuous distribution
 	DistComparator (
 		const list &py_list,				// Empirical data
-		const BaseModel &model,				// Theoretical model
+		const BaseContinuous &model,		// Theoretical model
 		size_t bins							// Bins count for a histogram
 	) : DistComparator (to_vector (py_list), model, bins)
 	{}
@@ -260,10 +260,20 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Load a distribution model as a reference for the distribution test    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+	// Discrete distribution
 	void ReferenceModel (
-		const BaseModel &model				// Theoretical model
+		const BaseDiscrete &model			// Theoretical model
 	){
-		BaseComparator::ReferenceModel (model);
+		BaseComparator::ReferenceModel <BaseDiscrete> (model);
+		params = model.Parameters();
+	}
+
+	// Continuous distribution
+	void ReferenceModel (
+		const BaseContinuous &model			// Theoretical model
+	){
+		BaseComparator::ReferenceModel <BaseContinuous> (model);
 		params = model.Parameters();
 	}
 
