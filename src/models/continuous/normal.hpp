@@ -88,6 +88,7 @@ public:
 		double level,				// Confidence level
 		size_t size					// Sample size
 	){
+		// Check if the level is correct
 		if (0.0 <= level && level <= 1.0) {
 			const auto dist = StandardT (size);
 			const double temp = scale / sqrt (size);
@@ -108,6 +109,7 @@ public:
 		double level,				// Confidence level
 		size_t size					// Sample size
 	){
+		// Check if the level is correct
 		if (0.0 <= level && level <= 1.0) {
 			const auto dist = ChiSquared (size);
 			const double temp = scale * scale * size;

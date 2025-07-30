@@ -85,7 +85,7 @@ public:
 	static bool InDomain (
 		const Range &subrange		// Testing range
 	){
-		return range.IsInside (subrange);
+		return range >= subrange;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -102,8 +102,8 @@ public:
 		double level,				// Confidence level
 		size_t size					// Sample size
 	){
-		if (0.0 <= level && level <= 1.0)
-		{
+		// Check if the level is correct
+		if (0.0 <= level && level <= 1.0) {
 			const auto dist = ChiSquared (2 * size);
 			const double temp = 2 * scale * size;
 			const double alpha = 1.0 - level;

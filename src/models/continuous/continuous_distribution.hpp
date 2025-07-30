@@ -63,7 +63,7 @@ public:
 	static bool InDomain (
 		const Range &subrange	// Testing range
 	){
-		return range.IsInside (subrange);
+		return range >= subrange;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
