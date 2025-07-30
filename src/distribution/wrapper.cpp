@@ -77,11 +77,9 @@ BOOST_PYTHON_MODULE (distribution) {
 		init <> ())
 
 		// Constructor from a theoretical model
-		.def (init <const BaseModel&, const vector <double>&>
-			(args ("model", "values"),
+		.def (init <const BaseDiscrete&> (args ("model"),
 			"Calculate a discrete distribution for a theoretical model"))
-		.def (init <const BaseModel&, const Range&, size_t>
-			(args ("model", "range", "bins"),
+		.def (init <const BaseContinuous&> (args ("model"),
 			"Calculate a continuous distribution for a theoretical model"))
 
 		// Constructors from empirical data
@@ -135,13 +133,13 @@ void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample
 			"Init the sample from empirical data"))
 
 		// Constructors from empirical data and a theoretical model
-		.def (init <const list&, const BaseModel&>
+		.def (init <const list&, const BaseContinuous&>
 			(args ("data", "model"),
 			"Init distributions from empirical data and a theoretical model"))
-		.def (init <const vector <double>&, const BaseModel&>
+		.def (init <const vector <double>&, const BaseContinuous&>
 			(args ("data", "model"),
 			"Init distributions from empirical data and a theoretical model"))
-		.def (init <const Observations&, const BaseModel&>
+		.def (init <const Observations&, const BaseContinuous&>
 			(args ("data", "model"),
 			"Init distributions from empirical data and a theoretical model"))
 
@@ -185,6 +183,8 @@ void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample
 //============================================================================//
 //      Expose "DistComparator" class to Python                               //
 //============================================================================//
+void (DistComparator::*ReferenceModel1)(const BaseDiscrete &model)			= &DistComparator::ReferenceModel;
+void (DistComparator::*ReferenceModel2)(const BaseContinuous &model)		= &DistComparator::ReferenceModel;
 	class_ <DistComparator> ("DistComparator",
 		"Compare two distributions functions with one another",
 		init <const list&> (args ("data"),
@@ -201,28 +201,30 @@ void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample
 			"Init the sample as a continuous distribution from empirical data"))
 
 		// Constructors from empirical data and a theoretical model
-		.def (init <const list&, const BaseModel&>
+		.def (init <const list&, const BaseDiscrete&>
 			(args ("data", "model"),
 			"Init discrete distributions from empirical data and a theoretical model"))
-		.def (init <const vector <double>&, const BaseModel&>
+		.def (init <const vector <double>&, const BaseDiscrete&>
 			(args ("data", "model"),
 			"Init discrete distributions from empirical data and a theoretical model"))
-		.def (init <const Observations&, const BaseModel&>
+		.def (init <const Observations&, const BaseDiscrete&>
 			(args ("data", "model"),
 			"Init discrete distributions from empirical data and a theoretical model"))
-		.def (init <const list&, const BaseModel&, size_t>
+		.def (init <const list&, const BaseContinuous&, size_t>
 			(args ("data", "model", "bins"),
 			"Init continuous distributions from empirical data and a theoretical model"))
-		.def (init <const vector <double>&, const BaseModel&, size_t>
+		.def (init <const vector <double>&, const BaseContinuous&, size_t>
 			(args ("data", "model", "bins"),
 			"Init continuous distributions from empirical data and a theoretical model"))
-		.def (init <const Observations&, const BaseModel&, size_t>
+		.def (init <const Observations&, const BaseContinuous&, size_t>
 			(args ("data", "model", "bins"),
 			"Init continuous distributions from empirical data and a theoretical model"))
 
 		// Methods
-		.def ("ReferenceModel",				&DistComparator::ReferenceModel,	args ("model"),
-			"Load a distribution model as a reference for the distribution test")
+		.def ("ReferenceModel",				ReferenceModel1,	args ("model"),
+			"Load a discrete distribution model as a reference for the distribution test")
+		.def ("ReferenceModel",				ReferenceModel2,	args ("model"),
+			"Load a continuous distribution model as a reference for the distribution test")
 		.def ("Sample",						&DistComparator::Sample,
 			return_value_policy <copy_const_reference> (),
 			"Return sample distribution")
