@@ -136,13 +136,6 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Convert an instance of a derived class to the base class              //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual const BaseModel& data (void) const {
-		return *this;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual DistType Type (void) const = 0;
@@ -155,6 +148,7 @@ public:
 	virtual double Mode (void) const = 0;
 	virtual double Mean (void) const = 0;
 	virtual double Variance (void) const = 0;
+	virtual const BaseModel& data (void) const = 0;
 	virtual unique_ptr <const BaseModel> clone (void) const = 0;
 };
 
