@@ -207,7 +207,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	CDF (
 		const Observations &data,			// Observations of a random value
-		const BaseModel &model				// Theoretical model
+		const BaseContinuous &model			// Theoretical model
 	) : CDF (data)
 	{
 		ReferenceModel (model);
@@ -215,7 +215,7 @@ public:
 
 	CDF (
 		const vector <double> &data,		// Empirical data
-		const BaseModel &model				// Theoretical model
+		const BaseContinuous &model			// Theoretical model
 	) : CDF (data)
 	{
 		ReferenceModel (model);
@@ -223,7 +223,7 @@ public:
 
 	CDF (
 		const list &py_list,				// Empirical data
-		const BaseModel &model				// Theoretical model
+		const BaseContinuous &model			// Theoretical model
 	) : CDF (to_vector (py_list), model)
 	{}
 
@@ -251,6 +251,15 @@ public:
 		const list &reference				// Empirical reference data
 	) : CDF (to_vector (sample), to_vector (reference))
 	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Load a distribution model as a reference for the distribution test    //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	void ReferenceModel (
+		const BaseContinuous &model			// Theoretical model
+	){
+		BaseComparator::ReferenceModel <BaseContinuous> (model);
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Load another sample as a reference for the distribution test          //
@@ -288,8 +297,6 @@ public:
 			Distribution::DistType type = reference.Type();
 			if (type == Distribution::THEORETICAL_CONTINUOUS)
 				return KolmogorovLevel();
-			else if (type == Distribution::THEORETICAL_DISCRETE)
-				throw invalid_argument ("KolmogorovConfidenceLevel: Only continuous distribution models can be tested");
 			else
 				throw invalid_argument ("KolmogorovConfidenceLevel: Can calculate the critical confidence level for a theoretical model only");
 		}
@@ -314,10 +321,8 @@ public:
 				Distribution::DistType type = reference.Type();
 				if (type == Distribution::THEORETICAL_CONTINUOUS)
 					return OneSampleTest (1.0 - level);
-				else if (type == Distribution::EMPIRICAL)
-					return TwoSampleTest (1.0 - level);
 				else
-					throw invalid_argument ("KolmogorovSmirnovTest: Only continuous distribution models can be tested");
+					return TwoSampleTest (1.0 - level);
 			}
 			else
 				throw invalid_argument ("KolmogorovSmirnovTest: Set a sample and a reference for the test");
