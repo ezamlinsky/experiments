@@ -80,7 +80,7 @@ public:
 	) const override final {
 
 		// Below the range
-		if (x < range) return 0.0;
+		if (x <= range) return 0.0;
 
 		// Above the range
 		if (x >= range) return 1.0;

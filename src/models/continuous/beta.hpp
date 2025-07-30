@@ -136,15 +136,15 @@ public:
 
 		// Handle the first case where log(0) would occur
 		if (x == range.Min()) {
-			if (shape1 > 1.0) return 0.0;
 			if (shape1 < 1.0) return INFINITY;
+			if (shape1 > 1.0) return 0.0;
 			return shape2;
 		}
 
 		// Handle the second case where log(0) would occur
 		if (x == range.Max()) {
-			if (shape2 > 1.0) return 0.0;
 			if (shape2 < 1.0) return INFINITY;
+			if (shape2 > 1.0) return 0.0;
 			return shape1;
 		}
 
@@ -163,7 +163,7 @@ public:
 	) const override final {
 
 		// Below the range
-		if (x < range) return 0.0;
+		if (x <= range) return 0.0;
 
 		// Above the range
 		if (x >= range) return 1.0;

@@ -135,11 +135,13 @@ public:
 	virtual double PDF (
 		double x					// Argument value
 	) const override final {
+
+		// Below the range
+		if (x < range) return 0.0;
+
+		// Common case
 		const double arg = x / scale;
-		if (arg >= 0.0)
-			return exp (-arg) / scale;
-		else
-			return NAN;
+		return exp (-arg) / scale;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -148,11 +150,13 @@ public:
 	virtual double CDF (
 		double x					// Argument value
 	) const override final {
+
+		// Below the range
+		if (x <= range) return 0.0;
+
+		// Common case
 		const double arg = x / scale;
-		if (arg >= 0)
-			return 1.0 - exp (-arg);
-		else
-			return 0.0;
+		return 1.0 - exp (-arg);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

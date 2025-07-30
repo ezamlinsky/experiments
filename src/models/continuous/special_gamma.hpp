@@ -70,28 +70,20 @@ public:
 		double x				// Argument value
 	) const override {
 
-		// Normalize the argument
-		const double arg = x / gamma_scale;
+		// Below the range
+		if (x < range) return 0.0;
 
-		// Negative argument
-		if (arg < 0.0)
-			return NAN;
-
-		// Handle cases where log(0) would occur
-		if (arg == 0.0) {
-			if (gamma_shape == 1)
-				return INFINITY;
-			else if (gamma_shape == 2)
-				return 0.5;
-			else
-				return 0.0;
+		// Handle a case where log(0) would occur
+		if (x == range.Min()) {
+			if (gamma_shape == 1) return INFINITY;
+			if (gamma_shape == 2) return 0.5;
+			return 0.0;
 		}
 
 		// Common case
-		else {
-			const double temp = (0.5 * gamma_shape) * log (arg) - arg - gamma_log;
-			return exp (temp) / x;
-		}
+		const double arg = x / gamma_scale;
+		const double temp = (0.5 * gamma_shape) * log (arg) - arg - gamma_log;
+		return exp (temp) / x;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -101,40 +93,31 @@ public:
 		double x				// Argument value
 	) const override {
 
-		// Normalize the argument
-		const double arg = x / gamma_scale;
-
-		// Negative argument
-		if (arg < 0.0)
-			return NAN;
-
-		// Zero argument
-		else if (arg == 0.0)
-			return 0.0;
+		// Below the range
+		if (x <= range) return 0.0;
 
 		// Common case
+		double sum = 0.0;
+		const double arg = x / gamma_scale;
+		const double arg_log = log (arg);
+		const size_t count = gamma_shape / 2;
+		if (gamma_shape % 2) {
+
+			// Shape is odd
+			for (size_t i = 0; i < count; i++) {
+				const double temp = (i + 0.5) * arg_log - arg - lgamma (i + 1.5);
+				sum += exp (temp);
+			}
+			return erf (sqrt (arg)) - sum;
+		}
 		else {
-			double sum = 0.0;
-			const double arg_log = log (arg);
-			const size_t count = gamma_shape / 2;
-			if (gamma_shape % 2) {
 
-				// Shape is odd
-				for (size_t i = 0; i < count; i++) {
-					const double temp = (i + 0.5) * arg_log - arg - lgamma (i + 1.5);
-					sum += exp (temp);
-				}
-				return erf (sqrt (arg)) - sum;
+			// Shape is even
+			for (size_t i = 0; i < count; i++) {
+				const double temp = i * arg_log - arg - lgamma (i + 1.0);
+				sum += exp (temp);
 			}
-			else {
-
-				// Shape is even
-				for (size_t i = 0; i < count; i++) {
-					const double temp = i * arg_log - arg - lgamma (i + 1.0);
-					sum += exp (temp);
-				}
-				return 1.0 - sum;
-			}
+			return 1.0 - sum;
 		}
 	}
 };

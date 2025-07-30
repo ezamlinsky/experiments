@@ -77,31 +77,25 @@ public:
 		double x					// Argument value
 	) const override final {
 
-		// Negative argument
-		if (x < 0.0)
-			return NAN;
+		// Below the range
+		if (x < range) return 0.0;
 
-		// Handle cases where log(0) would occur
-		else if (x == 0.0)
+		// Handle a case where log(0) would occur
+		if (x == range.Min())
 		{
-			if (df1 < 2)
-				return INFINITY;
-			else if (df1 == 2)
-				return 1.0;
-			else
-				return 0.0;
+			if (df1 < 2)  return INFINITY;
+			if (df1 == 2) return 1.0;
+			return 0.0;
 		}
 
 		// Common case
-		else {
-			const double a = df1 / 2.0;
-			const double b = df2 / 2.0;
-			const double t1 = a * log (df1) + b * log (df2);
-			const double t2 = (a - 1.0) * log (x);
-			const double t3 = (a + b) * log (df1 * x + df2);
-			const double temp = t1 + t2 - t3 - beta.BetaLog();
-			return exp (temp);
-		}
+		const double a = df1 / 2.0;
+		const double b = df2 / 2.0;
+		const double t1 = a * log (df1) + b * log (df2);
+		const double t2 = (a - 1.0) * log (x);
+		const double t3 = (a + b) * log (df1 * x + df2);
+		const double temp = t1 + t2 - t3 - beta.BetaLog();
+		return exp (temp);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -110,6 +104,11 @@ public:
 	virtual double CDF (
 		double x					// Argument value
 	) const override final {
+
+		// Below the range
+		if (x <= range) return 0.0;
+
+		// Common case
 		const double arg = (df1 * x) / (df1 * x + df2);
 		return beta.RegIncompleteBeta (arg);
 	}

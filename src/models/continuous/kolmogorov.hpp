@@ -60,38 +60,35 @@ public:
 		double x			// Argument value
 	) const override final {
 
-		// Non positive argument
-		if (x <= 0.0)
-			return 0.0;
+		// Below the range
+		if (x <= range) return 0.0;
 
 		// Common case
+		double sum = 0.0;
+
+		// Calculate the PDF function when x is big
+		if (x >= threshold) {
+			for (int i = 1; i < KOLMOGOROV_N; i++) {
+				const double temp = i * x;
+				const double exponent = -2.0 * temp * temp;
+				if (i % 2)
+					sum += i * i * exp (exponent);
+				else
+					sum -= i * i * exp (exponent);
+			}
+			return 8.0 * x * sum;
+		}
+
+		// Calculate the PDF function when x is small
 		else {
-			double sum = 0.0;
-
-			// Calculate the PDF function when x is big
-			if (x >= threshold) {
-				for (int i = 1; i < KOLMOGOROV_N; i++) {
-					const double temp = i * x;
-					const double exponent = -2.0 * temp * temp;
-					if (i % 2)
-						sum += i * i * exp (exponent);
-					else
-						sum -= i * i * exp (exponent);
-				}
-				return 8.0 * x * sum;
+			for (int i = 1; i < KOLMOGOROV_N; i++) {
+				const double p = (2.0 * i - 1.0) * M_PI;
+				const double q = 2.0 * x;
+				const double temp = p / q;
+				const double exponent = -0.5 * temp * temp;
+				sum += (temp * temp - 1.0) * exp (exponent);
 			}
-
-			// Calculate the PDF function when x is small
-			else {
-				for (int i = 1; i < KOLMOGOROV_N; i++) {
-					const double p = (2.0 * i - 1.0) * M_PI;
-					const double q = 2.0 * x;
-					const double temp = p / q;
-					const double exponent = -0.5 * temp * temp;
-					sum += (temp * temp - 1.0) * exp (exponent);
-				}
-				return sqrt (2.0 * M_PI) * sum / (x * x);
-			}
+			return sqrt (2.0 * M_PI) * sum / (x * x);
 		}
 	}
 
@@ -102,38 +99,35 @@ public:
 		double x			// Argument value
 	) const override final {
 
-		// Non positive argument
-		if (x <= 0.0)
-			return 0.0;
+		// Below the range
+		if (x <= range) return 0.0;
 
 		// Common case
-		else {
-			double sum = 0.0;
+		double sum = 0.0;
 
-			// Calculate the CDF function when x is big
-			if (x >= threshold) {
-				for (int i = 1; i < KOLMOGOROV_N; i++) {
-					const double temp = i * x;
-					const double exponent = -2.0 * temp * temp;
-					if (i % 2)
-						sum += exp (exponent);
-					else
-						sum -= exp (exponent);
-				}
-				return 1.0 - 2.0 * sum;
-			}
-
-			// Calculate the CDF function when x is small
-			else {
-				for (int i = 1; i < KOLMOGOROV_N; i++) {
-					const double p = (2.0 * i - 1.0) * M_PI;
-					const double q = 2.0 * x;
-					const double temp = p / q;
-					const double exponent = -0.5 * temp * temp;
+		// Calculate the CDF function when x is big
+		if (x >= threshold) {
+			for (int i = 1; i < KOLMOGOROV_N; i++) {
+				const double temp = i * x;
+				const double exponent = -2.0 * temp * temp;
+				if (i % 2)
 					sum += exp (exponent);
-				}
-				return sqrt (2.0 * M_PI) * sum / x;
+				else
+					sum -= exp (exponent);
 			}
+			return 1.0 - 2.0 * sum;
+		}
+
+		// Calculate the CDF function when x is small
+		else {
+			for (int i = 1; i < KOLMOGOROV_N; i++) {
+				const double p = (2.0 * i - 1.0) * M_PI;
+				const double q = 2.0 * x;
+				const double temp = p / q;
+				const double exponent = -0.5 * temp * temp;
+				sum += exp (exponent);
+			}
+			return sqrt (2.0 * M_PI) * sum / x;
 		}
 	}
 
