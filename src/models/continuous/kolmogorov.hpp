@@ -169,7 +169,7 @@ public:
 //****************************************************************************//
 //      Internal constants used by the class                                  //
 //****************************************************************************//
-const Range Kolmogorov::range = Range (-INFINITY, INFINITY);
+const Range Kolmogorov::range = Range (0, INFINITY);
 const size_t Kolmogorov::params = 0;
 const double Kolmogorov::mode = 0.735467907916572;
 const double Kolmogorov::mean = sqrt (0.5 * M_PI) * log (2.0);
