@@ -9,9 +9,17 @@
 */
 # pragma	once
 # include	"../python_helpers.hpp"
-# include	"../models/base.hpp"
+# include	"../models/discrete/discrete.hpp"
+# include	"../models/continuous/continuous.hpp"
 # include	"../observations/observations.hpp"
 # include	"../filters/smooth.hpp"
+
+// Quantiles to instantiate theoretical models
+# define	MIN		0.001
+# define	MAX		0.999
+
+// Bins count to instantiate a continuous theoretical model
+# define	BINS	1000
 
 //****************************************************************************//
 //      Class "Distribution"                                                  //
@@ -162,34 +170,64 @@ public:
 //      Constructors from a theoretical model                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-	// Universal constructor
+	// Discrete distribution
 	Distribution (
-		const BaseModel &model,			// Theoretical model
+		const BaseDiscrete &model,		// Theoretical model
 		const vector <double> &values	// Unique values
-	) :	range (values),
+	) :	type (THEORETICAL_DISCRETE),
+		range (values),
 		values (values)
 	{
-		// Calculate theoretical PDF and CDF values depending on the distribution type
-		if (model.Type() == BaseModel::DISCRETE) {
-			type = THEORETICAL_DISCRETE;
-			InitModel (model, values, 0.0);
-		}
-		else {
-			type = THEORETICAL_CONTINUOUS;
-			InitModel (model, values, NAN);
-		}
+		// Calculate theoretical PDF and CDF values for a discrete model
+		InitModel (model, values, 0.0);
+	}
+
+	// Discrete distribution
+	Distribution (
+		const BaseDiscrete &model		// Theoretical model
+	) :	type (THEORETICAL_DISCRETE)
+	{
+		// Limit the range of the discrete model
+		const Range &model_range = model.Domain();
+		const size_t min = isfinite (model_range.Min()) ? model_range.Min() : model.Quantile (MIN);
+		const size_t max = isfinite (model_range.Max()) ? model_range.Max() : model.Quantile (MAX);
+		Distribution::range = Range (min, max);
+
+		// Prepare the values to instantiate the model
+		for (size_t i = min; i <= max; i++)
+			values.push_back (i);
+
+		// Calculate theoretical PDF and CDF values for a discrete model
+		InitModel (model, values, 0.0);
 	}
 
 	// Continuous distribution
 	Distribution (
-		const BaseModel &model,			// Theoretical model
-		const Range &range,				// Values range
-		size_t bins						// Bins count for a histogram
+		const BaseContinuous &model,	// Theoretical model
+		const vector <double> &values	// Unique values
 	) :	type (THEORETICAL_CONTINUOUS),
-		range (range),
-		values (range.Split (bins))
+		range (values),
+		values (values)
 	{
-		// Calculate theoretical PDF and CDF values for a Continuous model
+		// Calculate theoretical PDF and CDF values for a continuous model
+		InitModel (model, values, NAN);
+	}
+
+	// Continuous distribution
+	Distribution (
+		const BaseContinuous &model		// Theoretical model
+	) :	type (THEORETICAL_CONTINUOUS)
+	{
+		// Limit the range of the continuous model
+		const Range &model_range = model.Domain();
+		const double min = isfinite (model_range.Min()) ? model_range.Min() : model.Quantile (MIN);
+		const double max = isfinite (model_range.Max()) ? model_range.Max() : model.Quantile (MAX);
+		Distribution::range = Range (min, max);
+
+		// Prepare the values to instantiate the model
+		values = range.Split (BINS);
+
+		// Calculate theoretical PDF and CDF values for a continuous model
 		InitModel (model, values, NAN);
 	}
 
@@ -208,7 +246,7 @@ public:
 
 		// Check if the dataset is not empty
 		if (temp.empty())
-			throw invalid_argument ("BaseDiscrete: There are no empirical observations to calculate PDF and CDF functions");
+			throw invalid_argument ("Distribution: There are no empirical observations to calculate PDF and CDF functions");
 
 		// Calculate empirical discrete PDF and CDF values
 		InitDiscrete (temp);
@@ -222,7 +260,7 @@ public:
 	{
 		// Check if the dataset is not empty
 		if (data.empty())
-			throw invalid_argument ("BaseDiscrete: There are no empirical observations to calculate PDF and CDF functions");
+			throw invalid_argument ("Distribution: There are no empirical observations to calculate PDF and CDF functions");
 
 		// Sort the dataset
 		sort (data.begin(), data.end());
