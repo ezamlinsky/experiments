@@ -64,7 +64,12 @@ public:
 	virtual double PDF (
 		double x					// Argument value
 	) const override final {
-		return range.IsInside (x) ? 1.0 / range.Length() : 0.0;
+
+		// Outside the distribution domain
+		if (x != range) return 0.0;
+
+		// Common case
+		return 1.0 / range.Length();
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -74,13 +79,11 @@ public:
 		double x					// Argument value
 	) const override final {
 
-		// Less than min value
-		if (x < range.Min())
-			return 0.0;
+		// Below the range
+		if (x < range) return 0.0;
 
-		// Greater than or equal to max value
-		if (range.Max() < x)
-			return 1.0;
+		// Above the range
+		if (x >= range) return 1.0;
 
 		// Common case
 		return (x - range.Min()) / range.Length();

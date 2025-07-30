@@ -93,7 +93,7 @@ public:
 	static bool InDomain (
 		const Range &subrange	// Testing range
 	){
-		return range.IsInside (subrange);
+		return range >= subrange;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -131,35 +131,28 @@ public:
 		double x					// Argument value
 	) const override final {
 
-		// Negative argument
-		if (x < 0.0)
-			return NAN;
+		// Outside the distribution domain
+		if (x != range) return 0.0;
 
-		// Handle cases where log(0) would occur
-		else if (x == 0.0) {
-			if (shape1 < 1.0)
-				return INFINITY;
-			else if (shape1 > 1.0)
-				return 0.0;
-			else
-				return shape2;
+		// Handle the first case where log(0) would occur
+		if (x == range.Min()) {
+			if (shape1 > 1.0) return 0.0;
+			if (shape1 < 1.0) return INFINITY;
+			return shape2;
 		}
-		else if (x == 1.0) {
-			if (shape2 < 1.0)
-				return INFINITY;
-			else if (shape2 > 1.0)
-				return 0.0;
-			else
-				return shape1;
+
+		// Handle the second case where log(0) would occur
+		if (x == range.Max()) {
+			if (shape2 > 1.0) return 0.0;
+			if (shape2 < 1.0) return INFINITY;
+			return shape1;
 		}
 
 		// Common case
-		else {
-			const double t1 = (shape1 - 1.0) * log (x) + (shape2 - 1.0) * log (1.0 - x);
-			const double t2 = beta.BetaLog();
-			const double temp = t1 - t2;
-			return exp (temp);
-		}
+		const double t1 = (shape1 - 1.0) * log (x) + (shape2 - 1.0) * log (1.0 - x);
+		const double t2 = beta.BetaLog();
+		const double temp = t1 - t2;
+		return exp (temp);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -168,6 +161,14 @@ public:
 	virtual double CDF (
 		double x					// Argument value
 	) const override final {
+
+		// Below the range
+		if (x < range) return 0.0;
+
+		// Above the range
+		if (x >= range) return 1.0;
+
+		// Common case
 		return beta.RegIncompleteBeta (x);
 	}
 
@@ -177,17 +178,14 @@ public:
 	virtual double Mode (void) const override final {
 		if (shape1 < 1.0 && shape2 < 1.0)
 			return NAN;
-		else if (shape1 > 1.0 && shape2 > 1.0) {
+		if (shape1 > 1.0 && shape2 > 1.0) {
 			const double temp1 = shape1 - 1.0;
 			const double temp2 = shape1 + shape2 - 2.0;
 			return temp1 / temp2;
 		}
-		else if (shape1 < shape2)
-			return 0.0;
-		else if (shape1 > shape2)
-			return 1.0;
-		else
-			return NAN;
+		if (shape1 < shape2) return 0.0;
+		if (shape1 > shape2) return 1.0;
+		return NAN;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
