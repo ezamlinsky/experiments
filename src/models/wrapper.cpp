@@ -10,6 +10,7 @@
 # include	<boost/python.hpp>
 # include	<boost/python/suite/indexing/vector_indexing_suite.hpp>
 # include	"confidence_interval.hpp"
+# include	"discrete/bernoulli.hpp"
 # include	"discrete/uniform.hpp"
 # include	"continuous/kolmogorov.hpp"
 # include	"continuous/uniform.hpp"
@@ -137,6 +138,22 @@ BOOST_PYTHON_MODULE (models) {
 //============================================================================//
 //      Discrete distributions                                                //
 //============================================================================//
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Bernoulli" class to Python                                    //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <Bernoulli> ("Bernoulli",
+		"Model for a Bernoulli distribution",
+		init <double> (args ("probability"),
+			"Create a new Bernoulli distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Bernoulli distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS(Bernoulli)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (Bernoulli);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "DiscreteUniform" class to Python                              //
