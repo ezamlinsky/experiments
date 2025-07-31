@@ -86,7 +86,8 @@ public:
 		if (x >= range) return 1.0;
 
 		// Common case
-		return (floor (x) - range.Min() + 1) / (range.Length() + 1);
+		const size_t arg = floor (x);
+		return (arg - range.Min() + 1) / (range.Length() + 1);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -112,10 +113,21 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Clone the distribution model                                          //
+//      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new DiscreteUniform (*this));
+	virtual double Skewness (void) const override final {
+		return 0.0;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kurtosis of the distribution                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Kurtosis (void) const override final {
+		const double length = range.Length() + 1;
+		const double temp = length * length;
+		const double p = 6.0 * (1.0 + temp);
+		const double q = 5.0 * (1.0 - temp);
+		return p / q;
 	}
 };
 
