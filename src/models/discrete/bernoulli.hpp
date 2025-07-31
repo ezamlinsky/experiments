@@ -65,10 +65,8 @@ public:
 		double probability			// Probability of a successful trial
 	) : probability (probability)
 	{
-		if (probability < 0)
-			throw invalid_argument ("Bernoulli: The probability of a successful trial must be positive");
-		if (probability > 1.0)
-			throw invalid_argument ("Bernoulli: The probability of a successful trial can not be greater than 1");
+		if (probability < 0.0 || probability > 1.0)
+			throw invalid_argument ("Bernoulli: The probability of a successful trial must be in the range [0..1]");
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -164,10 +162,23 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Clone the distribution model                                          //
+//      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new Bernoulli (*this));
+	virtual double Skewness (void) const override final {
+		const double temp = 1.0 - probability;
+		const double p = temp - probability;
+		const double q = sqrt (probability * temp);
+		return p / q;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kurtosis of the distribution                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Kurtosis (void) const override final {
+		const double temp = 1.0 - probability;
+		const double p = 1.0 - 6.0 * probability * temp;
+		const double q = probability * temp;
+		return p / q;
 	}
 };
 
