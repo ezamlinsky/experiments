@@ -150,12 +150,12 @@ public:
 	) const {
 		return min <= value && value <= max;
 	}
-    friend bool operator == (
+	friend bool operator == (
 		double value,				// The value to check
 		const Range &range			// The range to compare with
-    ){
+	){
 		return range == value;
-    }
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Check if the value is outside the target range                        //
@@ -165,12 +165,12 @@ public:
 	) const {
 		return min > value || value > max;
 	}
-    friend bool operator != (
+	friend bool operator != (
 		double value,				// The value to check
 		const Range &range			// The range to compare with
-    ){
+	){
 		return range != value;
-    }
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Check if the value is less than the target range                      //
@@ -180,12 +180,12 @@ public:
 	) const {
 		return min > value;
 	}
-    friend bool operator < (
+	friend bool operator < (
 		double value,				// The value to check
 		const Range &range			// The range to compare with
-    ){
+	){
 		return range > value;
-    }
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Check if the value is less than or equal to the target range          //
@@ -195,12 +195,12 @@ public:
 	) const {
 		return min >= value;
 	}
-    friend bool operator <= (
+	friend bool operator <= (
 		double value,				// The value to check
 		const Range &range			// The range to compare with
-    ){
+	){
 		return range >= value;
-    }
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Check if the value is greater than the target range                   //
@@ -210,12 +210,12 @@ public:
 	) const {
 		return max < value;
 	}
-    friend bool operator > (
+	friend bool operator > (
 		double value,				// The value to check
 		const Range &range			// The range to compare with
-    ){
+	){
 		return range < value;
-    }
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Check if the value is greater than or equal to the target range       //
@@ -225,12 +225,12 @@ public:
 	) const {
 		return max <= value;
 	}
-    friend bool operator >= (
+	friend bool operator >= (
 		double value,				// The value to check
 		const Range &range			// The range to compare with
-    ){
+	){
 		return range <= value;
-    }
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Check if the source range resides in the target range                 //
@@ -240,12 +240,15 @@ public:
 	) const {
 		return *this == source.min && *this == source.max;
 	}
-    friend bool operator <= (
-		const Range &source,		// Source range
-		const Range &target			// Target range
-    ){
-		return target >= source;
-    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the target range resides in the source range                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool operator <= (
+		const Range &source			// Source range
+	) const {
+		return source == min && source == max;
+	}
 };
 
 //****************************************************************************//
