@@ -10,8 +10,9 @@
 # include	<boost/python.hpp>
 # include	<boost/python/suite/indexing/vector_indexing_suite.hpp>
 # include	"confidence_interval.hpp"
-# include	"discrete/bernoulli.hpp"
 # include	"discrete/uniform.hpp"
+# include	"discrete/bernoulli.hpp"
+# include	"discrete/binomial.hpp"
 # include	"continuous/kolmogorov.hpp"
 # include	"continuous/uniform.hpp"
 # include	"continuous/standard_t.hpp"
@@ -54,6 +55,12 @@
 		"Variance of the distribution")											\
 	.add_property ("StdDev",				&class::StdDev,						\
 		"Standard deviation of the distribution")								\
+	.add_property ("Variation",				&class::Variation,					\
+		"Variation of the distribution")										\
+	.add_property ("Skewness",				&class::Variation,					\
+		"Skewness of the distribution")											\
+	.add_property ("Kurtosis",				&class::Variation,					\
+		"Kurtosis of the distribution")											\
 	.add_property ("Median",				&class::Median,						\
 		"Median of the distribution")											\
 	.add_property ("LowerQuartile",			&class::LowerQuartile,				\
@@ -140,22 +147,6 @@ BOOST_PYTHON_MODULE (models) {
 //============================================================================//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose "Bernoulli" class to Python                                    //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	class_ <Bernoulli> ("Bernoulli",
-		"Model for a Bernoulli distribution",
-		init <double> (args ("probability"),
-			"Create a new Bernoulli distribution"))
-		.def (init <const Observations &> (args ("data"),
-			"Create a new Bernoulli distribution from empirical data"))
-
-		// Methods
-		BASE_CLASS_METHODS(Bernoulli)
-
-		// Properties
-		BASE_CLASS_PROPERTIES (Bernoulli);
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "DiscreteUniform" class to Python                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <DiscreteUniform> ("DiscreteUniform",
@@ -166,10 +157,42 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Discrete Uniform distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS(DiscreteUniform)
+		BASE_CLASS_METHODS (DiscreteUniform)
 
 		// Properties
 		BASE_CLASS_PROPERTIES (DiscreteUniform);
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Bernoulli" class to Python                                    //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <Bernoulli> ("Bernoulli",
+		"Model for a Bernoulli distribution",
+		init <double> (args ("probability"),
+			"Create a new Bernoulli distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Bernoulli distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (Bernoulli)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (Bernoulli);
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Binomial" class to Python                                    //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <Binomial> ("Binomial",
+		"Model for a Binomial distribution",
+		init <size_t, double> (args ("trials", "probability"),
+			"Create a new Binomial distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Binomial distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (Binomial)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (Binomial);
 
 //============================================================================//
 //      Continuous distributions                                              //
@@ -183,10 +206,10 @@ BOOST_PYTHON_MODULE (models) {
 		init <> ("Create a new Kolmogorov distribution"))
 
 		// Methods
-		BASE_CLASS_METHODS(Kolmogorov)
+		BASE_CLASS_METHODS (Kolmogorov)
 
 		// Properties
-		BASE_CLASS_PROPERTIES(Kolmogorov);
+		BASE_CLASS_PROPERTIES (Kolmogorov);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "DiscreteUniform" class to Python                              //
@@ -199,7 +222,7 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Continuous Uniform distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS(ContinuousUniform)
+		BASE_CLASS_METHODS (ContinuousUniform)
 
 		// Properties
 		BASE_CLASS_PROPERTIES (ContinuousUniform);
@@ -213,10 +236,10 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Student’s T-distribution"))
 
 		// Methods
-		BASE_CLASS_METHODS(StandardT)
+		BASE_CLASS_METHODS (StandardT)
 
 		// Properties
-		BASE_CLASS_PROPERTIES(StandardT)
+		BASE_CLASS_PROPERTIES (StandardT)
 		.add_property ("DF",	&StandardT::DF,
 			"Degrees of freedom of the distribution");
 
@@ -229,10 +252,10 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Snedecor's F-distribution"))
 
 		// Methods
-		BASE_CLASS_METHODS(F)
+		BASE_CLASS_METHODS (F)
 
 		// Properties
-		BASE_CLASS_PROPERTIES(F)
+		BASE_CLASS_PROPERTIES (F)
 		.add_property ("DF1",	&F::DF1,
 			"The first degrees of freedom of the distribution")
 		.add_property ("DF2",	&F::DF2,
@@ -249,10 +272,10 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Beta distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS(Beta)
+		BASE_CLASS_METHODS (Beta)
 
 		// Properties
-		BASE_CLASS_PROPERTIES(Beta)
+		BASE_CLASS_PROPERTIES (Beta)
 		.add_property ("Shape1",	&Beta::Shape1,
 			"The first shape parameter of the distribution")
 		.add_property ("Shape2",	&Beta::Shape2,
@@ -269,10 +292,10 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Erlang distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS(Erlang)
+		BASE_CLASS_METHODS (Erlang)
 
 		// Properties
-		BASE_CLASS_PROPERTIES(Erlang)
+		BASE_CLASS_PROPERTIES (Erlang)
 		.add_property ("Shape",	&Erlang::Shape,
 			"Shape of the distribution")
 		.add_property ("Scale",	&Erlang::Scale,
@@ -289,10 +312,10 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Chi-Squared distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS(ChiSquared)
+		BASE_CLASS_METHODS (ChiSquared)
 
 		// Properties
-		BASE_CLASS_PROPERTIES(ChiSquared)
+		BASE_CLASS_PROPERTIES (ChiSquared)
 		.add_property ("DF",	&ChiSquared::DF,
 			"Degrees of freedom of the distribution");
 
@@ -307,12 +330,12 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Exponential distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS(Exponential)
+		BASE_CLASS_METHODS (Exponential)
 		.def ("Mean_ConfidenceInterval",	&Exponential::Mean_ConfidenceInterval,
 			args ("level", "size"), "Confidence interval of the mean value")
 
 		// Properties
-		BASE_CLASS_PROPERTIES(Exponential)
+		BASE_CLASS_PROPERTIES (Exponential)
 		.add_property ("Scale",				&Exponential::Scale,
 			"Scale of the distrsibution");
 
@@ -327,7 +350,7 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Normal (Gaussian) distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS(Normal)
+		BASE_CLASS_METHODS (Normal)
 		.def ("Mean_ConfidenceInterval",		&Normal::Mean_ConfidenceInterval,
 			args ("level", "size"), "Confidence interval of the mean")
 		.def ("Variance_ConfidenceInterval",	&Normal::Variance_ConfidenceInterval,
@@ -347,7 +370,7 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new Laplace distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS(Laplace)
+		BASE_CLASS_METHODS (Laplace)
 		.def ("MAD_ConfidenceInterval",	&Laplace::MAD_ConfidenceInterval,
 			args ("level", "size"), "Confidence interval of the Mean Absolute Deviation (MAD)")
 
@@ -367,7 +390,7 @@ BOOST_PYTHON_MODULE (models) {
 			"Create a new asymmetric Laplace distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS(AsymmetricLaplace)
+		BASE_CLASS_METHODS (AsymmetricLaplace)
 
 		// Properties
 		CONTINUOUS_CLASS_PROPERTIES (AsymmetricLaplace)
