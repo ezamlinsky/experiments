@@ -9,7 +9,6 @@
 */
 # pragma	once
 # include	<cmath>
-# include	<memory>
 # include	<random>
 # include	"range.hpp"
 # include	"../observations/observations.hpp"
@@ -136,6 +135,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Variation around the mean value                                       //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double Variation (void) const {
+		return StdDev() / Mean();
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual DistType Type (void) const = 0;
@@ -148,8 +154,9 @@ public:
 	virtual double Mode (void) const = 0;
 	virtual double Mean (void) const = 0;
 	virtual double Variance (void) const = 0;
+	virtual double Skewness (void) const = 0;
+	virtual double Kurtosis (void) const = 0;
 	virtual const BaseModel& data (void) const = 0;
-	virtual unique_ptr <const BaseModel> clone (void) const = 0;
 };
 
 //****************************************************************************//
@@ -166,6 +173,9 @@ ostream& operator << (ostream &stream, const BaseModel &model)
 	stream << "    Mean\t\t\t\t= " << model.Mean() << endl;
 	stream << "    Variance\t\t\t\t= " << model.Variance() << endl;
 	stream << "    Standard deviation\t\t\t= " << model.StdDev() << endl;
+	stream << "    Variation\t\t\t\t= " << model.Variation() << endl;
+	stream << "    Skewness\t\t\t\t= " << model.Skewness() << endl;
+	stream << "    Kurtosis\t\t\t\t= " << model.Kurtosis() << endl;
 	stream << "\nRobust estimators:" << endl;
 	stream << "~~~~~~~~~~~~~~~~~~" << endl;
 	stream << "    Median\t\t\t\t= " << model.Median() << endl;
