@@ -177,7 +177,9 @@ BOOST_PYTHON_MODULE (models) {
 		BASE_CLASS_METHODS (Bernoulli)
 
 		// Properties
-		BASE_CLASS_PROPERTIES (Bernoulli);
+		BASE_CLASS_PROPERTIES (Bernoulli)
+		.add_property ("Probability",	&Bernoulli::Probability,
+			"Probability of a successful trial");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Geometric" class to Python                                    //
@@ -193,10 +195,12 @@ BOOST_PYTHON_MODULE (models) {
 		BASE_CLASS_METHODS (Geometric)
 
 		// Properties
-		BASE_CLASS_PROPERTIES (Geometric);
+		BASE_CLASS_PROPERTIES (Geometric)
+		.add_property ("Probability",	&Bernoulli::Probability,
+			"Probability of a successful trial");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose "Binomial" class to Python                                    //
+//      Expose "Binomial" class to Python                                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <Binomial> ("Binomial",
 		"Model for a Binomial distribution",
@@ -209,7 +213,11 @@ BOOST_PYTHON_MODULE (models) {
 		BASE_CLASS_METHODS (Binomial)
 
 		// Properties
-		BASE_CLASS_PROPERTIES (Binomial);
+		BASE_CLASS_PROPERTIES (Binomial)
+		.add_property ("Probability",	&Binomial::Probability,
+			"Probability of a successful trial")
+		.add_property ("Trials",	&Binomial::Trials,
+			"Number of trials");
 
 //============================================================================//
 //      Continuous distributions                                              //
