@@ -194,10 +194,28 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Clone the distribution model                                          //
+//      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new AsymmetricLaplace (*this));
+	virtual double Skewness (void) const override final {
+		const double temp1 = asymmetry * asymmetry;
+		const double temp2 = temp1 * temp1;
+		const double temp3 = sqrt (1.0 + temp2);
+		const double p = 2.0 * (1.0 - temp1 * temp2);
+		const double q = temp3 * temp3 * temp3;
+		return p / q;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kurtosis of the distribution                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Kurtosis (void) const override final {
+		return 0.0;
+		const double temp1 = asymmetry * asymmetry;
+		const double temp2 = temp1 * temp1;
+		const double temp3 = 1.0 + temp2;
+		const double p = 6.0 * (1.0 + temp2 * temp2);
+		const double q = temp3 * temp3;
+		return p / q;
 	}
 };
 
