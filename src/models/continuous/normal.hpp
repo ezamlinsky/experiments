@@ -42,8 +42,12 @@ struct Params {
 		if (Continuous::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
-			location = data.Median();
-			scale = data.MedianAbsDevFromMedian() / (sqrt (2.0) * boost::math::erf_inv (0.5));
+			const double median = data.Median();
+			const double deviation = data.MedianAbsDevFromMedian();
+
+			// Find the location and the scale for these parameters
+			location = median;
+			scale = deviation / (sqrt (2.0) * boost::math::erf_inv (0.5));
 		}
 		else
 			throw invalid_argument ("Normal params: The data range is outside the distribution domain");
@@ -171,10 +175,17 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Clone the distribution model                                          //
+//      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new Normal (*this));
+	virtual double Skewness (void) const override final {
+		return 0.0;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kurtosis of the distribution                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Kurtosis (void) const override final {
+		return 0.0;
 	}
 };
 
