@@ -151,10 +151,32 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Clone the distribution model                                          //
+//      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new F (*this));
+	virtual double Skewness (void) const override final {
+		if (df2 > 6) {
+			const double temp = df1 + df2 - 2.0;
+			const double p = (df1 + temp) * sqrt (8.0 * (df2 - 4.0));
+			const double q = (df2 - 6.0) * sqrt (df1 * temp);
+			return p / q;
+		}
+		else
+			return INFINITY;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kurtosis of the distribution                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Kurtosis (void) const override final {
+		if (df2 > 8) {
+			const double temp1 = df2 - 2.0;
+			const double temp2 = df1 + temp1;
+			const double p = df1 * (5.0 * df2 - 22.0) * temp2 + (df2 - 4.0) * temp1 * temp1;
+			const double q = df1 * (df2 - 6.0) * (df2 - 8.0) * temp2;
+			return 12.0 * p / q;
+		}
+		else
+			return INFINITY;
 	}
 };
 
