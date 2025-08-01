@@ -29,7 +29,8 @@ private:
 
 		// Adjust the raw value of the target quantile when required
 		const double value = Quantile (level);
-		return CDF (value) == level ? value + 0.5 : value;
+		const double cdf = CDF (value);
+		return fabs (cdf - level) <= 1e-10 ? value + 0.5 : value;
 	}
 
 //============================================================================//
