@@ -200,14 +200,31 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {
 		const double temp = shape1 + shape2;
-		return shape1 * shape2 / (temp * temp * (temp + 1.0));
+		const double p = shape1 * shape2;
+		const double q = temp * temp * (temp + 1.0);
+		return p / q;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Clone the distribution model                                          //
+//      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new Beta (*this));
+	virtual double Skewness (void) const override final {
+		const double temp = shape1 + shape2;
+		const double p = 2.0 * (shape2 - shape1) * sqrt (temp + 1.0);
+		const double q = sqrt (shape1 * shape2) * (temp + 2.0);
+		return p / q;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kurtosis of the distribution                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Kurtosis (void) const override final {
+		const double temp = shape1 + shape2;
+		const double temp1 = shape1 * shape2;
+		const double temp2 = shape1 - shape2;
+		const double p = 6.0 * (temp2 * temp2 * (temp + 1.0) - temp1 * (temp + 2.0));
+		const double q = temp1 * (temp + 2.0) * (temp + 3.0);
+		return p / q;
 	}
 };
 
