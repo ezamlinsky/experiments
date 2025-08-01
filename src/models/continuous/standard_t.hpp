@@ -107,15 +107,32 @@ public:
 	virtual double Variance (void) const override final {
 		if (df > 2)
 			return df / (df - 2.0);
-		else
+		else if (df > 1)
 			return INFINITY;
+		else
+			return NAN;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Clone the distribution model                                          //
+//      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new StandardT (*this));
+	virtual double Skewness (void) const override final {
+		if (df > 3)
+			return 0.0;
+		else
+			return NAN;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kurtosis of the distribution                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Kurtosis (void) const override final {
+		if (df > 4)
+			return 6.0 / (df - 4.0);
+		else if (df > 2)
+			return INFINITY;
+		else
+			return NAN;
 	}
 };
 
