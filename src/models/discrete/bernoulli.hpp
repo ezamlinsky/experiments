@@ -38,9 +38,10 @@ struct Params {
 
 			// Extract parameters from the empirical observations
 			probability = data.Mean();
+			if (probability < 0.0 || probability > 1.0)
+				throw invalid_argument ("Bernoulli: Can not estimate the probability value for the dataset");
 		}
-		else
-			throw invalid_argument ("Bernoulli: The data range is outside the distribution domain");
+		else throw invalid_argument ("Bernoulli: The data range is outside the distribution domain");
 	}
 };
 

@@ -51,8 +51,7 @@ struct Params {
 			const size_t trials_max = round (mean / probability);
 			trials = max (data_max, trials_max);
 		}
-		else
-			throw invalid_argument ("Binomial: Can not estimate the probability value for the dataset");
+		else throw invalid_argument ("Binomial: Can not estimate the probability value for the dataset");
 	}
 };
 
