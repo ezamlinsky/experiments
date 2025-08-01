@@ -12,6 +12,7 @@
 # include	"confidence_interval.hpp"
 # include	"discrete/uniform.hpp"
 # include	"discrete/bernoulli.hpp"
+# include	"discrete/geometric.hpp"
 # include	"discrete/binomial.hpp"
 # include	"continuous/kolmogorov.hpp"
 # include	"continuous/uniform.hpp"
@@ -177,6 +178,22 @@ BOOST_PYTHON_MODULE (models) {
 
 		// Properties
 		BASE_CLASS_PROPERTIES (Bernoulli);
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Geometric" class to Python                                    //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <Geometric> ("Geometric",
+		"Model for a Geometric distribution",
+		init <double> (args ("probability"),
+			"Create a new Geometric distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Geometric distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (Geometric)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (Geometric);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Binomial" class to Python                                    //
