@@ -38,8 +38,12 @@ struct Params {
 		if (Continuous::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
-			location = data.Median();
-			scale = data.MedianAbsDevFromMedian() / log (2);
+			const double median = data.Median();
+			const double deviation = data.MedianAbsDevFromMedian();
+
+			// Find the location and the scale for these parameters
+			location = median;
+			scale = deviation / log (2);
 		}
 		else
 			throw invalid_argument ("Laplace params: The data range is outside the distribution domain");
@@ -156,10 +160,17 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Clone the distribution model                                          //
+//      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new Laplace (*this));
+	virtual double Skewness (void) const override final {
+		return 0.0;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kurtosis of the distribution                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Kurtosis (void) const override final {
+		return 3.0;
 	}
 };
 
