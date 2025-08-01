@@ -40,6 +40,8 @@ struct Params {
 
 			// Extract parameters from the empirical observations
 			scale = data.Median() / log (2);
+			if (scale <= 0.0)
+				throw invalid_argument ("Exponential params: Can not estimate the scale value for the dataset");
 		}
 		else
 			throw invalid_argument ("Exponential params: The data range is outside the distribution domain");
