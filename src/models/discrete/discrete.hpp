@@ -10,6 +10,13 @@
 # pragma	once
 # include	"../base.hpp"
 
+// Epsilon value for quartile estimation
+# define	EPSILON		1e-10
+
+// Finite range values for infinite domains of discrete functions
+# define	FINITE_MIN	-1e10
+# define	FINITE_MAX	+1e10
+
 //****************************************************************************//
 //      Class "BaseDiscrete"                                                  //
 //****************************************************************************//
@@ -30,7 +37,7 @@ private:
 		// Adjust the raw value of the target quantile when required
 		const double value = Quantile (level);
 		const double cdf = CDF (value);
-		return fabs (cdf - level) <= 1e-10 ? value + 0.5 : value;
+		return fabs (cdf - level) <= EPSILON ? value + 0.5 : value;
 	}
 
 //============================================================================//
@@ -64,8 +71,8 @@ public:
 			const Range &range = Domain();
 
 			// Binary search of argument value for the CDF function
-			int64_t left = range.Min();
-			int64_t right = range.Max();
+			int64_t left = max (range.Min(), FINITE_MIN);
+			int64_t right = min (range.Max(), FINITE_MAX);
 			while (left < right) {
 				const int64_t x = (left + right) / 2;
 				if (CDF (x) < level)
