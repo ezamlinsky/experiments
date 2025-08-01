@@ -27,7 +27,7 @@ private:
 struct Params {
 
 	// Members
-	double probability;				// The first shape parameter
+	double probability;				// Probability of a successful trial
 
 	// Constructor
 	Params (
@@ -39,9 +39,9 @@ struct Params {
 			// Extract parameters from the empirical observations
 			probability = 1.0 / (1.0 + data.Mean());
 			if (probability < 0.0 || probability > 1.0)
-				throw invalid_argument ("Geometric: Can not estimate the probability value for the dataset");
+				throw invalid_argument ("Geometric params: Can not estimate the probability value for the dataset");
 		}
-		else throw invalid_argument ("Geometric: The data range is outside the distribution domain");
+		else throw invalid_argument ("Geometric params: The data range is outside the distribution domain");
 	}
 };
 
