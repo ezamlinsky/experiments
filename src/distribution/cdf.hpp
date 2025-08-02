@@ -286,8 +286,8 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Confidence level of the one-sample Kolmogorov-Smirnov test            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// NOTE: Bigger confidence levels indicate we should accept the null hypothesis
-// about the distribution type
+// NOTE:	Bigger confidence levels indicate we should accept
+//			the null hypothesis about the distribution type
 	double KolmogorovConfidenceLevel (void) const {
 
 		// Check if the sample and the reference distributions are set

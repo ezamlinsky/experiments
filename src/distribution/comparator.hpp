@@ -280,8 +280,8 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Confidence level of Pearson's chi-squared test                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// NOTE: Bigger confidence levels indicate we should accept the null hypothesis
-// about the distribution type
+// NOTE:	Bigger confidence levels indicate we should accept
+//			the null hypothesis about the distribution type
 	double PearsonConfidenceLevel (void) const {
 
 		// Check if the sample and the reference distributions are set
