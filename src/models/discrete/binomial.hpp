@@ -87,7 +87,8 @@ public:
 	Binomial (
 		size_t trials,				// Number of trials
 		double probability			// Probability of a successful trial
-	) :	range (0, double (trials)),
+	) :	BaseDiscrete (trials),
+		range (0, double (trials)),
 		gamma_log (lgamma (trials + 1)),
 		probability (probability),
 		trials (trials)

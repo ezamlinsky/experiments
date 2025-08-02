@@ -64,7 +64,8 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Bernoulli (
 		double probability			// Probability of a successful trial
-	) : probability (probability)
+	) :	BaseDiscrete (1),
+		probability (probability)
 	{
 		if (probability < 0.0 || probability > 1.0)
 			throw invalid_argument ("Bernoulli: The probability of a successful trial must be in the range [0..1]");

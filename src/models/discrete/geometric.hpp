@@ -64,10 +64,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Geometric (
 		double probability			// Probability of a successful trial
-	) : probability (probability)
+	) :	BaseDiscrete (-1),
+		probability (probability)
 	{
 		if (probability < 0.0 || probability > 1.0)
 			throw invalid_argument ("Geometric: The probability of a successful trial must be in the range [0..1]");
+
+		// Limit the search range of the distribution quantile levels
+		LimitRange();
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

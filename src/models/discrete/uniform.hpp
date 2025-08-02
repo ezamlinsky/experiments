@@ -33,7 +33,8 @@ public:
 	DiscreteUniform (
 		int64_t min,				// Min value of the range
 		int64_t max					// Max value of the range
-	) :	range (min, max)
+	) :	BaseDiscrete (max),
+		range (min, max)
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -41,7 +42,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	DiscreteUniform (
 		const Observations &data	// Empirical observations
-	) : range (data.Domain())
+	) :	DiscreteUniform (data.Domain().Min(), data.Domain().Max())
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
