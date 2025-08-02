@@ -14,6 +14,7 @@
 # include	"discrete/bernoulli.hpp"
 # include	"discrete/geometric.hpp"
 # include	"discrete/binomial.hpp"
+# include	"discrete/poisson.hpp"
 # include	"continuous/kolmogorov.hpp"
 # include	"continuous/uniform.hpp"
 # include	"continuous/standard_t.hpp"
@@ -196,7 +197,7 @@ BOOST_PYTHON_MODULE (models) {
 
 		// Properties
 		BASE_CLASS_PROPERTIES (Geometric)
-		.add_property ("Probability",	&Bernoulli::Probability,
+		.add_property ("Probability",	&Geometric::Probability,
 			"Probability of a successful trial");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -216,8 +217,26 @@ BOOST_PYTHON_MODULE (models) {
 		BASE_CLASS_PROPERTIES (Binomial)
 		.add_property ("Probability",	&Binomial::Probability,
 			"Probability of a successful trial")
-		.add_property ("Trials",	&Binomial::Trials,
+		.add_property ("Trials",		&Binomial::Trials,
 			"Number of trials");
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Poisson" class to Python                                      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <Poisson> ("Poisson",
+		"Model for a Poisson distribution",
+		init <double> (args ("probability"),
+			"Create a new Poisson distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Poisson distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (Poisson)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (Poisson)
+		.add_property ("Rate",	&Poisson::Rate,
+			"Expected rate of occurrences");
 
 //============================================================================//
 //      Continuous distributions                                              //
