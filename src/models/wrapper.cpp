@@ -14,6 +14,7 @@
 # include	"discrete/bernoulli.hpp"
 # include	"discrete/geometric.hpp"
 # include	"discrete/binomial.hpp"
+# include	"discrete/negative_binomial.hpp"
 # include	"discrete/poisson.hpp"
 # include	"continuous/kolmogorov.hpp"
 # include	"continuous/uniform.hpp"
@@ -219,6 +220,26 @@ BOOST_PYTHON_MODULE (models) {
 			"Probability of a successful trial")
 		.add_property ("Trials",		&Binomial::Trials,
 			"Number of trials");
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "NegativeBinomial" class to Python                             //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <NegativeBinomial> ("NegativeBinomial",
+		"Model for a Negative Binomial distribution",
+		init <size_t, double> (args ("successes", "probability"),
+			"Create a new Negative Binomial distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Negative Binomial distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (NegativeBinomial)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (NegativeBinomial)
+		.add_property ("Probability",	&NegativeBinomial::Probability,
+			"Success probability")
+		.add_property ("Successes",		&NegativeBinomial::Successes,
+			"Number of successes");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Poisson" class to Python                                      //
