@@ -115,6 +115,27 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Make a linear discrete range from min to max                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	vector <double> Linear (void) const {
+
+		// Check the range length
+		int64_t min_val = floor (min);
+		int64_t max_val = ceil (max);
+		if (max_val > min_val) {
+
+			// Create a linear space from min to max
+			vector <double> result;
+			for (int64_t i = min_val; i <= max_val; i++)
+				result.push_back (i);
+
+			// Return the linear space
+			return result;
+		}
+		else throw invalid_argument ("Linear: The range min and max points must be different");
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Split the range into subranges (bins)                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Split (
@@ -138,8 +159,7 @@ public:
 			// Return all the created points
 			return result;
 		}
-		else
-			throw invalid_argument ("Split: The number of bins must be positive");
+		else throw invalid_argument ("Split: The number of bins must be positive");
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
