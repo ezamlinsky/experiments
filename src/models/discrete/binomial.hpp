@@ -229,8 +229,8 @@ ostream& operator << (ostream &stream, const Binomial &model)
 	stream << "\nBINOMIAL DISTRIBUTION:" << std::endl;
 	stream << "======================" << std::endl;
 	stream << static_cast <const BaseDiscrete&> (model);
-	stream << "    Number of trials\t\t\t= " << model.Trials() << endl;
 	stream << "    Success probability\t\t\t= " << model.Probability() << endl;
+	stream << "    Number of trials\t\t\t= " << model.Trials() << endl;
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;

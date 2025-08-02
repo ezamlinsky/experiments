@@ -153,14 +153,18 @@ public:
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override final {
-		return (1.0 - probability) / probability;
+		const double p = 1.0 - probability;
+		const double q = probability;
+		return p / q;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {
-		return (1.0 - probability) / (probability * probability);
+		const double p = 1.0 - probability;
+		const double q = probability * probability;
+		return p / q;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
