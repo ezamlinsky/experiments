@@ -87,16 +87,21 @@ public:
 	Binomial (
 		size_t trials,				// Number of trials
 		double probability			// Probability of a successful trial
-	) :	BaseDiscrete (trials),
-		range (0, double (trials)),
+	) :	range (0, double (trials)),
 		gamma_log (lgamma (trials + 1)),
 		probability (probability),
 		trials (trials)
 	{
+		// Check if the number of trials is correct
 		if (trials == 0.0)
 			throw invalid_argument ("Binomial: The number of trials must be positive");
+
+		// Check if the probability value is correct
 		if (probability < 0.0 && probability > 1.0)
 			throw invalid_argument ("Binomial: The probability of a successful trial must be in the range [0..1]");
+
+		// Init the CDF cache
+		Init (trials);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

@@ -74,14 +74,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Poisson (
 		double rate					// Expected rate of occurrences
-	) :	BaseDiscrete (-1),
-		rate (rate)
+	) :	rate (rate)
 	{
+		// Check if the expected rate of occurrences is correct
 		if (rate <= 0.0)
 			throw invalid_argument ("Poisson: The rate value must be positive");
 
-		// Limit the search range of the distribution quantile levels
-		LimitRange();
+		// Init the CDF cache
+		Init (0);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

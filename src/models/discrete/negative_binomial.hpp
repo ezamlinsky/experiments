@@ -85,18 +85,20 @@ public:
 	NegativeBinomial (
 		size_t successes,			// Number of successes
 		double probability			// Success probability
-	) :	BaseDiscrete (-1),
-		gamma_log (lgamma (successes)),
+	) :	gamma_log (lgamma (successes)),
 		probability (probability),
 		successes (successes)
 	{
+		// Check if the number of successes is correct
 		if (successes == 0.0)
 			throw invalid_argument ("NegativeBinomial: The number of successes must be positive");
+
+		// Check if the probability value is correct
 		if (probability < 0.0 && probability > 1.0)
 			throw invalid_argument ("NegativeBinomial: The success probability must be in the range [0..1]");
 
-		// Limit the search range of the distribution quantile levels
-		LimitRange();
+		// Init the CDF cache
+		Init (0);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

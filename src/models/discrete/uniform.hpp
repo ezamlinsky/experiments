@@ -33,9 +33,11 @@ public:
 	DiscreteUniform (
 		int64_t min,				// Min value of the range
 		int64_t max					// Max value of the range
-	) :	BaseDiscrete (max),
-		range (min, max)
-	{}
+	) :	range (min, max)
+	{
+		// Init the CDF cache
+		Init (max);
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor for empirical data                                        //

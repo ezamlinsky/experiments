@@ -64,11 +64,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Bernoulli (
 		double probability			// Probability of a successful trial
-	) :	BaseDiscrete (1),
-		probability (probability)
+	) :	probability (probability)
 	{
+		// Check if the probability value is correct
 		if (probability < 0.0 || probability > 1.0)
 			throw invalid_argument ("Bernoulli: The probability of a successful trial must be in the range [0..1]");
+
+		// Init the CDF cache
+		Init (1);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
