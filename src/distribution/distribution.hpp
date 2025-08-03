@@ -8,11 +8,10 @@
 ################################################################################
 */
 # pragma	once
-# include	"../python_helpers.hpp"
 # include	"../models/discrete/discrete.hpp"
 # include	"../models/continuous/continuous.hpp"
-# include	"../observations/observations.hpp"
 # include	"../filters/smooth.hpp"
+# include	"raw.hpp"
 
 // Quantiles to instantiate theoretical models
 # define	MIN		0.001
@@ -72,80 +71,23 @@ private:
 //      Calculate empirical discrete PDF and CDF values                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void InitDiscrete (
-		const vector <double> &data		// Empirical data for the calculation
+		const vector <double> &data,	// Empirical values for the calculation
+		const vector <double> &func		// Empirical discrete CDF function
 	){
-		// Calculate empirical discrete PDF and CDF values
-		size_t count = 0;
-		size_t total = 0;
-		double last_val = data [0];
-		double last_cdf = 0.0;
-		const size_t size = data.size();
-		for (const auto x : data) {
-
-			// Compare current value with the last one checked
-			if (x != last_val) {
-
-				// Found another unique value
-				total += count;
-				const double curr_cdf = double (total) / double (size);
-				values.push_back (last_val);
-				pdf.push_back (curr_cdf - last_cdf);
-				cdf.push_back (curr_cdf);
-
-				// Remember the last value of the CDF function for the next PDF value
-				last_cdf = curr_cdf;
-				count = 1;
-			}
-
-			// The same value
-			else count++;
-
-			// Update the last checked value
-			last_val = x;
-		}
-
-		// Finalize the PDF and CDF tables
-		total += count;
-		const double curr_cdf = double (total) / double (size);
-		values.push_back (last_val);
-		pdf.push_back (curr_cdf - last_cdf);
-		cdf.push_back (curr_cdf);
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Calculate empirical continuous PDF and CDF values                     //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	void InitContinuous (
-		const vector <double> &data,	// Empirical data for the calculation
-		const vector <double> &dcdf		// Empirical discrete CDF values
-	){
-		// The first value is trivial because we have the fixed minimum value
-		pdf.push_back (NAN);
-		cdf.push_back (0.0);
-
-		// Compute the PDF and CDF functions using created bins
-		// We do linear interpolation when a value resides between
-		// two empirical points
+		// Compute the PDF and CDF functions using discrete points
 		double last_cdf = 0.0;
 		size_t j = 0;
-		const size_t size = values.size();
-		for (size_t i = 1; i < size; i++) {
+		const size_t size = values.size() - 1;
+		for (size_t i = 0; i < size; i++) {
 
 			// Get the X value
 			const double x = values [i];
 
-			// Skip all the values that are less than the X value
-			while (data [j] < x) ++j;
+			// Skip all the values that are less than or equal to the X value
+			while (floor (data [j]) <= x) ++j;
 
 			// Get the last CDF point where the skip condition was correct
-			const double less_x = data [j - 1];
-			const double less_y = dcdf [j - 1];
-
-			// Calculate the gain value for the linear interpolation
-			const double gain = (x - less_x) / (data [j] - less_x);
-
-			// Compute interpolated value of the CDF function at the target point
-			const double cur_cdf = (1.0 - gain) * less_y + gain * dcdf [j];
+			const double cur_cdf = func [j - 1];
 
 			// Save computed PDF and CDF values
 			pdf.push_back (cur_cdf - last_cdf);
@@ -154,6 +96,56 @@ private:
 			// Update the last computed CDF point
 			last_cdf = cur_cdf;
 		}
+
+		// The last value
+		const double cur_cdf = func [func.size() - 1];
+		pdf.push_back (cur_cdf - last_cdf);
+		cdf.push_back (cur_cdf);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Calculate empirical continuous PDF and CDF values                     //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+// INFO:	We do linear interpolation when a value resides between
+//			two empirical points
+	void InitContinuous (
+		const vector <double> &data,	// Empirical values for the calculation
+		const vector <double> &func		// Empirical discrete CDF function
+	){
+		// Compute the PDF and CDF functions using created bins
+		double last_cdf = NAN;
+		size_t j = 0;
+		const size_t size = values.size() - 1;
+		for (size_t i = 0; i < size; i++) {
+
+			// Get the X value
+			const double x = values [i];
+
+			// Skip all the values that are less than or equal to the X value
+			while (data [j] <= x) ++j;
+
+			// Get the last CDF point where the skip condition was correct
+			const double less_x = data [j - 1];
+			const double less_y = func [j - 1];
+
+			// Calculate the gain value for the linear interpolation
+			const double gain = (x - less_x) / (data [j] - less_x);
+
+			// Compute interpolated value of the CDF function at the target point
+			const double cur_cdf = (1.0 - gain) * less_y + gain * func [j];
+
+			// Save computed PDF and CDF values
+			pdf.push_back (cur_cdf - last_cdf);
+			cdf.push_back (cur_cdf);
+
+			// Update the last computed CDF point
+			last_cdf = cur_cdf;
+		}
+
+		// The last value
+		const double cur_cdf = func [func.size() - 1];
+		pdf.push_back (cur_cdf - last_cdf);
+		cdf.push_back (cur_cdf);
 	}
 
 //============================================================================//
@@ -179,7 +171,8 @@ public:
 		values (values)
 	{
 		// Calculate theoretical PDF and CDF values for a discrete model
-		InitModel (model, values, 0.0);
+		const double last_cdf = model.CDF (range.Min() - 1.0);
+		InitModel (model, values, last_cdf);
 	}
 
 	// Discrete distribution
@@ -194,11 +187,11 @@ public:
 		Distribution::range = Range (min, max);
 
 		// Prepare the values to instantiate the model
-		for (size_t i = min; i <= max; i++)
-			values.push_back (i);
+		values = range.Linear();
 
 		// Calculate theoretical PDF and CDF values for a discrete model
-		InitModel (model, values, 0.0);
+		const double last_cdf = model.CDF (range.Min() - 1.0);
+		InitModel (model, values, last_cdf);
 	}
 
 	// Continuous distribution
@@ -210,7 +203,8 @@ public:
 		values (values)
 	{
 		// Calculate theoretical PDF and CDF values for a continuous model
-		InitModel (model, values, NAN);
+		const double last_cdf = NAN;
+		InitModel (model, values, last_cdf);
 	}
 
 	// Continuous distribution
@@ -228,7 +222,8 @@ public:
 		values = range.Split (BINS);
 
 		// Calculate theoretical PDF and CDF values for a continuous model
-		InitModel (model, values, NAN);
+		const double last_cdf = NAN;
+		InitModel (model, values, last_cdf);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -239,41 +234,29 @@ public:
 	Distribution (
 		const Observations &data		// Observations of a random value
 	) :	type (EMPIRICAL),
-		range (data.Domain())
+		range (data.Domain()),
+		values (range.Linear())
 	{
-		// Extract the ranked dataset
-		const vector <double> &temp = data.Data();
-
-		// Check if the dataset is not empty
-		if (temp.empty())
-			throw invalid_argument ("Distribution: There are no empirical observations to calculate PDF and CDF functions");
+		// Compute raw discrete distribution
+		RawDistribution raw (data);
 
 		// Calculate empirical discrete PDF and CDF values
-		InitDiscrete (temp);
-	}
-
-	// Discrete distribution
-	Distribution (
-		vector <double> &&data			// Empirical dataset
-	) :	type (EMPIRICAL),
-		range (data)
-	{
-		// Check if the dataset is not empty
-		if (data.empty())
-			throw invalid_argument ("Distribution: There are no empirical observations to calculate PDF and CDF functions");
-
-		// Sort the dataset
-		sort (data.begin(), data.end());
-
-		// Calculate empirical discrete PDF and CDF values
-		InitDiscrete (data);
+		InitDiscrete (raw.Values(), raw.CDF());
 	}
 
 	// Discrete distribution
 	Distribution (
 		const vector <double> &data		// Empirical dataset
-	) :	Distribution (move (vector <double> (data)))
-	{}
+	) :	type (EMPIRICAL),
+		range (data),
+		values (range.Linear())
+	{
+		// Compute raw discrete distribution
+		RawDistribution raw (move (vector <double> (data)));
+
+		// Calculate empirical discrete PDF and CDF values
+		InitDiscrete (raw.Values(), raw.CDF());
+	}
 
 	// Discrete distribution
 	Distribution (
@@ -290,10 +273,10 @@ public:
 		values (range.Split (bins))
 	{
 		// Compute raw discrete distribution
-		Distribution temp (data);
+		RawDistribution raw (data);
 
 		// Calculate empirical continuous PDF and CDF values
-		InitContinuous (temp.Values(), temp.CDF());
+		InitContinuous (raw.Values(), raw.CDF());
 	}
 
 	// Continuous distribution
@@ -305,10 +288,10 @@ public:
 		values (range.Split (bins))
 	{
 		// Compute raw discrete distribution
-		Distribution temp (move (vector <double> (data)));
+		RawDistribution raw (move (vector <double> (data)));
 
 		// Calculate empirical continuous PDF and CDF values
-		InitContinuous (temp.Values(), temp.CDF());
+		InitContinuous (raw.Values(), raw.CDF());
 	}
 
 	// Continuous distribution
