@@ -167,7 +167,7 @@ T KurtosisPopulation (
 		const T coeff = size;
 		const T temp1 = Array::SumHcubeDiff (array, size, value);
 		const T temp2 = Array::SumSqrDiff (array, size, value);
-		return coeff * temp1 / (temp2 * temp2) - 3;
+		return coeff * temp1 / (temp2 * temp2) - 3.0;
 	}
 	else
 		return NAN;
@@ -179,12 +179,12 @@ T KurtosisSample (
 	T value					// The central value
 ){
 	if (size > 3) {
-		const T coeff1 = (size - 1) * size * (size + 1);
-		const T coeff2 = (size - 1) * (size - 1);
-		const T coeff3 = (size - 2) * (size - 3);
+		const T coeff1 = static_cast <T> (size - 1) * size * (size + 1);
+		const T coeff2 = static_cast <T> (size - 1) * (size - 1);
+		const T coeff3 = static_cast <T> (size - 2) * (size - 3);
 		const T temp1 = Array::SumHcubeDiff (array, size, value);
 		const T temp2 = Array::SumSqrDiff (array, size, value);
-		return (coeff1 * temp1 / (temp2 * temp2) - 3 * coeff2) / coeff3;
+		return (coeff1 * temp1 / (temp2 * temp2) - 3.0 * coeff2) / coeff3;
 	}
 	else
 		return NAN;
