@@ -22,7 +22,7 @@ class BaseDiscrete : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
-	size_t last;				// The last index for the binary search
+	vector <double> cdf;	// Cached values of the CDF function for quick calculations
 
 //============================================================================//
 //      Private methods                                                       //
@@ -33,13 +33,12 @@ private:
 //      Estimation of the distribution quartile                               //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Quartile (
-		double level			// Quantile level to estimate
+		double level		// Quantile level to estimate
 	) const override final {
 
 		// Adjust the raw value of the target quantile when required
-		const double value = Quantile (level);
-		const double cdf = CDF (value);
-		return fabs (cdf - level) <= EPSILON ? value + 0.5 : value;
+		const size_t index = Quantile (level);
+		return fabs (cdf [index] - level) <= EPSILON ? index + 0.5 : index;
 	}
 
 //============================================================================//
@@ -48,21 +47,26 @@ private:
 protected:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Limit the search range of the distribution quantile levels            //
+//      Init the cache of the CDF values used for quantile estimates          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// INFO:	We are looking for the last PDF value that is indistinguishable
-//			from zero if subtracted from 1.0
-	void LimitRange (void) {
-
-		// Check if the last index is not limiting the range
-		if (last == static_cast <size_t> (-1)) {
+	void Init (
+		size_t range		// The argument range we are looking for the CDF values
+	){
+		// If the range is not set manually, then estimate it automatically
+		if (range == 0) {
 
 			// The distribution mode is the first index where the PDF starts decreasing
 			const double mode = Mode();
-			last = isnan (mode) ? 0 : mode;
-			while (1.0 - PDF (last) < 1.0)
-				last++;
+			range = isnan (mode) ? 0 : mode;
+
+			// We are looking for the last PDF value that is indistinguishable
+			// from zero if subtracted from 1.0
+			while (1.0 - PDF (range) < 1.0) range++;
 		}
+
+		// Calculate the CDF values for the target range for quick further estimates
+		for (size_t i = 0; i < range; i++)
+			cdf.push_back (CDF (i));
 	}
 
 //============================================================================//
@@ -73,10 +77,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDiscrete (
-		size_t last				// The last index for the binary search
-	) :	last (last)
-	{}
+	BaseDiscrete (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Distribution type                                                     //
@@ -89,28 +90,23 @@ public:
 //      Quantile value for the target level                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Quantile (
-		double level			// Quantile level to estimate
+		double level		// Quantile level to estimate
 	) const override final {
 
 		// Check if the level is correct
 		if (0.0 <= level and level <= 1.0) {
 
-			// Check if the last index is a finite number
-			if (last != static_cast <size_t> (-1)) {
-
-				// Binary search of argument value for the CDF function
-				int64_t left = 0;
-				int64_t right = last;
-				while (left < right) {
-					const int64_t x = (left + right) / 2;
-					if (CDF (x) < level)
-						left = x + 1;
-					else
-						right = x;
-				}
-				return left;
+			// Binary search of argument value for the CDF function
+			int64_t left = 0;
+			int64_t right = cdf.size();
+			while (left < right) {
+				const size_t median = (left + right) / 2;
+				if (cdf [median] < level)
+					left = median + 1;
+				else
+					right = median;
 			}
-			else throw invalid_argument ("Quantile: The discrete distribution is not completely initialized");
+			return left;
 		}
 		else throw invalid_argument ("Quantile: Level must be in the range [0..1]");
 	}
