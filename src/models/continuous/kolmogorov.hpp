@@ -11,7 +11,7 @@
 # include	"continuous.hpp"
 
 // TS elements to compute for PDF and CDF approximation
-# define	KOLMOGOROV_N	100	// TODO: Check this threshold
+# define	KOLMOGOROV_N	6
 
 //****************************************************************************//
 //      Class "Kolmogorov"                                                    //
@@ -24,9 +24,6 @@ class Kolmogorov final : public BaseContinuous
 private:
 	static const Range range;		// Function domain where the distribution exists
 	static const size_t params;		// Count of distribution parameters
-	static const double mode;		// Mode of the distribution
-	static const double mean;		// Mean of the distribution
-	static const double variance;	// Variance of the distribution
 	static const double threshold;	// The threshold value to improve precision
 
 //============================================================================//
@@ -135,28 +132,40 @@ public:
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mode (void) const override final {
-		return mode;
+		return 0.735467907916572;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Mean (void) const override final {
-		return mean;
+		return sqrt (0.5 * M_PI) * log (2.0);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {
-		return variance;
+		const double temp = log (2.0);
+		return 0.5 * M_PI * (M_PI / 6.0 - temp * temp);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Clone the distribution model                                          //
+//      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual unique_ptr <const BaseModel> clone (void) const override final {
-		return unique_ptr <const BaseModel> (new Kolmogorov (*this));
+	virtual double Skewness (void) const override final {
+		const double temp1 = log (2);
+		const double temp2 = M_PI / 6.0 - temp1 * temp1;
+		const double p = 2.0 * temp1 * (temp1 * temp1 - 0.25 * M_PI);
+		const double q = temp2 * sqrt (temp2);
+		return (p + 0.4304549205350666) / q;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kurtosis of the distribution                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Kurtosis (void) const override final {
+		return NAN;		// TODO: Not implemented yet
 	}
 };
 
@@ -165,9 +174,6 @@ public:
 //****************************************************************************//
 const Range Kolmogorov::range = Range (0, INFINITY);
 const size_t Kolmogorov::params = 0;
-const double Kolmogorov::mode = 0.735467907916572;
-const double Kolmogorov::mean = sqrt (0.5 * M_PI) * log (2.0);
-const double Kolmogorov::variance = 0.5 * M_PI * (M_PI / 6.0 - log (2.0) * log (2.0));
 const double Kolmogorov::threshold = sqrt (log (2.0));
 
 //****************************************************************************//
