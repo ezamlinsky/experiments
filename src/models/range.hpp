@@ -122,17 +122,14 @@ public:
 		// Check the range length
 		int64_t min_val = floor (min);
 		int64_t max_val = ceil (max);
-		if (max_val > min_val) {
 
-			// Create a linear space from min to max
-			vector <double> result;
-			for (int64_t i = min_val; i <= max_val; i++)
-				result.push_back (i);
+		// Create a linear space from min to max
+		vector <double> result;
+		for (int64_t i = min_val; i <= max_val; i++)
+			result.push_back (i);
 
-			// Return the linear space
-			return result;
-		}
-		else throw invalid_argument ("Linear: The range min and max points must be different");
+		// Return the linear space
+		return result;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -142,24 +139,19 @@ public:
 		size_t bins					// The number of bins to create for the range
 	) const {
 
-		// Check bins count
-		if (bins) {
+		// Store the min value as well
+		vector <double> result;
+		result.push_back (min);
 
-			// Store the min value as well
-			vector <double> result;
-			result.push_back (min);
-
-			// Store all the intermediate points
-			for (size_t i = 0; i < bins; i++) {
-				const size_t index = i + 1;
-				const double x = ((bins - index) * min + index * max) / bins;
-				result.push_back (x);
-			}
-
-			// Return all the created points
-			return result;
+		// Store all the intermediate points
+		for (size_t i = 0; i < bins; i++) {
+			const size_t index = i + 1;
+			const double x = ((bins - index) * min + index * max) / bins;
+			result.push_back (x);
 		}
-		else throw invalid_argument ("Split: The number of bins must be positive");
+
+		// Return all the created points
+		return result;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
