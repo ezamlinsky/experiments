@@ -13,6 +13,10 @@
 // TS elements to compute for PDF and CDF approximation
 # define	KOLMOGOROV_N	6
 
+// Adjusted distribution moments
+# define	M3		sqrt (M_PI_2) * 0.6761570080272717
+# define	M4		M_PI * M_PI * M_PI * M_PI * 7.0 / 720.0
+
 //****************************************************************************//
 //      Class "Kolmogorov"                                                    //
 //****************************************************************************//
@@ -131,41 +135,46 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mode of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override final {
+	virtual constexpr double Mode (void) const override final {
 		return 0.735467907916572;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override final {
-		return sqrt (0.5 * M_PI) * log (2.0);
+	virtual constexpr double Mean (void) const override final {
+		return sqrt (M_PI_2) * M_LN2;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override final {
-		const double temp = log (2.0);
-		return 0.5 * M_PI * (M_PI / 6.0 - temp * temp);
+	virtual constexpr double Variance (void) const override final {
+		return M_PI_2 * (M_PI / 6 - M_LN2 * M_LN2);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Skewness (void) const override final {
-		const double temp1 = log (2);
-		const double temp2 = M_PI / 6.0 - temp1 * temp1;
-		const double p = 2.0 * temp1 * (temp1 * temp1 - 0.25 * M_PI);
-		const double q = temp2 * sqrt (temp2);
-		return (p + 0.4304549205350666) / q;
+	virtual constexpr double Skewness (void) const override final {
+		constexpr double mean = Mean();
+		constexpr double variance = Variance();
+		constexpr double temp = mean * mean;
+		constexpr double p = M3 + mean * (2.0 * temp - M_PI_2 * M_PI_2);
+		constexpr double q = variance * sqrt (variance);
+		return p / q;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Kurtosis of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Kurtosis (void) const override final {
-		return NAN;		// TODO: Not implemented yet
+	virtual constexpr double Kurtosis (void) const override final {
+		constexpr double mean = Mean();
+		constexpr double variance = Variance();
+		constexpr double temp = mean * mean;
+		constexpr double p = M4 - (4.0 * M3 * mean + temp * (3.0 * temp - M_PI * M_PI_2));
+		constexpr double q = variance * variance;
+		return p / q;
 	}
 };
 
@@ -174,7 +183,7 @@ public:
 //****************************************************************************//
 const Range Kolmogorov::range = Range (0, INFINITY);
 const size_t Kolmogorov::params = 0;
-const double Kolmogorov::threshold = sqrt (log (2.0));
+const double Kolmogorov::threshold = sqrt (M_LN2);
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
