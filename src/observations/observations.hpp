@@ -253,63 +253,77 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Median of squared deviations from the mean value                      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double MedianSqrDevFromMean (void) const {
+	double MedianSqrDevFromMean (void) const {
 		return Stats::MedianSqrDev (array, size, Mean());
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Median of absolute deviations from the mean value                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double MedianAbsDevFromMean (void) const {
+	double MedianAbsDevFromMean (void) const {
 		return Stats::MedianAbsDev (array, size, Mean());
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Median of signed deviations from the mean value                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double MedianSignDevFromMean (void) const {
+	double MedianSignDevFromMean (void) const {
 		return Stats::MedianSignDev (array, size, Mean());
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Median of squared deviations from the median value                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double MedianSqrDevFromMedian (void) const {
+	double MedianSqrDevFromMedian (void) const {
 		return Stats::MedianSqrDev (array, size, Median());
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Median of absolute deviations from the median value                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double MedianAbsDevFromMedian (void) const {
+	double MedianAbsDevFromMedian (void) const {
 		return Stats::MedianAbsDev (array, size, Median());
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Median of signed deviations from the median value                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double MedianSignDevFromMedian (void) const {
+	double MedianSignDevFromMedian (void) const {
 		return Stats::MedianSignDev (array, size, Median());
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Excess kurtosis around the mean value                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double KurtosisExcessAroundMean (void) const {
+		return KurtosisAroundMean() - 3.0;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Excess kurtosis around the median value                               //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double KurtosisExcessAroundMedian (void) const {
+		return KurtosisAroundMedian() - 3.0;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Pearson's skewness estimator of the dataset                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double PearsonSkewness (void) const {
+	double PearsonSkewness (void) const {
 		return 3.0 * (Mean() - Median()) / StdDev();
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Meeden's skewness estimator of the dataset                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double MeedenSkewness (void) const {
+	double MeedenSkewness (void) const {
 		return (Mean() - Median()) / MeanAbsDevFromMedian();
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Convert an instance of a derived class to the base class              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual const Observations& data (void) const {
+	const Observations& data (void) const {
 		return *this;
 	}
 
@@ -376,11 +390,13 @@ ostream& operator << (ostream &stream, const Observations &object)
 	stream << "    Variation\t\t\t\t= " << object.VariationAroundMean() << endl;
 	stream << "    Skewness\t\t\t\t= " << object.SkewnessAroundMean() << endl;
 	stream << "    Kurtosis\t\t\t\t= " << object.KurtosisAroundMean() << endl;
+	stream << "    Excess kurtosis\t\t\t= " << object.KurtosisExcessAroundMean() << endl;
 	stream << "\nEstimators around the median value:" << endl;
 	stream << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 	stream << "    Variation\t\t\t\t= " << object.VariationAroundMedian() << endl;
 	stream << "    Skewness\t\t\t\t= " << object.SkewnessAroundMedian() << endl;
 	stream << "    Kurtosis\t\t\t\t= " << object.KurtosisAroundMedian() << endl;
+	stream << "    Excess kurtosis\t\t\t= " << object.KurtosisExcessAroundMedian() << endl;
 	stream << "\nSkewness:" << endl;
 	stream << "~~~~~~~~~" << endl;
 	stream << "    Pearson's skewness\t\t\t= " << object.PearsonSkewness() << endl;
