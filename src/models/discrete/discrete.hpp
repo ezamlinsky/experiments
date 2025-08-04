@@ -36,9 +36,13 @@ private:
 		double level		// Quantile level to estimate
 	) const override final {
 
+		// Get the distribution location
+		const size_t location = Domain().Min();
+
 		// Adjust the raw value of the target quantile when required
 		const size_t index = Quantile (level);
-		return fabs (cdf [index] - level) <= EPSILON ? index + 0.5 : index;
+		const size_t value = location + index;
+		return fabs (cdf.at (index) - level) <= EPSILON ? value + 0.5 : value;
 	}
 
 //============================================================================//
@@ -64,9 +68,12 @@ protected:
 			while (1.0 - PDF (range) < 1.0) range++;
 		}
 
+		// Get the distribution location
+		const size_t location = Domain().Min();
+
 		// Calculate the CDF values for the target range for quick further estimates
 		for (size_t i = 0; i < range; i++)
-			cdf.push_back (CDF (i));
+			cdf.push_back (CDF (location + i));
 	}
 
 //============================================================================//
@@ -101,11 +108,12 @@ public:
 			int64_t right = cdf.size();
 			while (left < right) {
 				const size_t median = (left + right) / 2;
-				if (cdf [median] < level)
+				if (cdf.at (median) < level)
 					left = median + 1;
 				else
 					right = median;
 			}
+
 			return left;
 		}
 		else throw invalid_argument ("Quantile: Level must be in the range [0..1]");
