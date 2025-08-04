@@ -64,6 +64,8 @@
 		"Skewness of the distribution")											\
 	.add_property ("Kurtosis",				&class::Variation,					\
 		"Kurtosis of the distribution")											\
+	.add_property ("KurtosisExcess",		&class::Variation,					\
+		"Excess kurtosis of the distribution")									\
 	.add_property ("Median",				&class::Median,						\
 		"Median of the distribution")											\
 	.add_property ("LowerQuartile",			&class::LowerQuartile,				\
