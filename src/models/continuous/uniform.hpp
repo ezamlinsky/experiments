@@ -122,7 +122,7 @@ public:
 //      Kurtosis of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Kurtosis (void) const override final {
-		return -6.0 / 5.0;
+		return 1.8;
 	}
 };
 
