@@ -167,7 +167,7 @@ T KurtosisPopulation (
 		const T coeff = size;
 		const T temp1 = Array::SumHcubeDiff (array, size, value);
 		const T temp2 = Array::SumSqrDiff (array, size, value);
-		return coeff * temp1 / (temp2 * temp2) - 3.0;
+		return coeff * temp1 / (temp2 * temp2);
 	}
 	else
 		return NAN;
@@ -179,16 +179,34 @@ T KurtosisSample (
 	T value					// The central value
 ){
 	if (size > 3) {
-		const T coeff1 = static_cast <T> (size - 1) * size * (size + 1);
-		const T coeff2 = static_cast <T> (size - 1) * (size - 1);
-		const T coeff3 = static_cast <T> (size - 2) * (size - 3);
+		const T coeff = static_cast <T> (size - 1) * size * (size + 1);
 		const T temp1 = Array::SumHcubeDiff (array, size, value);
 		const T temp2 = Array::SumSqrDiff (array, size, value);
-		return (coeff1 * temp1 / (temp2 * temp2) - 3.0 * coeff2) / coeff3;
+		const T temp3 = coeff * temp1 / (temp2 * temp2);
+		const T temp4 = 15.0 - 9.0 * size;
+		return (temp3 + temp4) / (static_cast <T> (size - 2) * (size - 3));
 	}
 	else
 		return NAN;
 }
+
+//****************************************************************************//
+//      Excess kurtosis                                                       //
+//****************************************************************************//
+# define	KURTOSIS_EXCESS(func, kurt)											\
+template <typename T>															\
+T func (																		\
+	const T array[],															\
+	size_t size,																\
+	T value																		\
+){																				\
+	if (size > 0)																\
+		return kurt (array, size, value) - 3.0;									\
+	else																		\
+		return NAN;																\
+}
+KURTOSIS_EXCESS(KurtosisExcessPopulation, KurtosisPopulation)
+KURTOSIS_EXCESS(KurtosisExcessSample, KurtosisSample)
 
 //****************************************************************************//
 //      Median value of signed deviations                                     //
