@@ -220,7 +220,7 @@ public:
 //      Kurtosis of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Kurtosis (void) const override final {
-		const double temp = 6.0 / successes;
+		const double temp = 6.0 / successes + 3.0;
 		const double p = probability * probability;
 		const double q = successes * (1.0 - probability);
 		return temp + p / q;
