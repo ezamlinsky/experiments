@@ -180,14 +180,18 @@ public:
 //      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Skewness (void) const override final {
-		return 1.0 / sqrt (rate);
+		const double p = 1.0;
+		const double q = sqrt (rate);
+		return p / q;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Kurtosis of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Kurtosis (void) const override final {
-		return 1.0 / rate;
+		const double p = 1.0;
+		const double q = rate;
+		return 3.0 + p / q;
 	}
 };
 
