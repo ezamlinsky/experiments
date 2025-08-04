@@ -97,12 +97,16 @@
 		"Skewness around the mean value")										\
 	.add_property ("KurtosisAroundMean",		&class::KurtosisAroundMean,		\
 		"Kurtosis around the mean value")										\
+	.add_property ("KurtosisExcessAroundMean",	&class::KurtosisExcessAroundMean,\
+		"Excess kurtosis around the mean value")								\
 	.add_property ("VariationAroundMedian",		&class::VariationAroundMedian,	\
 		"Variation around the median value")									\
 	.add_property ("SkewnessAroundMedian",		&class::SkewnessAroundMedian,	\
 		"Skewness around the median value")										\
 	.add_property ("KurtosisAroundMedian",		&class::KurtosisAroundMedian,	\
 		"Kurtosis around the median value")										\
+	.add_property ("KurtosisExcessAroundMedian",&class::KurtosisExcessAroundMedian,\
+		"Excess kurtosis around the median value")								\
 	.add_property ("PearsonSkewness",			&class::PearsonSkewness,		\
 		"Pearson's skewness estimator of the dataset")							\
 	.add_property ("MeedenSkewness",			&class::MeedenSkewness,			\
