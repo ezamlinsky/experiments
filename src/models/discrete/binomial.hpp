@@ -213,7 +213,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Kurtosis (void) const override final {
 		const double temp = 1.0 - probability;
-		const double p = 1.0 - 6.0 * probability * temp;
+		const double p = 1.0 + 3.0 * probability * temp * (trials - 2);
 		const double q = trials * probability * temp;
 		return p / q;
 	}
