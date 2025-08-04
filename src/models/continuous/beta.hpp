@@ -224,7 +224,7 @@ public:
 		const double temp2 = shape1 - shape2;
 		const double p = 6.0 * (temp2 * temp2 * (temp + 1.0) - temp1 * (temp + 2.0));
 		const double q = temp1 * (temp + 2.0) * (temp + 3.0);
-		return p / q;
+		return 3.0 + p / q;
 	}
 };
 
