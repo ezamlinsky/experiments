@@ -209,12 +209,12 @@ public:
 //      Kurtosis of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Kurtosis (void) const override final {
-		return 0.0;
 		const double temp1 = asymmetry * asymmetry;
 		const double temp2 = temp1 * temp1;
-		const double temp3 = 1.0 + temp2;
-		const double p = 6.0 * (1.0 + temp2 * temp2);
-		const double q = temp3 * temp3;
+		const double temp3 = 1.0 + 3.0 * temp2;
+		const double temp4 = 1.0 + temp2;
+		const double p = temp3 * temp3 + 8.0;
+		const double q = temp4 + temp4;
 		return p / q;
 	}
 };
