@@ -36,7 +36,7 @@ public:
 	) :	range (min, max)
 	{
 		// Init the CDF cache
-		Init (max);
+		Init (range.Length() + 1);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -72,7 +72,9 @@ public:
 		if (x != range) return 0.0;
 
 		// Common case
-		return 1.0 / (range.Length() + 1);
+		const double p = 1.0;
+		const double q = range.Length() + 1;
+		return p / q;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -90,7 +92,9 @@ public:
 
 		// Common case
 		const size_t arg = floor (x);
-		return (arg - range.Min() + 1) / (range.Length() + 1);
+		const double p = arg - range.Min() + 1;
+		const double q = range.Length() + 1;
+		return p / q;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -112,7 +116,9 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {
 		const double temp = (range.Length() + 1);
-		return (temp * temp - 1.0) / 12.0;
+		const double p = temp * temp - 1.0;
+		const double q = 12.0;
+		return p / q;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -126,11 +132,10 @@ public:
 //      Kurtosis of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Kurtosis (void) const override final {
-		const double length = range.Length() + 1;
-		const double temp = length * length;
-		const double p = 6.0 * (1.0 + temp);
-		const double q = 5.0 * (1.0 - temp);
-		return p / q;
+		const double temp = range.Length() + 1;
+		const double p = 12.0;
+		const double q = 5.0 * (temp * temp - 1.0);
+		return 1.8 - p / q;
 	}
 };
 
