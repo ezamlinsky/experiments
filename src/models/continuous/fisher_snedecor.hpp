@@ -173,7 +173,7 @@ public:
 			const double temp2 = df1 + temp1;
 			const double p = df1 * (5.0 * df2 - 22.0) * temp2 + (df2 - 4.0) * temp1 * temp1;
 			const double q = df1 * (df2 - 6.0) * (df2 - 8.0) * temp2;
-			return 12.0 * p / q;
+			return 3.0 + 12.0 * p / q;
 		}
 		else
 			return INFINITY;
