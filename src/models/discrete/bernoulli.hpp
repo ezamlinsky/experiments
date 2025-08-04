@@ -71,7 +71,7 @@ public:
 			throw invalid_argument ("Bernoulli: The probability of a successful trial must be in the range [0..1]");
 
 		// Init the CDF cache
-		Init (1);
+		Init (2);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -181,7 +181,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Kurtosis (void) const override final {
 		const double temp = 1.0 - probability;
-		const double p = 1.0 - 6.0 * probability * temp;
+		const double p = 1.0 - 3.0 * probability * temp;
 		const double q = probability * temp;
 		return p / q;
 	}
