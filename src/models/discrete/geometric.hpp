@@ -183,7 +183,7 @@ public:
 		const double temp = probability;
 		const double p = temp * temp;
 		const double q = 1.0 - probability;
-		return 6.0 + p / q;
+		return 9.0 + p / q;
 	}
 };
 
