@@ -142,6 +142,13 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Excess kurtosis of the distribution                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double KurtosisExcess (void) const {
+		return Kurtosis() - 3.0;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual DistType Type (void) const = 0;
@@ -176,6 +183,7 @@ ostream& operator << (ostream &stream, const BaseModel &model)
 	stream << "    Variation\t\t\t\t= " << model.Variation() << endl;
 	stream << "    Skewness\t\t\t\t= " << model.Skewness() << endl;
 	stream << "    Kurtosis\t\t\t\t= " << model.Kurtosis() << endl;
+	stream << "    Excess kurtosis\t\t\t= " << model.KurtosisExcess() << endl;
 	stream << "\nRobust estimators:" << endl;
 	stream << "~~~~~~~~~~~~~~~~~~" << endl;
 	stream << "    Median\t\t\t\t= " << model.Median() << endl;
