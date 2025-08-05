@@ -19,17 +19,6 @@
 class BaseModel
 {
 //============================================================================//
-//      Members                                                               //
-//============================================================================//
-public:
-
-// Distribution type
-enum DistType {
-	DISCRETE,					// Discrete distribution
-	CONTINUOUS					// Continuous distribution
-};
-
-//============================================================================//
 //      Public methods                                                        //
 //============================================================================//
 public:
@@ -151,7 +140,6 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual DistType Type (void) const = 0;
 	virtual const Range& Domain (void) const = 0;
 	virtual size_t Parameters (void) const = 0;
 	virtual double Quartile (double level) const = 0;
