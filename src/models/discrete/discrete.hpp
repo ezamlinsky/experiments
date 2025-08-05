@@ -22,7 +22,8 @@ class BaseDiscrete : public BaseModel
 //      Members                                                               //
 //============================================================================//
 private:
-	vector <double> cdf;	// Cached values of the CDF function for quick calculations
+	vector <double> cmf;	// Cached values of the CMF function for quick calculations
+	size_t location;		// Location of the distribution
 
 //============================================================================//
 //      Private methods                                                       //
@@ -36,13 +37,9 @@ private:
 		double level		// Quantile level to estimate
 	) const override final {
 
-		// Get the distribution location
-		const size_t location = Domain().Min();
-
 		// Adjust the raw value of the target quantile when required
-		const size_t index = Quantile (level);
-		const size_t value = location + index;
-		return fabs (cdf.at (index) - level) <= EPSILON ? value + 0.5 : value;
+		const size_t value = Quantile (level);
+		return fabs (CMF (value) - level) <= EPSILON ? value + 0.5 : value;
 	}
 
 //============================================================================//
@@ -51,29 +48,44 @@ private:
 protected:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Init the cache of the CDF values used for quantile estimates          //
+//      Init the cache of the CMF values used for quantile estimates          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void Init (
-		size_t range		// The argument range we are looking for the CDF values
+		size_t range		// The argument range we are looking for the CMF values
 	){
-		// If the range is not set manually, then estimate it automatically
-		if (range == 0) {
+		// Get the distribution location
+		location = Domain().Min();
 
-			// The distribution mode is the first index where the PDF starts decreasing
+		// If the range is not set manually, then estimate it automatically
+		if (!range) {
+
+			// The distribution mode is the first index where the PMF starts decreasing
 			const double mode = Mode();
-			range = isnan (mode) ? 0 : mode;
+			range = isnan (mode) ? location : mode;
 
 			// We are looking for the last PDF value that is indistinguishable
 			// from zero if subtracted from 1.0
 			while (1.0 - PDF (range) < 1.0) range++;
+			range -= location;
 		}
 
-		// Get the distribution location
-		const size_t location = Domain().Min();
+		// Calculate the CMF values for the target range for quick further estimates
+		double sum = 0.0;
+		for (size_t i = 0; i < range; i++) {
+			sum += PDF (location + i);
+			cmf.push_back (sum);
+		}
+	}
 
-		// Calculate the CDF values for the target range for quick further estimates
-		for (size_t i = 0; i < range; i++)
-			cdf.push_back (CDF (location + i));
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Return the cache of the Cumulative Mass Function (CMF)                //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double CMF (
+		size_t x			// Argument value
+	) const try {
+		return cmf.at (x - location);
+	} catch (const out_of_range &ex) {
+		return NAN;
 	}
 
 //============================================================================//
@@ -87,13 +99,6 @@ public:
 	BaseDiscrete (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Distribution type                                                     //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual DistType Type (void) const override final {
-		return DISCRETE;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Quantile value for the target level                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Quantile (
@@ -103,18 +108,19 @@ public:
 		// Check if the level is correct
 		if (0.0 <= level and level <= 1.0) {
 
-			// Binary search of argument value for the CDF function
+			// Binary search of argument value for the CMF function
 			int64_t left = 0;
-			int64_t right = cdf.size();
+			int64_t right = cmf.size();
 			while (left < right) {
 				const size_t median = (left + right) / 2;
-				if (cdf.at (median) < level)
+				if (cmf.at (median) < level)
 					left = median + 1;
 				else
 					right = median;
 			}
 
-			return left;
+			// Return the quantile value
+			return location + left;
 		}
 		else throw invalid_argument ("Quantile: Level must be in the range [0..1]");
 	}
