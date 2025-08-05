@@ -127,8 +127,11 @@ public:
 //      Kurtosis of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Kurtosis (void) const override final {
-		if (df > 4)
-			return 6.0 / (df - 4.0);
+		if (df > 4) {
+			const double p = 3.0 * df - 6.0;
+			const double q = df - 4.0;
+			return p / q;
+		}
 		else if (df > 2)
 			return INFINITY;
 		else
