@@ -46,13 +46,6 @@ public:
 	BaseContinuous (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Distribution type                                                     //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual DistType Type (void) const override final {
-		return CONTINUOUS;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Quantile value for the target level                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Quantile (
@@ -98,6 +91,8 @@ public:
 				// Clamp the value inside the distribution domain
 				x = range.Clamp (x);
 			}
+
+			// Return the quantile value
 			return x;
 		}
 		else
