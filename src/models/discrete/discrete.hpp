@@ -66,19 +66,18 @@ protected:
 			// We are looking for the last PDF value that is indistinguishable
 			// from zero if subtracted from 1.0
 			while (1.0 - PDF (range) < 1.0) range++;
-			range -= location;
 		}
 
 		// Calculate the CMF values for the target range for quick further estimates
 		double sum = 0.0;
-		for (size_t i = 0; i < range; i++) {
-			sum += PDF (location + i);
+		for (size_t i = location; i < range; i++) {
+			sum += PDF (i);
 			cmf.push_back (sum);
 		}
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Return the cache of the Cumulative Mass Function (CMF)                //
+//      Return the cached value of the Cumulative Mass Function (CMF)         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double CMF (
 		size_t x			// Argument value
@@ -86,6 +85,18 @@ protected:
 		return cmf.at (x - location);
 	} catch (const out_of_range &ex) {
 		return NAN;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Trivial way to calculate the Cumulative Distribution Function (CDF)   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double TrivialCDF (
+		size_t x			// Argument value
+	) const {
+		double sum = 0.0;
+		for (size_t i = location; i <= x; i++)
+			sum += PDF (i);
+		return sum;
 	}
 
 //============================================================================//
