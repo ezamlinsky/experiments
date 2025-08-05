@@ -64,18 +64,6 @@ private:
 	) : Binomial (params.trials, params.probability)
 	{}
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Probability Mass Function (PMF)                                       //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double PMF (
-		size_t x					// Argument value
-	) const {
-		const double t1 = x * log (probability) - lgamma (x + 1);
-		const double t2 = (trials - x) * log (1.0 - probability) - lgamma (trials - x + 1);
-		const double temp = gamma_log + t1 + t2;
-		return exp (temp);
-	}
-
 //============================================================================//
 //      Public methods                                                        //
 //============================================================================//
@@ -152,7 +140,10 @@ public:
 
 		// Common case
 		const size_t arg = floor (x);
-		return PMF (arg);
+		const double t1 = arg * log (probability) - lgamma (arg + 1);
+		const double t2 = (trials - arg) * log (1.0 - probability) - lgamma (trials - arg + 1);
+		const double temp = gamma_log + t1 + t2;
+		return exp (temp);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -170,10 +161,8 @@ public:
 
 		// Common case
 		const size_t arg = floor (x);
-		double sum = 0.0;
-		for (size_t i = 0; i <= arg; i++)
-			sum += PMF (i);
-		return sum;
+		const double value = BaseDiscrete::CMF (arg);
+		return isnan (value) ? TrivialCDF (arg) : value;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
