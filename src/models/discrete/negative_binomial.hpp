@@ -86,7 +86,7 @@ public:
 			throw invalid_argument ("NegativeBinomial: The success probability must be in the range [0..1]");
 
 		// Init the CDF cache
-		Init (0);
+		Init ();
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

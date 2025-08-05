@@ -50,27 +50,27 @@ protected:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Init the cache of the CMF values used for quantile estimates          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	void Init (
-		size_t range		// The argument range we are looking for the CMF values
-	){
-		// Get the distribution location
-		location = Domain().Min();
+	void Init (void) {
 
-		// If the range is not set manually, then estimate it automatically
-		if (!range) {
+		// Initial position to look for significant CDF points to cache
+		double pos = Mode();
+		if (isnan (pos)) pos = Mean();
+		if (isinf (pos)) pos = Domain().Min();
 
-			// The distribution mode is the first index where the PMF starts decreasing
-			const double mode = Mode();
-			range = isnan (mode) ? location : mode;
+		// Find the minimum index where the PDF value is still different from zero
+		size_t min_index = pos;
+		while (min_index && 1.0 - PDF (min_index) < 1.0)
+			--min_index;
 
-			// We are looking for the last PDF value that is indistinguishable
-			// from zero if subtracted from 1.0
-			while (1.0 - PDF (range) < 1.0) range++;
-		}
+		// Find the maximum index where the PDF value is still different from zero
+		size_t max_index = pos;
+		while (1.0 - PDF (max_index) < 1.0)
+			++max_index;
 
-		// Calculate the CMF values for the target range for quick further estimates
+		// Fill the cache with CMF values for quick further estimates
+		location = min_index;
 		double sum = 0.0;
-		for (size_t i = location; i < range; i++) {
+		for (size_t i = min_index; i <= max_index; i++) {
 			sum += PDF (i);
 			cmf.push_back (sum);
 		}

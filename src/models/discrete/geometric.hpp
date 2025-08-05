@@ -71,7 +71,7 @@ public:
 			throw invalid_argument ("Geometric: The probability of a successful trial must be in the range [0..1]");
 
 		// Init the CDF cache
-		Init (0);
+		Init ();
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

@@ -71,7 +71,7 @@ public:
 			throw invalid_argument ("Poisson: The rate value must be positive");
 
 		// Init the CDF cache
-		Init (0);
+		Init ();
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

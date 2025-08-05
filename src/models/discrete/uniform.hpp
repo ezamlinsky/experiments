@@ -36,7 +36,7 @@ public:
 	) :	range (min, max)
 	{
 		// Init the CDF cache
-		Init (range.Length() + 1);
+		Init ();
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
