@@ -181,10 +181,7 @@ public:
 	) :	type (THEORETICAL_DISCRETE)
 	{
 		// Limit the range of the discrete model
-		const Range &model_range = model.Domain();
-		const size_t min = isfinite (model_range.Min()) ? model_range.Min() : model.Quantile (MIN);
-		const size_t max = isfinite (model_range.Max()) ? model_range.Max() : model.Quantile (MAX);
-		Distribution::range = Range (min, max);
+		Distribution::range = Range (model.Quantile (MIN), model.Quantile (MAX));
 
 		// Prepare the values to instantiate the model
 		values = range.Linear();
@@ -213,10 +210,7 @@ public:
 	) :	type (THEORETICAL_CONTINUOUS)
 	{
 		// Limit the range of the continuous model
-		const Range &model_range = model.Domain();
-		const double min = isfinite (model_range.Min()) ? model_range.Min() : model.Quantile (MIN);
-		const double max = isfinite (model_range.Max()) ? model_range.Max() : model.Quantile (MAX);
-		Distribution::range = Range (min, max);
+		Distribution::range = Range (model.Quantile (MIN), model.Quantile (MAX));
 
 		// Prepare the values to instantiate the model
 		values = range.Split (BINS);
