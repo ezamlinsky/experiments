@@ -21,9 +21,11 @@ class Observations
 //      Members                                                               //
 //============================================================================//
 protected:
-	const Range range;			// Values range
-	double *array;				// Array of observed values
-	size_t size;				// Array size
+	const Range range;				// Values range
+	double *array;					// Array of observed values
+	size_t size;					// Array size
+	double mean;					// Mean value
+	double median;					// Median value
 
 //============================================================================//
 //      Private methods                                                       //
@@ -34,7 +36,7 @@ private:
 //      Trim the observations from the left side                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void trim_left (
-		size_t count			// Count of observations to remove
+		size_t count				// Count of observations to remove
 	){
 		double *target = array;
 		double *source = array + count;
@@ -48,7 +50,7 @@ private:
 //      Trim the observations from the right side                             //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void trim_right (
-		size_t count			// Count of observations to remove
+		size_t count				// Count of observations to remove
 	){
 		size -= count;
 	}
@@ -57,10 +59,25 @@ private:
 //      Trim the observations from both sides                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void trim_both (
-		size_t count			// Count of observations to remove
+		size_t count				// Count of observations to remove
 	){
 		trim_left (count);
 		trim_right (count);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Special constructor                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Observations (
+		const double data[],		// Raw observations to work with
+		size_t size					// Array size
+	) :	range (data, size),
+		size (size)
+	{
+		// Sort the observations
+		array = new double [size];
+		Array::Copy (array, data, size);
+		Array::Sort (array, size);
 	}
 
 //============================================================================//
@@ -69,17 +86,29 @@ private:
 public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor                                                           //
+//      Constructors                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+	// Statistical sample
 	Observations (
-		const double data[],	// Raw observations to work with
-		size_t size				// Array size
-	) :	range (data, size),
-		size (size)
+		const vector <double> data	// Observations of a random value
+	) :	Observations (data.data(), data.size())
 	{
-		array = new double [size];
-		Array::Copy (array, data, size);
-		Array::Sort (array, size);
+		// Estimate the mean and the median values
+		Observations::mean = Stats::Mean (array, size);
+		Observations::median = Quantile (0.5);
+	}
+
+	// Statistical population
+	Observations (
+		const vector <double> data,	// Observations of a random value
+		double mean,				// Population mean
+		double median				// Population median
+	) :	Observations (data.data(), data.size())
+	{
+		// Set the mean and the median values
+		Observations::mean = mean;
+		Observations::median = median;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -93,7 +122,7 @@ public:
 //      Trim the target percent of observed min values                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void TrimMin (
-		double percent			// Percent of observations to cut off
+		double percent				// Percent of observations to cut off
 	){
 		if (0.0 <= percent && percent <= 1.0)
 			trim_left (size * percent);
@@ -103,7 +132,7 @@ public:
 //      Trim the target percent of observed max values                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void TrimMax (
-		double percent			// Percent of observations to cut off
+		double percent				// Percent of observations to cut off
 	){
 		if (0.0 <= percent && percent <= 1.0)
 			trim_right (size * percent);
@@ -113,7 +142,7 @@ public:
 //      Trim the target percent of observed min and max values                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void TrimBoth (
-		double percent			// Percent of observations to cut off
+		double percent				// Percent of observations to cut off
 	){
 		if (0.0 <= percent && percent <= 1.0)
 			trim_both (size * percent);
@@ -123,7 +152,7 @@ public:
 //      Trim all the values less than the target value                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void TrimLess (
-		double value			// Threshold value
+		double value				// Threshold value
 	){
 		trim_left (Array::BinSearchLess (array, size, value) + 1);
 	}
@@ -132,7 +161,7 @@ public:
 //      Trim all the values less than or equal to the target value            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void TrimLessOrEqual (
-		double value			// Threshold value
+		double value				// Threshold value
 	){
 		trim_left (Array::BinSearchLessOrEqual (array, size, value) + 1);
 	}
@@ -141,7 +170,7 @@ public:
 //      Trim all the values greater than the target value                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void TrimGreater (
-		double value			// Threshold value
+		double value				// Threshold value
 	){
 		trim_right (size - Array::BinSearchGreater (array, size, value));
 	}
@@ -150,7 +179,7 @@ public:
 //      Trim all the values greater than or equal to the target value         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void TrimGreaterOrEqual (
-		double value			// Threshold value
+		double value				// Threshold value
 	){
 		trim_right (size - Array::BinSearchGreaterOrEqual (array, size, value));
 	}
@@ -180,7 +209,7 @@ public:
 //      Quantile value for the target level                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double Quantile (
-		double level		// Quantile level to estimate
+		double level				// Quantile level to estimate
 	) const {
 
 		// Check if the level is correct
@@ -248,6 +277,20 @@ public:
 			return (upper + lower - 2.0 * Median()) / range;
 		else
 			return 0.0;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Median of the dataset                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double Median (void) const {
+		return median;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Mean of the dataset                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double Mean (void) const {
+		return mean;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -330,8 +373,6 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Median (void) const = 0;
-	virtual double Mean (void) const = 0;
 	virtual double Variance (void) const = 0;
 	virtual double StdDev (void) const = 0;
 	virtual double StdErr (void) const = 0;

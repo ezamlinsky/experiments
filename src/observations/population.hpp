@@ -17,13 +17,6 @@
 class Population : public Observations
 {
 //============================================================================//
-//      Members                                                               //
-//============================================================================//
-private:
-	const double mean;				// Mean value
-	const double median;			// Median value
-
-//============================================================================//
 //      Public methods                                                        //
 //============================================================================//
 public:
@@ -35,9 +28,7 @@ public:
 		const vector <double> data,	// Population data
 		double mean,				// Population mean value
 		double median				// Population median value
-	) :	Observations (data.data(), data.size()),
-		mean (mean),
-		median (median)
+	) :	Observations (data)
 	{}
 
 	Population (
@@ -46,20 +37,6 @@ public:
 		double median				// Population median value
 	) : Population (to_vector (py_list), mean, median)
 	{}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Median of the dataset                                                 //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Median (void) const override final {
-		return median;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Mean of the dataset                                                   //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override final {
-		return mean;
-	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the dataset                                               //
