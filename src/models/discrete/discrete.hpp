@@ -11,7 +11,7 @@
 # include	"../base.hpp"
 
 // Epsilon value for quartile estimation
-# define	EPSILON		1e-10
+# define	QUARTILE_EPSILON	1e-10
 
 //****************************************************************************//
 //      Class "BaseDiscrete"                                                  //
@@ -39,7 +39,7 @@ private:
 
 		// Adjust the raw value of the target quantile when required
 		const size_t value = Quantile (level);
-		return fabs (CMF (value) - level) <= EPSILON ? value + 0.5 : value;
+		return fabs (CMF (value) - level) <= QUARTILE_EPSILON ? value + 0.5 : value;
 	}
 
 //============================================================================//
