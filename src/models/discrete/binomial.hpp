@@ -8,6 +8,7 @@
 ################################################################################
 */
 # pragma	once
+# include	"../functions/beta.hpp"
 # include	"discrete.hpp"
 
 //****************************************************************************//
@@ -161,8 +162,8 @@ public:
 
 		// Common case
 		const size_t arg = floor (x);
-		const double value = BaseDiscrete::CMF (arg);
-		return isnan (value) ? TrivialCDF (arg) : value;
+		const SpecialBeta beta (trials - arg, 1 + arg);
+		return beta.RegIncompleteBeta (probability);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
