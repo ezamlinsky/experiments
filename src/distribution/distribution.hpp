@@ -13,11 +13,6 @@
 # include	"../filters/smooth.hpp"
 # include	"raw.hpp"
 
-// Quantiles to instantiate theoretical models
-# define	EPSILON	1e-6
-# define	MIN		(0.0 + EPSILON)
-# define	MAX		(1.0 - EPSILON)
-
 // Bins count to instantiate a continuous theoretical model
 # define	BINS	1000
 
@@ -181,8 +176,8 @@ public:
 		const BaseDiscrete &model		// Theoretical model
 	) :	type (THEORETICAL_DISCRETE)
 	{
-		// Limit the range of the discrete model
-		Distribution::range = Range (model.Quantile (MIN), model.Quantile (MAX));
+		// Extract the distribution location
+		Distribution::range = model.DistLocation();
 
 		// Prepare the values to instantiate the model
 		values = range.Linear();
@@ -210,8 +205,8 @@ public:
 		const BaseContinuous &model		// Theoretical model
 	) :	type (THEORETICAL_CONTINUOUS)
 	{
-		// Limit the range of the continuous model
-		Distribution::range = Range (model.Quantile (MIN), model.Quantile (MAX));
+		// Extract the distribution location
+		Distribution::range = model.DistLocation();
 
 		// Prepare the values to instantiate the model
 		values = range.Split (BINS);
