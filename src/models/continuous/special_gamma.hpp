@@ -8,6 +8,7 @@
 ################################################################################
 */
 # pragma	once
+# include	"../functions/gamma.hpp"
 # include	"continuous.hpp"
 
 //****************************************************************************//
@@ -68,7 +69,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double PDF (
 		double x				// Argument value
-	) const override {
+	) const override final {
 
 		// Below the range
 		if (x < range) return 0.0;
@@ -91,34 +92,18 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double CDF (
 		double x				// Argument value
-	) const override {
+	) const override final {
 
 		// Below the range
 		if (x <= range) return 0.0;
 
 		// Common case
-		double sum = 0.0;
 		const double arg = x / gamma_scale;
-		const double arg_log = log (arg);
 		const size_t count = gamma_shape / 2;
-		if (gamma_shape % 2) {
-
-			// Shape is odd
-			for (size_t i = 0; i < count; i++) {
-				const double temp = (i + 0.5) * arg_log - arg - lgamma (i + 1.5);
-				sum += exp (temp);
-			}
-			return erf (sqrt (arg)) - sum;
-		}
-		else {
-
-			// Shape is even
-			for (size_t i = 0; i < count; i++) {
-				const double temp = i * arg_log - arg - lgamma (i + 1.0);
-				sum += exp (temp);
-			}
-			return 1.0 - sum;
-		}
+		if (gamma_shape % 2)
+			return NormalizedLowerIncompleteGammaHalf (arg, count);
+		else
+			return NormalizedLowerIncompleteGamma (arg, count);
 	}
 };
 
