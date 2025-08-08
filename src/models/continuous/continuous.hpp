@@ -14,7 +14,7 @@
 # define	STEP_OUTSIDE		0.001
 
 // The number of iterations for the Newton solve method
-# define	NEWTON_ITERATIONS	8
+# define	NEWTON_ITERATIONS	52
 
 //****************************************************************************//
 //      Class "BaseContinuous"                                                //
@@ -65,15 +65,16 @@ public:
 			if (isinf (x)) x = 0.0;
 
 			// Find a solution using the Newton solve method
+			double diff = INFINITY;
 			int i = NEWTON_ITERATIONS;
-			while (i--) {
+			do {
 
 				// Calculate the function and its derivative
 				const double func = CDF (x);
 				const double der = PDF (x);
 
 				// Check the distance between the function and the target value
-				const double diff = func - level;
+				diff = func - level;
 
 				// Calculate a step value to move for the next point
 				double step = diff / der;
@@ -90,7 +91,7 @@ public:
 
 				// Clamp the value inside the distribution domain
 				x = range.Clamp (x);
-			}
+			} while (diff && --i);
 
 			// Return the quantile value
 			return x;
