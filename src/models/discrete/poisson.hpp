@@ -8,6 +8,7 @@
 ################################################################################
 */
 # pragma	once
+# include	"../functions/gamma.hpp"
 # include	"discrete.hpp"
 
 //****************************************************************************//
@@ -140,8 +141,7 @@ public:
 
 		// Common case
 		const size_t arg = floor (x);
-		const double value = BaseDiscrete::CMF (arg);
-		return isnan (value) ? TrivialCDF (arg) : value;
+		return NormalizedUpperIncompleteGamma (rate, arg + 1);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
