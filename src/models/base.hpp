@@ -141,6 +141,7 @@ public:
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual const Range& Domain (void) const = 0;
+	virtual Range DistLocation (void) const = 0;
 	virtual size_t Parameters (void) const = 0;
 	virtual double Quartile (double level) const = 0;
 	virtual double Quantile (double level) const = 0;

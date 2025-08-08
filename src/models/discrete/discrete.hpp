@@ -23,7 +23,8 @@ class BaseDiscrete : public BaseModel
 //============================================================================//
 private:
 	vector <double> cmf;	// Cached values of the CMF function for quick calculations
-	size_t location;		// Location of the distribution
+	size_t min_index;		// The minimum index where the PDF value is still different from zero
+	size_t max_index;		// The maximum index where the PDF value is still different from zero
 
 //============================================================================//
 //      Private methods                                                       //
@@ -58,17 +59,16 @@ protected:
 		if (isinf (pos)) pos = Domain().Min();
 
 		// Find the minimum index where the PDF value is still different from zero
-		size_t min_index = pos;
-		while (min_index && 1.0 - PDF (min_index) < 1.0)
-			--min_index;
+		int64_t first_index = pos;
+		while (1.0 - PDF (first_index) < 1.0) --first_index;
+		min_index = first_index + 1;
 
 		// Find the maximum index where the PDF value is still different from zero
-		size_t max_index = pos;
-		while (1.0 - PDF (max_index) < 1.0)
-			++max_index;
+		int64_t last_index = pos;
+		while (1.0 - PDF (last_index) < 1.0) ++last_index;
+		max_index = last_index - 1;
 
 		// Fill the cache with CMF values for quick further estimates
-		location = min_index;
 		double sum = 0.0;
 		for (size_t i = min_index; i <= max_index; i++) {
 			sum += PDF (i);
@@ -82,7 +82,7 @@ protected:
 	double CMF (
 		size_t x			// Argument value
 	) const try {
-		return cmf.at (x - location);
+		return cmf.at (x - min_index);
 	} catch (const out_of_range &ex) {
 		return NAN;
 	}
@@ -94,7 +94,7 @@ protected:
 		size_t x			// Argument value
 	) const {
 		double sum = 0.0;
-		for (size_t i = location; i <= x; i++)
+		for (size_t i = min_index; i <= x; i++)
 			sum += PDF (i);
 		return sum;
 	}
@@ -107,7 +107,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	BaseDiscrete (void) = default;
+	BaseDiscrete (void) : min_index (0), max_index (0) {}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Location where the PDF function is distinguishable from zero          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual Range DistLocation (void) const override final {
+		return Range (min_index, max_index);
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Quantile value for the target level                                   //
@@ -131,7 +138,7 @@ public:
 			}
 
 			// Return the quantile value
-			return location + left;
+			return min_index + left;
 		}
 		else throw invalid_argument ("Quantile: Level must be in the range [0..1]");
 	}
