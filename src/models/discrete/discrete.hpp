@@ -40,7 +40,7 @@ private:
 
 		// Adjust the raw value of the target quantile when required
 		const size_t value = Quantile (level);
-		return fabs (CMF (value) - level) <= QUARTILE_EPSILON ? value + 0.5 : value;
+		return fabs (cmf.at (value - min_index) - level) <= QUARTILE_EPSILON ? value + 0.5 : value;
 	}
 
 //============================================================================//
@@ -69,34 +69,9 @@ protected:
 		max_index = last_index - 1;
 
 		// Fill the cache with CMF values for quick further estimates
-		double sum = 0.0;
 		for (size_t i = min_index; i <= max_index; i++) {
-			sum += PDF (i);
-			cmf.push_back (sum);
+			cmf.push_back (CDF (i));
 		}
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Return the cached value of the Cumulative Mass Function (CMF)         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double CMF (
-		size_t x			// Argument value
-	) const try {
-		return cmf.at (x - min_index);
-	} catch (const out_of_range &ex) {
-		return NAN;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Trivial way to calculate the Cumulative Distribution Function (CDF)   //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double TrivialCDF (
-		size_t x			// Argument value
-	) const {
-		double sum = 0.0;
-		for (size_t i = min_index; i <= x; i++)
-			sum += PDF (i);
-		return sum;
 	}
 
 //============================================================================//
