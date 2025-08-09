@@ -77,7 +77,7 @@ public:
 		// Handle a case where log(0) would occur
 		if (x == range.Min()) {
 			if (gamma_shape == 1) return INFINITY;
-			if (gamma_shape == 2) return 0.5;
+			if (gamma_shape == 2) return 1.0 / gamma_scale;
 			return 0.0;
 		}
 
