@@ -16,6 +16,11 @@
 // The number of iterations for the Newton solve method
 # define	NEWTON_ITERATIONS	52
 
+// Quantiles to locate theoretical models
+# define	EPSILON				1e-6
+# define	MIN					(0.0 + EPSILON)
+# define	MAX					(1.0 - EPSILON)
+
 //****************************************************************************//
 //      Class "BaseContinuous"                                                //
 //****************************************************************************//
@@ -49,7 +54,7 @@ public:
 //      Location where the PDF function is distinguishable from zero          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual Range DistLocation (void) const override final {
-		return Range (Quantile (0.0), Quantile (1.0));
+		return Range (Quantile (MIN), Quantile (MAX));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -71,17 +76,15 @@ public:
 			if (isnan (x)) x = Mean();
 			if (isinf (x)) x = 0.0;
 
+			// Get the difference between the function and the target value
+			double diff = CDF (x) - level;
+
 			// Find a solution using the Newton solve method
-			double diff = INFINITY;
 			int i = NEWTON_ITERATIONS;
-			do {
+			while (diff && i--) {
 
-				// Calculate the function and its derivative
-				const double func = CDF (x);
+				// Calculate the function derivative
 				const double der = PDF (x);
-
-				// Check the distance between the function and the target value
-				diff = func - level;
 
 				// Calculate a step value to move for the next point
 				double step = diff / der;
@@ -98,7 +101,10 @@ public:
 
 				// Clamp the value inside the distribution domain
 				x = range.Clamp (x);
-			} while (diff && --i);
+
+				// Check the difference for the new function value
+				diff = CDF (x) - level;
+			}
 
 			// Return the quantile value
 			return x;
