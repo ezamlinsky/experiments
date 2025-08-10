@@ -8,12 +8,12 @@
 ################################################################################
 */
 # pragma	once
-# include	"special_gamma.hpp"
+# include	"base_gamma.hpp"
 
 //****************************************************************************//
 //      Class "Erlang"                                                        //
 //****************************************************************************//
-class Erlang final : public SpecialGamma
+class Erlang final : public BaseGamma
 {
 //============================================================================//
 //      Members                                                               //
@@ -33,7 +33,7 @@ struct Params {
 		const Observations &data	// Empirical observations
 	){
 		// Check if empirical data range is inside the model domain
-		if (SpecialGamma::InDomain (data.Domain())) {
+		if (BaseGamma::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
 			const double mean = data.Mean();
@@ -68,7 +68,7 @@ public:
 	Erlang (
 		size_t shape,				// Shape of the distribution
 		double scale				// Scale of the distribution
-	) : SpecialGamma (shape * 2, scale)
+	) : BaseGamma (shape, scale)
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -80,59 +80,10 @@ public:
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Shape of the distribution                                             //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	size_t Shape (void) const {
-		return gamma_shape / 2;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Scale of the distribution                                             //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double Scale (void) const {
-		return gamma_scale;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Number of distribution parameters to describe the population          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual size_t Parameters (void) const override final {
 		return params;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Mode of the distribution                                              //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override final {
-		return (0.5 * gamma_shape - 1) * gamma_scale;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Mean of the distribution                                              //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mean (void) const override final {
-		return 0.5 * gamma_shape * gamma_scale;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Variance of the distribution                                          //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Variance (void) const override final {
-		return 0.5 * gamma_shape * gamma_scale * gamma_scale;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Skewness of the distribution                                          //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Skewness (void) const override final {
-		return 2.0 * sqrt (2.0 / gamma_shape);
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Kurtosis of the distribution                                          //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Kurtosis (void) const override final {
-		return 3.0 + 12.0 / gamma_shape;
 	}
 };
 
