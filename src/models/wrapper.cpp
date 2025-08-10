@@ -23,6 +23,7 @@
 # include	"continuous/beta.hpp"
 # include	"continuous/erlang.hpp"
 # include	"continuous/chi_squared.hpp"
+# include	"continuous/gamma.hpp"
 # include	"continuous/exponential.hpp"
 # include	"continuous/normal.hpp"
 # include	"continuous/laplace.hpp"
@@ -385,6 +386,26 @@ BOOST_PYTHON_MODULE (models) {
 		BASE_CLASS_PROPERTIES (ChiSquared)
 		.add_property ("DF",	&ChiSquared::DF,
 			"Degrees of freedom of the distribution");
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Gamma" class to Python                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <Gamma> ("Gamma",
+		"Model for a Gamma distribution",
+		init <double, double> (args ("shape", "scale"),
+			"Create a new Gamma distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Gamma distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (Gamma)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (Gamma)
+		.add_property ("Shape",	&Gamma::Shape,
+			"Shape of the distribution")
+		.add_property ("Scale",	&Gamma::Scale,
+			"Scale of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Exponential" class to Python                                  //
