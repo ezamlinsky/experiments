@@ -71,6 +71,39 @@ double NormalizedLowerIncompleteGammaHalf (
 ){
 	return 1.0 - NormalizedUpperIncompleteGammaHalf (arg, count);
 }
+
+//****************************************************************************//
+//      Normalized lower incomplete gamma function for a real argument        //
+//****************************************************************************//
+double NormalizedLowerIncompleteGamma (
+	double arg,					// Argument value
+	double shape				// The shape value
+){
+	// Check if the argument value is correct
+	if (arg <= 0.0)
+		throw invalid_argument ("NormalizedUpperIncompleteGamma: The argument value must be positive");
+	if (shape <= 0.0)
+		throw invalid_argument ("NormalizedLowerIncompleteGamma: The shape value must be positive");
+
+	// Special case
+	if (exp (shape - arg) == 0.0)
+		return 1.0;
+
+	// Common case
+	const double arg_log = log (arg);
+	double gamma_log = lgamma (shape);
+	double sum = 0.0;
+	double last;
+	size_t i = 0;
+	do {
+		last = sum;
+		gamma_log += log (shape + i);
+		const double current = exp ((shape + i) * arg_log - arg - gamma_log);
+		sum += current;
+		i++;
+	} while (sum > last);
+	return sum;
+}
 /*
 ################################################################################
 #                                 END OF FILE                                  #
