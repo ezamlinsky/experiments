@@ -22,7 +22,6 @@ private:
 	static const size_t params;	// Count of distribution parameters
 
 protected:
-	static const Range range;	// Function domain where the distribution exists
 	const double shape;			// Shape of the distribution
 	const double scale;			// Scale of the distribution
 
@@ -47,15 +46,6 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Check if the range is inside the model domain                         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	static bool InDomain (
-		const Range &subrange	// Testing range
-	){
-		return range >= subrange;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Shape of the distribution                                             //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double Shape (void) const {
@@ -70,13 +60,6 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Function domain where the distribution exists                         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual const Range& Domain (void) const override final {
-		return range;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Number of distribution parameters to describe the population          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual size_t Parameters (void) const override final {
@@ -87,7 +70,6 @@ public:
 //****************************************************************************//
 //      Internal constants used by the class                                  //
 //****************************************************************************//
-const Range ShapeScale::range = Range (0.0, INFINITY);
 const size_t ShapeScale::params = 2;
 
 //****************************************************************************//

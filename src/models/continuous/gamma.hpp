@@ -19,6 +19,7 @@ class Gamma : public ShapeScale
 //      Members                                                               //
 //============================================================================//
 private:
+	static const Range range;	// Function domain where the distribution exists
 	const double gamma_log;		// Logarithm of the gamma function
 
 // Extract the distribution parameters from empirical observations
@@ -81,6 +82,22 @@ public:
 		const Observations &data	// Empirical observations
 	) : Gamma (Params (data))
 	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check if the range is inside the model domain                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	static bool InDomain (
+		const Range &subrange	// Testing range
+	){
+		return range >= subrange;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Function domain where the distribution exists                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual const Range& Domain (void) const override final {
+		return range;
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
@@ -158,6 +175,11 @@ public:
 		return 3.0 + 6.0 / shape;
 	}
 };
+
+//****************************************************************************//
+//      Internal constants used by the class                                  //
+//****************************************************************************//
+const Range Gamma::range = Range (0.0, INFINITY);
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
