@@ -24,6 +24,7 @@
 # include	"continuous/erlang.hpp"
 # include	"continuous/chi_squared.hpp"
 # include	"continuous/gamma.hpp"
+# include	"continuous/pareto.hpp"
 # include	"continuous/exponential.hpp"
 # include	"continuous/normal.hpp"
 # include	"continuous/laplace.hpp"
@@ -405,6 +406,26 @@ BOOST_PYTHON_MODULE (models) {
 		.add_property ("Shape",	&Gamma::Shape,
 			"Shape of the distribution")
 		.add_property ("Scale",	&Gamma::Scale,
+			"Scale of the distribution");
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Pareto" class to Python                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <Pareto> ("Pareto",
+		"Model for a Pareto distribution",
+		init <double, double> (args ("shape", "scale"),
+			"Create a new Pareto distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Pareto distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (Pareto)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (Pareto)
+		.add_property ("Shape",	&Pareto::Shape,
+			"Shape of the distribution")
+		.add_property ("Scale",	&Pareto::Scale,
 			"Scale of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
