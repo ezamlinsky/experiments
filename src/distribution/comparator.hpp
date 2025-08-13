@@ -10,6 +10,11 @@
 # pragma	once
 # include	"base.hpp"
 # include	"../models/discrete/uniform.hpp"
+# include	"../models/discrete/binomial.hpp"
+# include	"../models/discrete/negative_binomial.hpp"
+# include	"../models/discrete/bernoulli.hpp"
+# include	"../models/discrete/geometric.hpp"
+# include	"../models/discrete/poisson.hpp"
 # include	"../models/continuous/chi_squared.hpp"
 
 //****************************************************************************//
@@ -343,6 +348,11 @@ public:
 
 		// Test available distribution models
 		temp.TestModel <DiscreteUniform> (table, data, "Discrete Uniform\t= ");
+		temp.TestModel <Binomial> (table, data, "Binomial\t\t= ");
+		temp.TestModel <NegativeBinomial> (table, data, "NegativeBinomial\t= ");
+		temp.TestModelWithRange <Bernoulli> (table, data, "Bernoulli\t\t= ");
+		temp.TestModelWithRange <Geometric> (table, data, "Geometric\t\t= ");
+		temp.TestModelWithRange <Poisson> (table, data, "Poisson\t\t\t= ");
 
 		// Compare function to sort the scores in descending order
 		auto comp = [] (PearsonScore a, PearsonScore b) {
