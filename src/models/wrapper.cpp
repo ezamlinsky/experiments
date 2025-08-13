@@ -26,6 +26,7 @@
 # include	"continuous/gamma.hpp"
 # include	"continuous/pareto.hpp"
 # include	"continuous/exponential.hpp"
+# include	"continuous/rayleigh.hpp"
 # include	"continuous/normal.hpp"
 # include	"continuous/laplace.hpp"
 # include	"continuous/asymmetric_laplace.hpp"
@@ -446,6 +447,24 @@ BOOST_PYTHON_MODULE (models) {
 		// Properties
 		BASE_CLASS_PROPERTIES (Exponential)
 		.add_property ("Scale",				&Exponential::Scale,
+			"Scale of the distrsibution");
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Rayleigh" class to Python                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <Rayleigh> ("Rayleigh",
+		"Model for an Rayleigh distribution",
+		init <double> (args ("scale"),
+			"Create a new Rayleigh distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Rayleigh distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (Rayleigh)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (Rayleigh)
+		.add_property ("Scale",				&Rayleigh::Scale,
 			"Scale of the distrsibution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
