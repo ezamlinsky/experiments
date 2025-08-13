@@ -8,20 +8,17 @@
 ################################################################################
 */
 # pragma	once
-# include	"continuous.hpp"
+# include	"scale_dist.hpp"
 
 //****************************************************************************//
 //      Class "Rayleigh"                                                      //
 //****************************************************************************//
-class Rayleigh final : public BaseContinuous
+class Rayleigh final : public ScaleDist
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 private:
-	static const Range range;		// Function domain where the distribution exists
-	static const size_t params;		// Count of distribution parameters
-	const double scale;				// Scale of the distribution
 
 // Extract the distribution parameters from empirical observations
 struct Params {
@@ -65,7 +62,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Rayleigh (
 		double scale				// Scale of the distribution
-	) : scale (scale)
+	) : ScaleDist (scale)
 	{
 		if (scale <= 0.0)
 			throw invalid_argument ("Rayleigh: The scale value must be positive");
@@ -78,36 +75,6 @@ public:
 		const Observations &data	// Empirical observations
 	) : Rayleigh (Params (data))
 	{}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Check if the range is inside the model domain                         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	static bool InDomain (
-		const Range &subrange		// Testing range
-	){
-		return range >= subrange;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Scale of the distribution                                             //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double Scale (void) const {
-		return scale;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Function domain where the distribution exists                         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual const Range& Domain (void) const override final {
-		return range;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Number of distribution parameters to describe the population          //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual size_t Parameters (void) const override final {
-		return params;
-	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Probability Density Function (PDF)                                    //
@@ -182,12 +149,6 @@ public:
 };
 
 //****************************************************************************//
-//      Internal constants used by the class                                  //
-//****************************************************************************//
-const Range Rayleigh::range = Range (0.0, INFINITY);
-const size_t Rayleigh::params = 1;
-
-//****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
 ostream& operator << (ostream &stream, const Rayleigh &model)
@@ -197,7 +158,7 @@ ostream& operator << (ostream &stream, const Rayleigh &model)
 	stream << "\nRAYLEIGH DISTRIBUTION:" << std::endl;
 	stream << "======================" << std::endl;
 	stream << static_cast <const BaseContinuous&> (model);
-	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
+	stream << static_cast <const ScaleDist&> (model);
 	stream << static_cast <const BaseModel&> (model);
 	stream.precision (restore);
 	return stream;
