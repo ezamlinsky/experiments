@@ -72,6 +72,13 @@ public:
 	virtual const Range& Domain (void) const override final {
 		return range;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Mode of the distribution                                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double Mode (void) const override final {
+		return location;
+	}
 };
 
 //****************************************************************************//
