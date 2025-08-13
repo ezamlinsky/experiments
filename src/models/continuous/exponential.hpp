@@ -39,7 +39,7 @@ struct Params {
 		if (Exponential::InDomain (data.Domain())) {
 
 			// Extract parameters from the empirical observations
-			scale = data.Median() / log (2);
+			scale = data.Median() / M_LN2;
 			if (scale <= 0.0)
 				throw invalid_argument ("Exponential params: Can not estimate the scale value for the dataset");
 		}
