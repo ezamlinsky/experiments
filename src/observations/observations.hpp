@@ -21,7 +21,7 @@ class Observations
 //      Members                                                               //
 //============================================================================//
 protected:
-	const Range range;				// Values range
+	Range range;					// Values range
 	double *array;					// Array of observed values
 	size_t size;					// Array size
 	double mean;					// Mean value
@@ -182,6 +182,54 @@ public:
 		double value				// Threshold value
 	){
 		trim_right (size - Array::BinSearchGreaterOrEqual (array, size, value));
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Add a value to all the observations                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	void Add (
+		double value				// The value to add
+	){
+		range.Shift (value);
+		mean += value;
+		median += value;
+		Array::Add (array, size, value);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Subtract a value from all the observations                            //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	void Sub (
+		double value				// The value to subtract
+	){
+		range.Shift (-value);
+		mean += -value;
+		median += -value;
+		Array::Sub (array, size, value);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Multiply all the observations by a value                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	void Mul (
+		double value				// The value to multiply by
+	){
+		range.Scale (value);
+		mean *= value;
+		median *= value;
+		Array::Mul (array, size, value);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Divide all the observations by a value                                //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	void Div (
+		double value				// The value to divide by
+	){
+		range.Scale (1.0 / value);
+		mean *= 1.0 / value;
+		median *= 1.0 / value;
+		Array::Div (array, size, value);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

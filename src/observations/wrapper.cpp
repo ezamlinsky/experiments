@@ -35,6 +35,14 @@
 		"Trim all the values greater than the target value")					\
 	.def ("TrimGreaterOrEqual",	&class::TrimGreaterOrEqual,	args ("value"),		\
 		"Trim all the values greater than or equal to the target value")		\
+	.def ("Add",				&class::Add,	args ("value"),					\
+		"Add a value to all the observations")									\
+	.def ("Sub",				&class::Sub,	args ("value"),					\
+		"Subtract a value from all the observations")							\
+	.def ("Mul",				&class::Mul,	args ("value"),					\
+		"Multiply all the observations by a value")								\
+	.def ("Div",				&class::Div,	args ("value"),					\
+		"Divide all the observations by a value")								\
 	.def ("Quantile",			&class::Quantile,			args ("level"),		\
 		"Quantile value for the target level")									\
 	.def ("data",				&class::data,	return_internal_reference <> (),\
