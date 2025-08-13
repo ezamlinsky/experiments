@@ -24,8 +24,6 @@ class Normal final : public Continuous
 //============================================================================//
 private:
 	static const size_t params;		// Count of distribution parameters
-	static const double sqrt_2;		// Square root of 2
-	static const double sqrt_pi;	// Square root of PI
 
 // Extract the distribution parameters from empirical observations
 struct Params {
@@ -47,7 +45,7 @@ struct Params {
 
 			// Find the location and the scale for these parameters
 			location = median;
-			scale = deviation / (sqrt (2.0) * boost::math::erf_inv (0.5));
+			scale = deviation / (M_SQRT2 * boost::math::erf_inv (0.5));
 		}
 		else
 			throw invalid_argument ("Normal params: The data range is outside the distribution domain");
@@ -140,7 +138,7 @@ public:
 		double x					// Argument value
 	) const override final {
 		const double arg = (x - location) / scale;
-		return exp (-0.5 * arg * arg) / (scale * sqrt_2 * sqrt_pi);
+		return exp (-0.5 * arg * arg) / (scale * M_SQRT2 * sqrt (M_PI));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -150,14 +148,7 @@ public:
 		double x					// Argument value
 	) const override final {
 		const double arg = (x - location) / scale;
-		return 0.5 * (1.0 + erf (arg / sqrt_2));
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Mode of the distribution                                              //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double Mode (void) const override final {
-		return location;
+		return 0.5 * (1.0 + erf (arg / M_SQRT2));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -193,8 +184,6 @@ public:
 //      Internal constants used by the class                                  //
 //****************************************************************************//
 const size_t Normal::params = 2;
-const double Normal::sqrt_2 = sqrt (2);
-const double Normal::sqrt_pi = sqrt (M_PI);
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
