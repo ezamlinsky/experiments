@@ -27,6 +27,7 @@
 # include	"continuous/pareto.hpp"
 # include	"continuous/exponential.hpp"
 # include	"continuous/rayleigh.hpp"
+# include	"continuous/logistic.hpp"
 # include	"continuous/normal.hpp"
 # include	"continuous/laplace.hpp"
 # include	"continuous/asymmetric_laplace.hpp"
@@ -450,7 +451,7 @@ BOOST_PYTHON_MODULE (models) {
 			"Scale of the distrsibution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose "Rayleigh" class to Python                                  //
+//      Expose "Rayleigh" class to Python                                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	class_ <Rayleigh> ("Rayleigh",
 		"Model for an Rayleigh distribution",
@@ -466,6 +467,22 @@ BOOST_PYTHON_MODULE (models) {
 		BASE_CLASS_PROPERTIES (Rayleigh)
 		.add_property ("Scale",				&Rayleigh::Scale,
 			"Scale of the distrsibution");
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Logistic" class to Python                                     //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	class_ <Logistic> ("Logistic",
+		"Model for a Logistic distribution",
+		init <double, double> (args ("location", "scale"),
+			"Create a new Logistic distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Logistic distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (Logistic)
+
+		// Properties
+		CONTINUOUS_CLASS_PROPERTIES (Logistic);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Normal" class to Python                                       //
