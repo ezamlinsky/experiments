@@ -228,6 +228,21 @@ SCALAR_NORMAL_REVERSE(ReverseDiv, /)
 // Vector reverse division
 VECTOR_INPLACE_REVERSE(ReverseDiv, /)
 VECTOR_NORMAL_REVERSE(ReverseDiv, /)
+
+//****************************************************************************//
+//      Power                                                                 //
+//****************************************************************************//
+template <typename T>
+T* Pow (
+	T result[],
+	const T source[],
+	size_t size,
+	T power
+){
+	for (size_t i = 0; i < size; i++)
+		result[i] = pow (source[i], power);
+	return result;
+}
 }
 /*
 ################################################################################
