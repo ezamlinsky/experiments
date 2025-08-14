@@ -22,25 +22,27 @@ namespace Array
 // Forward operation
 # define	SCALAR_INPLACE_FORWARD(fname, operation)							\
 template <typename T>															\
-void fname (																	\
+T* fname (																		\
 	T array[],																	\
 	size_t size,																\
 	T value																		\
 ){																				\
 	for (size_t i = 0; i < size; i++)											\
 		array[i] operation value;												\
+	return array;																\
 }
 
 // Reverse operation
 # define	SCALAR_INPLACE_REVERSE(fname, operation)							\
 template <typename T>															\
-void fname (																	\
+T* fname (																		\
 	T array[],																	\
 	size_t size,																\
 	T value																		\
 ){																				\
 	for (size_t i = 0; i < size; i++)											\
 		array[i] = value operation array[i];									\
+	return array;																\
 }
 
 //============================================================================//
@@ -50,7 +52,7 @@ void fname (																	\
 // Forward operation
 # define	SCALAR_NORMAL_FORWARD(fname, operation)								\
 template <typename T>															\
-void fname (																	\
+T* fname (																		\
 	T result[],																	\
 	const T source[],															\
 	size_t size,																\
@@ -58,12 +60,13 @@ void fname (																	\
 ){																				\
 	for (size_t i = 0; i < size; i++)											\
 		result[i] = source[i] operation value;									\
+	return result;																\
 }
 
 // Reverse operation
 # define	SCALAR_NORMAL_REVERSE(fname, operation)								\
 template <typename T>															\
-void fname (																	\
+T* fname (																		\
 	T result[],																	\
 	const T source[],															\
 	size_t size,																\
@@ -71,6 +74,7 @@ void fname (																	\
 ){																				\
 	for (size_t i = 0; i < size; i++)											\
 		result[i] = value operation source[i];									\
+	return result;																\
 }
 
 //****************************************************************************//
@@ -84,7 +88,7 @@ void fname (																	\
 // Forward operation
 # define	VECTOR_INPLACE_FORWARD(fname, operation)							\
 template <typename T>															\
-void fname																		\
+T* fname																		\
 (																				\
 	T array[],																	\
 	const T source[],															\
@@ -92,12 +96,13 @@ void fname																		\
 ){																				\
 	for (size_t i = 0; i < size; i++)											\
 		array[i] operation source[i];											\
+	return array;																\
 }
 
 // Reverse operation
 # define	VECTOR_INPLACE_REVERSE(fname, operation)							\
 template <typename T>															\
-void fname																		\
+T* fname																		\
 (																				\
 	T array[],																	\
 	const T source[],															\
@@ -105,6 +110,7 @@ void fname																		\
 ){																				\
 	for (size_t i = 0; i < size; i++)											\
 		array[i] = source[i] operation array[i];								\
+	return array;																\
 }
 
 //============================================================================//
@@ -114,7 +120,7 @@ void fname																		\
 // Forward operation
 # define	VECTOR_NORMAL_FORWARD(fname, operation)								\
 template <typename T>															\
-void fname																		\
+T* fname																		\
 (																				\
 	T result[],																	\
 	const T source1[],															\
@@ -123,12 +129,13 @@ void fname																		\
 ){																				\
 	for (size_t i = 0; i < size; i++)											\
 		result[i] = source1[i] operation source2[i];							\
+	return result;																\
 }
 
 // Reverse operation
 # define	VECTOR_NORMAL_REVERSE(fname, operation)								\
 template <typename T>															\
-void fname																		\
+T* fname																		\
 (																				\
 	T result[],																	\
 	const T source1[],															\
@@ -137,6 +144,7 @@ void fname																		\
 ){																				\
 	for (size_t i = 0; i < size; i++)											\
 		result[i] = source2[i] operation source1[i];							\
+	return result;																\
 }
 
 //****************************************************************************//
