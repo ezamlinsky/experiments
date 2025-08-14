@@ -65,6 +65,90 @@ public:
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Absolute value transformation                                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Sample Abs (void) const {
+
+		// Create a new array for transformed data
+		double *data = new double [size];
+
+		// Return transformed observations
+		return Sample (Array::Abs (data, array, size), size);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Logarithmic transformation                                            //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Sample Log (void) const {
+
+		// Check if the transformation is possible for the data
+		if (range <= 0.0)
+			throw invalid_argument ("Log: Can not transform observations with non-positive values");
+
+		// Create a new array for transformed data
+		double *data = new double [size];
+
+		// Return transformed observations
+		return Sample (Array::Log (data, array, size), size);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Exponential transformation                                            //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Sample Exp (void) const {
+
+		// Create a new array for transformed data
+		double *data = new double [size];
+
+		// Return transformed observations
+		return Sample (Array::Exp (data, array, size), size);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Power transformation                                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Sample Pow (
+		double power				// The power to use for the transformation
+	) const {
+
+		// Check if the transformation is possible for the data
+		if (range <= 0.0)
+			throw invalid_argument ("Pow: Can not transform observations with non-positive values");
+
+		// Create a new array for transformed data
+		double *data = new double [size];
+
+		// Return transformed observations
+		return Sample (Array::Pow (data, array, size, power), size);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Box-Cox transformation                                                //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Sample BoxCox (
+		double power				// The power to use for the transformation
+	) const {
+
+		// Check if the transformation is possible for the data
+		if (range <= 0.0)
+			throw invalid_argument ("BoxCox: Can not transform observations with non-positive values");
+
+		// Special case
+		if (power == 0.0)
+			return Log();
+
+		// Create a new array for transformed data
+		double *data = new double [size];
+
+		// Fill it with the transformed data
+		for (size_t i = 0; i < size; i++)
+			data [i] = (pow (array[i], power) - 1.0) / power;
+
+		// Return transformed observations
+		return Sample (data, size);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the dataset                                               //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const override final {

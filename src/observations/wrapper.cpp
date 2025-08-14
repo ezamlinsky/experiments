@@ -157,6 +157,16 @@ BOOST_PYTHON_MODULE (observations) {
 
 		// Methods
 		BASE_CLASS_METHODS(Sample)
+		.def ("Abs",	&Sample::Abs,											\
+			"Absolute value transformation")									\
+		.def ("Log",	&Sample::Log,											\
+			"Logarithmic transformation")										\
+		.def ("Exp",	&Sample::Exp,											\
+			"Exponential transformation")										\
+		.def ("Pow",	&Sample::Pow,		args ("power"),						\
+			"Power transformation")												\
+		.def ("BoxCox",	&Sample::BoxCox,	args ("power"),						\
+			"Box-Cox transformation")											\
 
 		// Properties
 		BASE_CLASS_PROPERTIES(Sample);
