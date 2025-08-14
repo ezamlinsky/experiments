@@ -66,7 +66,7 @@ private:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Special constructor                                                   //
+//      Store raw observations                                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Observations (
 		const double data[],		// Raw observations to work with
@@ -78,6 +78,29 @@ private:
 		array = new double [size];
 		Array::Copy (array, data, size);
 		Array::Sort (array, size);
+	}
+
+//============================================================================//
+//      Protected methods                                                     //
+//============================================================================//
+protected:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Store transformed observations                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Observations (
+		double data[],				// Transformed observations to store
+		size_t size					// Array size
+	) :	range (data, size),
+		array (data),
+		size (size)
+	{
+		// Sort the observations
+		Array::Sort (array, size);
+
+		// Estimate the mean and the median values
+		Observations::mean = Stats::Mean (array, size);
+		Observations::median = Quantile (0.5);
 	}
 
 //============================================================================//
@@ -109,6 +132,37 @@ public:
 		// Set the mean and the median values
 		Observations::mean = mean;
 		Observations::median = median;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Copy constructor                                                      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Observations (
+		const Observations &source	// The source object to copy
+	) :	range (source.range),
+		size (source.size),
+		mean (source.mean),
+		median (source.median)
+	{
+		// Copy the data
+		array = new double [source.size];
+		Array::Copy (array, source.array, source.size);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Move constructor                                                      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	Observations (
+		Observations &&source		// The source object to move
+	) :	range (source.range),
+		array (source.array),
+		size (source.size),
+		mean (source.mean),
+		median (source.median)
+	{
+		// Reset the original object
+		source.array = NULL;
+		source.size = 0;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
