@@ -38,7 +38,7 @@ struct Params {
 
 		// Find the shape and the scale for these parameters
 		shape = 1.0 + sqrt (1.0 + mean * mean / variance);
-		scale = mean * (shape - 1.0) / shape;
+		scale = min (data.Domain().Min(), mean * (shape - 1.0) / shape);
 	}
 };
 
