@@ -11,27 +11,25 @@
 # include	"../filters/smooth.hpp"
 # include	"raw.hpp"
 
-// Bins count to instantiate a continuous theoretical model
-# define	BINS	1000
-
 //****************************************************************************//
 //      Class "Distribution"                                                  //
 //****************************************************************************//
 class Distribution
 {
 //============================================================================//
-//      Members                                                               //
+//      Distribution type                                                     //
 //============================================================================//
 public:
+	enum DistType {
+		NONE,							// Type is unknown
+		EMPIRICAL,						// Empirical distribution
+		THEORETICAL_DISCRETE,			// Theoretical discrete distribution
+		THEORETICAL_CONTINUOUS			// Theoretical continuous distribution
+	};
 
-// Distribution type
-enum DistType {
-	NONE,								// Type is unknown
-	EMPIRICAL,							// Empirical distribution
-	THEORETICAL_DISCRETE,				// Theoretical discrete distribution
-	THEORETICAL_CONTINUOUS				// Theoretical continuous distribution
-};
-
+//============================================================================//
+//      Members                                                               //
+//============================================================================//
 private:
 	DistType type;						// Distribution type
 	Range range;						// Values range
@@ -235,7 +233,7 @@ public:
 
 	// Discrete distribution
 	Distribution (
-		const list &py_list				// Empirical dataset
+		const pylist &py_list			// Empirical dataset
 	) : Distribution (to_vector (py_list))
 	{}
 
@@ -271,7 +269,7 @@ public:
 
 	// Continuous distribution
 	Distribution (
-		const list &py_list,			// Empirical dataset
+		const pylist &py_list,			// Empirical dataset
 		size_t bins						// Bins count for a histogram
 	) : Distribution (to_vector (py_list), bins)
 	{}
