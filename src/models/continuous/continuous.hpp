@@ -18,8 +18,8 @@
 
 // Quantiles to locate theoretical models
 # define	EPSILON				1e-6
-# define	MIN					(0.0 + EPSILON)
-# define	MAX					(1.0 - EPSILON)
+# define	MIN_LEVEL			(0.0 + EPSILON)
+# define	MAX_LEVEL			(1.0 - EPSILON)
 
 //****************************************************************************//
 //      Class "BaseContinuous"                                                //
@@ -54,7 +54,7 @@ public:
 //      Location where the PDF function is distinguishable from zero          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual Range DistLocation (void) const override final {
-		return Range (Quantile (MIN), Quantile (MAX));
+		return Range (Quantile (MIN_LEVEL), Quantile (MAX_LEVEL));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
