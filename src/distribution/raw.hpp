@@ -2,7 +2,7 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#            CALCULATE RAW PDF AND CDF FUNCTIONS FOR A DISTRIBUTION            #
+#               CALCULATE A RAW CDF FUNCTION FOR A DISTRIBUTION                #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
@@ -12,9 +12,9 @@
 # include	"../observations/observations.hpp"
 
 //****************************************************************************//
-//      Class "RawDistribution"                                               //
+//      Class "RawCDF"                                                        //
 //****************************************************************************//
-class RawDistribution
+class RawCDF
 {
 //============================================================================//
 //      Members                                                               //
@@ -29,7 +29,7 @@ private:
 private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Calculate empirical discrete PDF and CDF values                       //
+//      Calculate empirical discrete CDF values                               //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void Init (
 		const vector <double> &data		// Empirical data for the calculation
@@ -74,7 +74,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	RawDistribution (
+	RawCDF (
 		const Observations &data		// Observations of a random value
 	){
 		// Extract the ranked dataset
@@ -88,7 +88,7 @@ public:
 		Init (temp);
 	}
 
-	RawDistribution (
+	RawCDF (
 		vector <double> &&data			// Empirical dataset
 	){
 		// Check if the dataset is not empty

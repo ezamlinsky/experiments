@@ -228,7 +228,7 @@ public:
 		values (range.Linear())
 	{
 		// Compute raw discrete distribution
-		RawDistribution raw (data);
+		RawCDF raw (data);
 
 		// Calculate empirical discrete PDF and CDF values
 		InitDiscrete (raw.Values(), raw.CDF());
@@ -242,7 +242,7 @@ public:
 		values (range.Linear())
 	{
 		// Compute raw discrete distribution
-		RawDistribution raw (move (vector <double> (data)));
+		RawCDF raw (move (vector <double> (data)));
 
 		// Calculate empirical discrete PDF and CDF values
 		InitDiscrete (raw.Values(), raw.CDF());
@@ -263,7 +263,7 @@ public:
 		values (range.Split (bins))
 	{
 		// Compute raw discrete distribution
-		RawDistribution raw (data);
+		RawCDF raw (data);
 
 		// Calculate empirical continuous PDF and CDF values
 		InitContinuous (raw.Values(), raw.CDF());
@@ -278,7 +278,7 @@ public:
 		values (range.Split (bins))
 	{
 		// Compute raw discrete distribution
-		RawDistribution raw (move (vector <double> (data)));
+		RawCDF raw (move (vector <double> (data)));
 
 		// Calculate empirical continuous PDF and CDF values
 		InitContinuous (raw.Values(), raw.CDF());
