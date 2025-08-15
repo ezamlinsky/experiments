@@ -32,7 +32,7 @@ public:
 	{}
 
 	Population (
-		const list &py_list,		// Population data
+		const pylist &py_list,		// Population data
 		double mean,				// Population mean value
 		double median				// Population median value
 	) : Population (to_vector (py_list), mean, median)

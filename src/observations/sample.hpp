@@ -44,7 +44,7 @@ public:
 	{}
 
 	Sample (
-		const list &py_list			// Sample data
+		const pylist &py_list		// Sample data
 	) : Sample (to_vector (py_list))
 	{}
 
