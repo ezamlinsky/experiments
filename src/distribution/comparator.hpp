@@ -8,7 +8,8 @@
 ################################################################################
 */
 # pragma	once
-# include	"base.hpp"
+# include	<cmath>
+# include	"distribution.hpp"
 # include	"../models/discrete/uniform.hpp"
 # include	"../models/discrete/binomial.hpp"
 # include	"../models/discrete/negative_binomial.hpp"
@@ -34,12 +35,14 @@ struct PearsonScore
 //****************************************************************************//
 //      Class "DistComparator"                                                //
 //****************************************************************************//
-class DistComparator : public BaseComparator
+class DistComparator
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 private:
+	Distribution sample;					// Sample distribution to compare
+	Distribution reference;					// Reference distribution
 	size_t observations;					// Number of collected observations
 	size_t params;							// Number of model parameters
 
@@ -165,15 +168,17 @@ public:
 	// Discrete distribution
 	DistComparator (
 		const Observations &data			// Observations of a random value
-	) : BaseComparator (data),
-		observations (data.Size())
+	) : sample (data),
+		observations (data.Size()),
+		params (0)
 	{}
 
 	// Discrete distribution
 	DistComparator (
 		const vector <double> &data			// Empirical data
-	) : BaseComparator (data),
-		observations (data.size())
+	) : sample (data),
+		observations (data.size()),
+		params (0)
 	{}
 
 	// Discrete distribution
@@ -186,16 +191,18 @@ public:
 	DistComparator (
 		const Observations &data,			// Observations of a random value
 		size_t bins							// Bins count for a histogram
-	) : BaseComparator (data, bins),
-		observations (data.Size())
+	) : sample (data, bins),
+		observations (data.Size()),
+		params (0)
 	{}
 
 	// Continuous distribution
 	DistComparator (
 		const vector <double> &data,		// Empirical data
 		size_t bins							// Bins count for a histogram
-	) : BaseComparator (data, bins),
-		observations (data.size())
+	) : sample (data, bins),
+		observations (data.size()),
+		params (0)
 	{}
 
 	// Continuous distribution
@@ -265,21 +272,47 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Load a distribution model as a reference for the distribution test    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	template <typename T>
+	void ReferenceModel (
+		const T &model						// Theoretical model
+	){
+		// Check if empirical data range is inside the model domain
+		if (model.Domain() >= sample.Domain()) {
+
+			// Set the distribution model
+			reference = Distribution (model, sample.Values());
+			params = model.Parameters();
+		}
+		else
+			throw invalid_argument ("ReferenceModel: The sample data range is outside the distribution model domain");
+	}
 
 	// Discrete distribution
 	void ReferenceModel (
 		const BaseDiscrete &model			// Theoretical model
 	){
-		BaseComparator::ReferenceModel <BaseDiscrete> (model);
-		params = model.Parameters();
+		ReferenceModel <BaseDiscrete> (model);
 	}
 
 	// Continuous distribution
 	void ReferenceModel (
 		const BaseContinuous &model			// Theoretical model
 	){
-		BaseComparator::ReferenceModel <BaseContinuous> (model);
-		params = model.Parameters();
+		ReferenceModel <BaseContinuous> (model);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Return sample distribution                                            //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	const Distribution& Sample (void) const {
+		return sample;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Return reference distribution                                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	const Distribution& Reference (void) const {
+		return reference;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -366,7 +399,7 @@ public:
 };
 
 //****************************************************************************//
-//      Translate the object to a string                                      //
+//      Translate the objects to a string                                     //
 //****************************************************************************//
 const string pearson_score_to_string (const vector <PearsonScore> &table)
 {
@@ -379,6 +412,17 @@ const string pearson_score_to_string (const vector <PearsonScore> &table)
 	for (const auto &item : table)
 		stream << item.name << fixed << setprecision (3) << item.score * 100 <<endl;
 	return stream.str();
+}
+ostream& operator << (ostream &stream, const DistComparator &object)
+{
+	auto restore = stream.precision();
+	stream.precision (PRECISION);
+	stream << "\nDISTRIBUTION COMPARATOR:" << endl;
+	stream << "========================" << endl;
+	stream << "Sample data points\t\t\t= " << object.Sample().Bins() << endl;
+	stream << "Reference data points\t\t\t= " << object.Reference().Bins() << endl;
+	stream.precision (restore);
+	return stream;
 }
 /*
 ################################################################################
