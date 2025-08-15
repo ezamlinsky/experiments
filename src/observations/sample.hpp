@@ -10,6 +10,7 @@
 # pragma	once
 # include	"../python_helpers.hpp"
 # include	"observations.hpp"
+# include	"gui.hpp"
 
 //****************************************************************************//
 //      Class "Sample"                                                        //
@@ -244,6 +245,19 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double KurtosisAroundMedian (void) const override final {
 		return Stats::KurtosisSample (array, size, Median());
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Show the object in GUI mode                                           //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	void Show (void) const override final {
+
+		// Create a new application
+		auto app = Application::create ("org.gtkmm.application");
+
+		// Show the summary window
+		SummaryWindow window ("SAMPLE", *this);
+		app -> run (window);
 	}
 };
 

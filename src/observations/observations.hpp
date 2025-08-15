@@ -72,10 +72,10 @@ private:
 		const double data[],		// Raw observations to work with
 		size_t size					// Array size
 	) :	range (data, size),
+		array (new double [size]),
 		size (size)
 	{
 		// Sort the observations
-		array = new double [size];
 		Array::Copy (array, data, size);
 		Array::Sort (array, size);
 	}
@@ -140,12 +140,12 @@ public:
 	Observations (
 		const Observations &source	// The source object to copy
 	) :	range (source.range),
+		array (new double [source.size]),
 		size (source.size),
 		mean (source.mean),
 		median (source.median)
 	{
 		// Copy the data
-		array = new double [source.size];
 		Array::Copy (array, source.array, source.size);
 	}
 
@@ -489,6 +489,7 @@ public:
 	virtual double VariationAroundMedian (void) const = 0;
 	virtual double SkewnessAroundMedian (void) const = 0;
 	virtual double KurtosisAroundMedian (void) const = 0;
+	virtual void Show (void) const = 0;
 };
 
 //****************************************************************************//
