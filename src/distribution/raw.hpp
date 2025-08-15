@@ -13,23 +13,27 @@
 # include	"../models/continuous/continuous.hpp"
 # include	"../observations/observations.hpp"
 
+// Bins count to instantiate a continuous theoretical model
+# define	BINS	1000
+
 //****************************************************************************//
 //      Class "RawCDF"                                                        //
 //****************************************************************************//
 class RawCDF
 {
 //============================================================================//
-//      Members                                                               //
+//      CDF function type                                                     //
 //============================================================================//
 public:
+	enum DistType {
+		NONE,							// Type is unknown
+		EMPIRICAL,						// Empirical CDF function
+		THEORETICAL						// Theoretical CDF function
+	};
 
-// CDF function type
-enum DistType {
-	NONE,								// Type is unknown
-	EMPIRICAL,							// Empirical CDF function
-	THEORETICAL							// Theoretical CDF function
-};
-
+//============================================================================//
+//      Members                                                               //
+//============================================================================//
 private:
 	DistType type;						// CDF function type
 	Range range;						// Values range
@@ -114,6 +118,28 @@ public:
 		Init (model);
 	}
 
+	// Discrete model
+	RawCDF (
+		const BaseDiscrete &model		// Theoretical model
+	) :	type (THEORETICAL),
+		range (model.DistLocation()),
+		values (range.Linear())
+	{
+		// Calculate theoretical CDF values for a discrete model
+		Init (model);
+	}
+
+	// Continuous model
+	RawCDF (
+		const BaseContinuous &model		// Theoretical model
+	) :	type (THEORETICAL),
+		range (model.DistLocation()),
+		values (range.Split (BINS))
+	{
+		// Calculate theoretical CDF values for a continuous model
+		Init (model);
+	}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors from empirical data                                      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -149,6 +175,16 @@ public:
 		Init (data);
 	}
 
+	RawCDF (
+		const vector <double> &data		// Empirical dataset
+	) :	RawCDF (move (vector <double> (data)))
+	{}
+
+	RawCDF (
+		const pylist &py_list			// Empirical dataset
+	) : RawCDF (to_vector (py_list))
+	{}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      CDF function type                                                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -164,7 +200,7 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      The count of collected CDF values                                     //
+//      Count of collected CDF values                                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	size_t Size (void) const {
 		return cdf.size();
