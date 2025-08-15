@@ -10,6 +10,7 @@
 # include	<boost/python.hpp>
 # include	<boost/python/suite/indexing/vector_indexing_suite.hpp>
 # include	"bins.hpp"
+# include	"raw.hpp"
 # include	"distribution.hpp"
 # include	"cdf.hpp"
 # include	"comparator.hpp"
@@ -70,26 +71,62 @@ BOOST_PYTHON_MODULE (distribution) {
 		.def (self_ns::str (self_ns::self));
 
 //============================================================================//
-//      Expose "Distribution" class to Python                                 //
+//      Expose "RawCDF" class to Python                                       //
 //============================================================================//
-	class_ <Distribution> ("Distribution",
-		"Calculate pdf and cdf for a discrete distribution",
+	class_ <RawCDF> ("RawCDF",
+		"Calculate a raw cdf function",
 		init <> ())
 
 		// Constructor from a theoretical model
 		.def (init <const BaseDiscrete&> (args ("model"),
-			"Calculate a discrete distribution for a theoretical model"))
+			"Calculate theoretical raw CDF values for a discrete model"))
 		.def (init <const BaseContinuous&> (args ("model"),
-			"Calculate a continuous distribution for a theoretical model"))
+			"Calculate theoretical raw CDF values for a continuous model"))
 
 		// Constructors from empirical data
-		.def (init <const list&> (args ("data"),
+		.def (init <const pylist&> (args ("data"),
+			"Calculate raw CDF values from empirical data"))
+		.def (init <const vector <double>&> (args ("data"),
+			"Calculate raw CDF values from empirical data"))
+		.def (init <const Observations&> (args ("data"),
+			"Calculate raw CDF values from empirical data"))
+
+		// Methods
+		.def ("Domain",			&RawCDF::Domain,	return_internal_reference <> (),
+			"Domain of the raw CDF values")
+		.def ("Values",			&RawCDF::Values,	return_internal_reference <> (),
+			"Unique values in the dataset")
+		.def ("CDF",			&RawCDF::CDF,		return_internal_reference <> (),
+			"Values of the CDF function for the dataset")
+		.def ("GetCDF",			&RawCDF::GetCDF, args ("x"),
+			"Find a value of the CDF function for an arbitrary Х")
+		.def (self_ns::str (self_ns::self))
+
+		// Properties
+		.add_property ("Size",	&RawCDF::Size,
+			"Count of collected CDF values");
+
+//============================================================================//
+//      Expose "Distribution" class to Python                                 //
+//============================================================================//
+	class_ <Distribution> ("Distribution",
+		"Calculate pdf and cdf functions for a distribution",
+		init <> ())
+
+		// Constructor from a theoretical model
+		.def (init <const BaseDiscrete&> (args ("model"),
+			"Calculate theoretical PDF and CDF values for a discrete model"))
+		.def (init <const BaseContinuous&> (args ("model"),
+			"Calculate theoretical PDF and CDF values for a continuous model"))
+
+		// Constructors from empirical data
+		.def (init <const pylist&> (args ("data"),
 			"Calculate a discrete distribution from empirical data"))
 		.def (init <const vector <double>&> (args ("data"),
 			"Calculate a discrete distribution from empirical data"))
 		.def (init <const Observations&> (args ("data"),
 			"Calculate a discrete distribution from empirical data"))
-		.def (init <const list&, size_t> (args ("data", "bins"),
+		.def (init <const pylist&, size_t> (args ("data", "bins"),
 			"Calculate a continuous distribution from empirical data"))
 		.def (init <const vector <double>&, size_t> (args ("data", "bins"),
 			"Calculate a continuous distribution from empirical data"))
@@ -120,12 +157,12 @@ BOOST_PYTHON_MODULE (distribution) {
 //============================================================================//
 //      Expose "CDF" class to Python                                          //
 //============================================================================//
-void (CDF::*ReferenceSample1)(const list &py_list)			= &CDF::ReferenceSample;
+void (CDF::*ReferenceSample1)(const pylist &py_list)		= &CDF::ReferenceSample;
 void (CDF::*ReferenceSample2)(const vector <double> &data)	= &CDF::ReferenceSample;
 void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample;
 	class_ <CDF> ("CDF",
 		"Compare two cdf functions with one another",
-		init <const list&> (args ("data"),
+		init <const pylist&> (args ("data"),
 			"Init the sample from empirical data"))
 		.def (init <const vector <double>&> (args ("data"),
 			"Init the sample from empirical data"))
@@ -133,26 +170,35 @@ void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample
 			"Init the sample from empirical data"))
 
 		// Constructors from empirical data and a theoretical model
-		.def (init <const list&, const BaseContinuous&>
+		.def (init <const pylist&, const BaseDiscrete&>
 			(args ("data", "model"),
-			"Init distributions from empirical data and a theoretical model"))
+			"Init CDF functions from empirical data and a discrete theoretical model"))
+		.def (init <const vector <double>&, const BaseDiscrete&>
+			(args ("data", "model"),
+			"Init CDF functions from empirical data and a discrete theoretical model"))
+		.def (init <const Observations&, const BaseDiscrete&>
+			(args ("data", "model"),
+			"Init CDF functions from empirical data and a discrete theoretical model"))
+		.def (init <const pylist&, const BaseContinuous&>
+			(args ("data", "model"),
+			"Init CDF functions from empirical data and a continuous theoretical model"))
 		.def (init <const vector <double>&, const BaseContinuous&>
 			(args ("data", "model"),
-			"Init distributions from empirical data and a theoretical model"))
+			"Init CDF functions from empirical data and a continuous theoretical model"))
 		.def (init <const Observations&, const BaseContinuous&>
 			(args ("data", "model"),
-			"Init distributions from empirical data and a theoretical model"))
+			"Init CDF functions from empirical data and a continuous theoretical model"))
 
 		// Constructors from empirical data only (a sample and a reference)
-		.def (init <const list&, const list&>
+		.def (init <const pylist&, const pylist&>
 			(args ("sample", "reference"),
-			"Init distributions from empirical data only (a sample and a reference)"))
+			"Init CDF functions from empirical data only (a sample and a reference)"))
 		.def (init <const vector <double>&, const vector <double>&>
 			(args ("sample", "reference"),
-			"Init distributions from empirical data only (a sample and a reference)"))
+			"Init CDF functions from empirical data only (a sample and a reference)"))
 		.def (init <const Observations&, const Observations&>
 			(args ("sample", "reference"),
-			"Init distributions from empirical data only (a sample and a reference)"))
+			"Init CDF functions from empirical data only (a sample and a reference)"))
 
 		// Methods
 		.def ("ReferenceSample",			ReferenceSample1,		args ("data"),
@@ -165,10 +211,10 @@ void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample
 			"Load a distribution model as a reference for the distribution test")
 		.def ("Sample",						&CDF::Sample,
 			return_value_policy <copy_const_reference> (),
-			"Return sample distribution")
+			"Return sample CDF function")
 		.def ("Reference",					&CDF::Reference,
 			return_value_policy <copy_const_reference> (),
-			"Return reference distribution")
+			"Return reference CDF function")
 		.def ("KolmogorovConfidenceLevel",	&CDF::KolmogorovConfidenceLevel,
 			"Confidence level of the one-sample Kolmogorov-Smirnov test")
 		.def ("KolmogorovSmirnovTest",		&CDF::KolmogorovSmirnovTest,
@@ -178,22 +224,22 @@ void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample
 		.def (self_ns::str (self_ns::self))
 
 		// Static methods
-        .staticmethod ("ScoreTable");
+		.staticmethod ("ScoreTable");
 
 //============================================================================//
 //      Expose "DistComparator" class to Python                               //
 //============================================================================//
-void (DistComparator::*ReferenceModel1)(const BaseDiscrete &model)			= &DistComparator::ReferenceModel;
-void (DistComparator::*ReferenceModel2)(const BaseContinuous &model)		= &DistComparator::ReferenceModel;
+void (DistComparator::*ReferenceModel1)(const BaseDiscrete &model)		= &DistComparator::ReferenceModel;
+void (DistComparator::*ReferenceModel2)(const BaseContinuous &model)	= &DistComparator::ReferenceModel;
 	class_ <DistComparator> ("DistComparator",
 		"Compare two distributions functions with one another",
-		init <const list&> (args ("data"),
+		init <const pylist&> (args ("data"),
 			"Init the sample as a discrete distribution from empirical data"))
 		.def (init <const vector <double>&> (args ("data"),
 			"Init the sample as a discrete distribution from empirical data"))
 		.def (init <const Observations&> (args ("data"),
 			"Init the sample as a discrete distribution from empirical data"))
-		.def (init <const list&, size_t> (args ("data", "bins"),
+		.def (init <const pylist&, size_t> (args ("data", "bins"),
 			"Init the sample as a continuous distribution from empirical data"))
 		.def (init <const vector <double>&, size_t> (args ("data", "bins"),
 			"Init the sample as a continuous distribution from empirical data"))
@@ -201,7 +247,7 @@ void (DistComparator::*ReferenceModel2)(const BaseContinuous &model)		= &DistCom
 			"Init the sample as a continuous distribution from empirical data"))
 
 		// Constructors from empirical data and a theoretical model
-		.def (init <const list&, const BaseDiscrete&>
+		.def (init <const pylist&, const BaseDiscrete&>
 			(args ("data", "model"),
 			"Init discrete distributions from empirical data and a theoretical model"))
 		.def (init <const vector <double>&, const BaseDiscrete&>
@@ -210,7 +256,7 @@ void (DistComparator::*ReferenceModel2)(const BaseContinuous &model)		= &DistCom
 		.def (init <const Observations&, const BaseDiscrete&>
 			(args ("data", "model"),
 			"Init discrete distributions from empirical data and a theoretical model"))
-		.def (init <const list&, const BaseContinuous&, size_t>
+		.def (init <const pylist&, const BaseContinuous&, size_t>
 			(args ("data", "model", "bins"),
 			"Init continuous distributions from empirical data and a theoretical model"))
 		.def (init <const vector <double>&, const BaseContinuous&, size_t>
@@ -240,7 +286,7 @@ void (DistComparator::*ReferenceModel2)(const BaseContinuous &model)		= &DistCom
 		.def (self_ns::str (self_ns::self))
 
 		// Static methods
-        .staticmethod ("ScoreTable");
+		.staticmethod ("ScoreTable");
 }
 /*
 ################################################################################
