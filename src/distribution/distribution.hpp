@@ -8,8 +8,6 @@
 ################################################################################
 */
 # pragma	once
-# include	"../models/discrete/discrete.hpp"
-# include	"../models/continuous/continuous.hpp"
 # include	"../filters/smooth.hpp"
 # include	"raw.hpp"
 
@@ -28,10 +26,10 @@ public:
 
 // Distribution type
 enum DistType {
-	NONE,
+	NONE,								// Type is unknown
 	EMPIRICAL,							// Empirical distribution
 	THEORETICAL_DISCRETE,				// Theoretical discrete distribution
-	THEORETICAL_CONTINUOUS,				// Theoretical continuous distribution
+	THEORETICAL_CONTINUOUS				// Theoretical continuous distribution
 };
 
 private:
@@ -51,11 +49,10 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void InitModel (
 		const BaseModel &model,			// Theoretical model
-		const vector <double> &data,	// Points to calculate the model values for
 		double last_cdf					// Initial point of the CDF function
 	){
 		// Fill the theoretical CDF table
-		for (const auto x : data) {
+		for (const auto x : values) {
 			const double cur_cdf = model.CDF (x);
 			pdf.push_back (cur_cdf - last_cdf);
 			cdf.push_back (cur_cdf);
@@ -167,24 +164,18 @@ public:
 		values (values)
 	{
 		// Calculate theoretical PDF and CDF values for a discrete model
-		const double last_cdf = model.CDF (range.Min() - 1.0);
-		InitModel (model, values, last_cdf);
+		InitModel (model, model.CDF (range.Min() - 1.0));
 	}
 
 	// Discrete distribution
 	Distribution (
 		const BaseDiscrete &model		// Theoretical model
-	) :	type (THEORETICAL_DISCRETE)
+	) :	type (THEORETICAL_DISCRETE),
+		range (model.DistLocation()),
+		values (range.Linear())
 	{
-		// Extract the distribution location
-		Distribution::range = model.DistLocation();
-
-		// Prepare the values to instantiate the model
-		values = range.Linear();
-
 		// Calculate theoretical PDF and CDF values for a discrete model
-		const double last_cdf = model.CDF (range.Min() - 1.0);
-		InitModel (model, values, last_cdf);
+		InitModel (model, model.CDF (range.Min() - 1.0));
 	}
 
 	// Continuous distribution
@@ -196,24 +187,18 @@ public:
 		values (values)
 	{
 		// Calculate theoretical PDF and CDF values for a continuous model
-		const double last_cdf = NAN;
-		InitModel (model, values, last_cdf);
+		InitModel (model, NAN);
 	}
 
 	// Continuous distribution
 	Distribution (
 		const BaseContinuous &model		// Theoretical model
-	) :	type (THEORETICAL_CONTINUOUS)
+	) :	type (THEORETICAL_CONTINUOUS),
+		range (model.DistLocation()),
+		values (range.Split (BINS))
 	{
-		// Extract the distribution location
-		Distribution::range = model.DistLocation();
-
-		// Prepare the values to instantiate the model
-		values = range.Split (BINS);
-
 		// Calculate theoretical PDF and CDF values for a continuous model
-		const double last_cdf = NAN;
-		InitModel (model, values, last_cdf);
+		InitModel (model, NAN);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -290,11 +275,6 @@ public:
 		size_t bins						// Bins count for a histogram
 	) : Distribution (to_vector (py_list), bins)
 	{}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Destructor                                                            //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	~Distribution (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Distribution type                                                     //
