@@ -81,9 +81,8 @@ private:
 		const string name					// Distribution model name
 	)
 	try {
-		if (T::InDomain (data.Domain())) {
+		if (T::InDomain (data.Domain()))
 			TestModel <T> (table, data, name);
-		}
 	} catch (const invalid_argument &exception) {}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -183,7 +182,7 @@ public:
 
 	// Discrete distribution
 	DistComparator (
-		const list &py_list					// Empirical data
+		const pylist &py_list				// Empirical data
 	) : DistComparator (to_vector (py_list))
 	{}
 
@@ -207,7 +206,7 @@ public:
 
 	// Continuous distribution
 	DistComparator (
-		const list &py_list,				// Empirical data
+		const pylist &py_list,				// Empirical data
 		size_t bins							// Bins count for a histogram
 	) : DistComparator (to_vector (py_list), bins)
 	{}
@@ -236,7 +235,7 @@ public:
 
 	// Discrete distribution
 	DistComparator (
-		const list &py_list,				// Empirical data
+		const pylist &py_list,				// Empirical data
 		const BaseDiscrete &model			// Theoretical model
 	) : DistComparator (to_vector (py_list), model)
 	{}
@@ -263,7 +262,7 @@ public:
 
 	// Continuous distribution
 	DistComparator (
-		const list &py_list,				// Empirical data
+		const pylist &py_list,				// Empirical data
 		const BaseContinuous &model,		// Theoretical model
 		size_t bins							// Bins count for a histogram
 	) : DistComparator (to_vector (py_list), model, bins)
