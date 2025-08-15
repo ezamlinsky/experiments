@@ -27,7 +27,7 @@ public:
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	SmoothFilter (
-		size_t points			// Count of neighbor points to smooth by
+		size_t points				// Count of neighbor points to smooth by
 	) :	Filter (points)
 	{
 		if (points == 0)
@@ -87,7 +87,7 @@ public:
 //      Apply the filter to the target python list                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Apply (
-		const list &py_list			// The python list to smooth with the filter
+		const pylist &py_list		// The python list to smooth with the filter
 	) const {
 		return Apply (to_vector (py_list));
 	}

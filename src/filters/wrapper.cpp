@@ -36,7 +36,7 @@ BOOST_PYTHON_MODULE (filters) {
 //============================================================================//
 //      Expose "MedianFilter" class to Python                                 //
 //============================================================================//
-vector <double> (MedianFilter::*Apply1)(const list &py_list) const			= &MedianFilter::Apply;
+vector <double> (MedianFilter::*Apply1)(const pylist &py_list) const		= &MedianFilter::Apply;
 vector <double> (MedianFilter::*Apply2)(const vector <double> &data) const	= &MedianFilter::Apply;
 	class_ <MedianFilter> ("MedianFilter",
 		"Median filter for a time series",
@@ -53,7 +53,7 @@ vector <double> (MedianFilter::*Apply2)(const vector <double> &data) const	= &Me
 //============================================================================//
 //      Expose "SmoothFilter" class to Python                                 //
 //============================================================================//
-vector <double> (SmoothFilter::*Apply3)(const list &py_list) const			= &SmoothFilter::Apply;
+vector <double> (SmoothFilter::*Apply3)(const pylist &py_list) const		= &SmoothFilter::Apply;
 vector <double> (SmoothFilter::*Apply4)(const vector <double> &data) const	= &SmoothFilter::Apply;
 	class_ <SmoothFilter> ("SmoothFilter",
 		"Smooth filter for a time series",
@@ -68,7 +68,7 @@ vector <double> (SmoothFilter::*Apply4)(const vector <double> &data) const	= &Sm
 //============================================================================//
 //      Expose "MinDelayFilter" class to Python                               //
 //============================================================================//
-vector <double> (MinDelayFilter::*Apply5)(const list &py_list) const			= &MinDelayFilter::Apply;
+vector <double> (MinDelayFilter::*Apply5)(const pylist &py_list) const			= &MinDelayFilter::Apply;
 vector <double> (MinDelayFilter::*Apply6)(const vector <double> &data) const	= &MinDelayFilter::Apply;
 	class_ <MinDelayFilter> ("MinDelayFilter",
 		"Minimum group delay filter for a time series",

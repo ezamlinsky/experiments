@@ -83,7 +83,7 @@ public:
 //      Apply the filter to the target python list                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Apply (
-		const list &py_list			// The python list to filter
+		const pylist &py_list		// The python list to filter
 	) const {
 		return Apply (to_vector (py_list));
 	}
