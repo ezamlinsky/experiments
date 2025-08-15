@@ -8,13 +8,25 @@
 ################################################################################
 */
 # pragma	once
-# include	"base.hpp"
-# include	"../models/continuous/uniform.hpp"
+# include	<cmath>
+# include	"raw.hpp"
+# include	"../models/discrete/uniform.hpp"
+# include	"../models/discrete/binomial.hpp"
+# include	"../models/discrete/negative_binomial.hpp"
+# include	"../models/discrete/bernoulli.hpp"
+# include	"../models/discrete/geometric.hpp"
+# include	"../models/discrete/poisson.hpp"
+# include	"../models/continuous/chi_squared.hpp"
 # include	"../models/continuous/kolmogorov.hpp"
-# include	"../models/continuous/beta.hpp"
+# include	"../models/continuous/uniform.hpp"
+# include	"../models/continuous/rayleigh.hpp"
+# include	"../models/continuous/exponential.hpp"
 # include	"../models/continuous/erlang.hpp"
 # include	"../models/continuous/chi_squared.hpp"
-# include	"../models/continuous/exponential.hpp"
+# include	"../models/continuous/gamma.hpp"
+# include	"../models/continuous/pareto.hpp"
+# include	"../models/continuous/beta.hpp"
+# include	"../models/continuous/logistic.hpp"
 # include	"../models/continuous/normal.hpp"
 # include	"../models/continuous/laplace.hpp"
 # include	"../models/continuous/asymmetric_laplace.hpp"
@@ -36,8 +48,15 @@ struct KolmogorovScore
 //****************************************************************************//
 //      Class "CDF"                                                           //
 //****************************************************************************//
-class CDF : public BaseComparator
+class CDF
 {
+//============================================================================//
+//      Members                                                               //
+//============================================================================//
+private:
+	RawCDF sample;							// Sample CDF to compare
+	RawCDF reference;						// Reference CDF
+
 //============================================================================//
 //      Private methods                                                       //
 //============================================================================//
@@ -73,9 +92,8 @@ private:
 		const string name					// Distribution model name
 	)
 	try {
-		if (T::InDomain (data.Domain())) {
+		if (T::InDomain (data.Domain()))
 			TestModel <T> (table, data, name);
-		}
 	} catch (const invalid_argument &exception) {}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -125,8 +143,8 @@ private:
 		}
 
 		// Calculate the criteria function
-		const size_t size1 = sample.Bins();
-		const size_t size2 = reference.Bins();
+		const size_t size1 = sample.Size();
+		const size_t size2 = reference.Size();
 		return sqrt (size1 * size2 / double (size1 + size2)) * max_diff;
 	}
 
@@ -189,22 +207,49 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	CDF (
 		const Observations &data			// Observations of a random value
-	) : BaseComparator (data)
+	) : sample (data)
 	{}
 
 	CDF (
 		const vector <double> &data			// Empirical data
-	) : BaseComparator (data)
+	) : sample (move (vector <double> (data)))
 	{}
 
 	CDF (
-		const list &py_list					// Empirical data
+		const pylist &py_list				// Empirical data
 	) : CDF (to_vector (py_list))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors from empirical data and a theoretical model              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+	// Discrete distribution
+	CDF (
+		const Observations &data,			// Observations of a random value
+		const BaseDiscrete &model			// Theoretical model
+	) : CDF (data)
+	{
+		ReferenceModel (model);
+	}
+
+	// Discrete distribution
+	CDF (
+		const vector <double> &data,		// Empirical data
+		const BaseDiscrete &model			// Theoretical model
+	) : CDF (data)
+	{
+		ReferenceModel (model);
+	}
+
+	// Discrete distribution
+	CDF (
+		const pylist &py_list,				// Empirical data
+		const BaseDiscrete &model			// Theoretical model
+	) : CDF (to_vector (py_list), model)
+	{}
+
+	// Continuous distribution
 	CDF (
 		const Observations &data,			// Observations of a random value
 		const BaseContinuous &model			// Theoretical model
@@ -213,6 +258,7 @@ public:
 		ReferenceModel (model);
 	}
 
+	// Continuous distribution
 	CDF (
 		const vector <double> &data,		// Empirical data
 		const BaseContinuous &model			// Theoretical model
@@ -221,8 +267,9 @@ public:
 		ReferenceModel (model);
 	}
 
+	// Continuous distribution
 	CDF (
-		const list &py_list,				// Empirical data
+		const pylist &py_list,				// Empirical data
 		const BaseContinuous &model			// Theoretical model
 	) : CDF (to_vector (py_list), model)
 	{}
@@ -247,18 +294,25 @@ public:
 	}
 
 	CDF (
-		const list &sample,					// Empirical sample data
-		const list &reference				// Empirical reference data
+		const pylist &sample,				// Empirical sample data
+		const pylist &reference				// Empirical reference data
 	) : CDF (to_vector (sample), to_vector (reference))
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Load a distribution model as a reference for the distribution test    //
+//      Load a CDF model as a reference for the distribution test             //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void ReferenceModel (
-		const BaseContinuous &model			// Theoretical model
+		const BaseModel &model				// Theoretical model
 	){
-		BaseComparator::ReferenceModel <BaseContinuous> (model);
+		// Check if empirical data range is inside the model domain
+		if (model.Domain() >= sample.Domain()) {
+
+			// Set the CDF model
+			reference = RawCDF (model, sample.Values());
+		}
+		else
+			throw invalid_argument ("ReferenceModel: The sample data range is outside the distribution model domain");
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -267,20 +321,33 @@ public:
 	void ReferenceSample (
 		const Observations &data			// Observations of a random value
 	){
-		reference = Distribution (data);
+		reference = RawCDF (data);
 	}
 
 	void ReferenceSample (
 		const vector <double> &data			// Empirical data
 	){
-		// Check type of the sample distribution
-		reference = Distribution (data);
+		reference = RawCDF (move (vector <double> (data)));
 	}
 
 	void ReferenceSample (
-		const list &py_list					// Empirical data
+		const pylist &py_list				// Empirical data
 	){
 		ReferenceSample (to_vector (py_list));
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Return sample CDF function                                            //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	const RawCDF& Sample (void) const {
+		return sample;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Return reference CDF function                                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	const RawCDF& Reference (void) const {
+		return reference;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -291,11 +358,10 @@ public:
 	double KolmogorovConfidenceLevel (void) const {
 
 		// Check if the sample and the reference distributions are set
-		if (sample.Bins() && reference.Bins()) {
+		if (sample.Size() && reference.Size()) {
 
 			// Check type of the reference distribution
-			Distribution::DistType type = reference.Type();
-			if (type == Distribution::THEORETICAL_CONTINUOUS)
+			if (reference.Type() == RawCDF::THEORETICAL)
 				return KolmogorovLevel();
 			else
 				throw invalid_argument ("KolmogorovConfidenceLevel: Can calculate the critical confidence level for a theoretical model only");
@@ -315,11 +381,10 @@ public:
 		if (0.0 <= level && level <= 1.0) {
 
 			// Check if the sample and the reference distributions are set
-			if (sample.Bins() && reference.Bins()) {
+			if (sample.Size() && reference.Size()) {
 
 				// Check type of the reference distribution
-				Distribution::DistType type = reference.Type();
-				if (type == Distribution::THEORETICAL_CONTINUOUS)
+				if (reference.Type() == RawCDF::THEORETICAL)
 					return OneSampleTest (1.0 - level);
 				else
 					return TwoSampleTest (1.0 - level);
@@ -343,12 +408,24 @@ public:
 		// Score table
 		vector <KolmogorovScore> table;
 
-		// Test available distribution models
+		// Test available discrete distribution models
+		temp.TestModel <DiscreteUniform> (table, data, "Discrete Uniform\t= ");
+		temp.TestModel <Binomial> (table, data, "Binomial\t\t= ");
+		temp.TestModel <NegativeBinomial> (table, data, "NegativeBinomial\t= ");
+		temp.TestModelWithRange <Bernoulli> (table, data, "Bernoulli\t\t= ");
+		temp.TestModelWithRange <Geometric> (table, data, "Geometric\t\t= ");
+		temp.TestModelWithRange <Poisson> (table, data, "Poisson\t\t\t= ");
+
+		// Test available continuous distribution models
 		temp.TestModel <ContinuousUniform> (table, data, "Continuous Uniform\t= ");
-		temp.TestModelWithRange <Beta> (table, data, "Beta\t\t\t= ");
+		temp.TestModel <Pareto> (table, data, "Pareto\t\t\t= ");
+		temp.TestModelWithRange <Rayleigh> (table, data, "Rayleigh\t\t= ");
+		temp.TestModelWithRange <Exponential> (table, data, "Exponential\t\t= ");
 		temp.TestModelWithRange <Erlang> (table, data, "Erlang\t\t\t= ");
 		temp.TestModelWithRange <ChiSquared> (table, data, "Chi-squared\t\t= ");
-		temp.TestModelWithRange <Exponential> (table, data, "Exponential\t\t= ");
+		temp.TestModelWithRange <Gamma> (table, data, "Gamma\t\t\t= ");
+		temp.TestModelWithRange <Beta> (table, data, "Beta\t\t\t= ");
+		temp.TestModelWithRange <Logistic> (table, data, "Logistic\t\t= ");
 		temp.TestModelWithRange <Normal> (table, data, "Normal\t\t\t= ");
 		temp.TestModelWithRange <Laplace> (table, data, "Laplace\t\t\t= ");
 		temp.TestModelWithRange <AsymmetricLaplace> (table, data, "Asymmetric Laplace\t= ");
@@ -378,6 +455,17 @@ const string kolmogorov_score_to_string (const vector <KolmogorovScore> &table)
 	for (const auto &item : table)
 		stream << item.name << fixed << setprecision (3) << item.score * 100 <<endl;
 	return stream.str();
+}
+ostream& operator << (ostream &stream, const CDF &object)
+{
+	auto restore = stream.precision();
+	stream.precision (PRECISION);
+	stream << "\nCDF COMPARATOR:" << endl;
+	stream << "===============" << endl;
+	stream << "Sample CDF values\t\t\t= " << object.Sample().Size() << endl;
+	stream << "Reference CDF values\t\t\t= " << object.Reference().Size() << endl;
+	stream.precision (restore);
+	return stream;
 }
 /*
 ################################################################################
