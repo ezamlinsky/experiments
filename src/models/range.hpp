@@ -9,17 +9,13 @@
 */
 # pragma	once
 # include	<stdexcept>
-# include	<iostream>
 # include	<iomanip>
-# include	<vector>
 # include	<algorithm>
+# include	"../prop_group.hpp"
 # include	"../templates/array.hpp"
 
 // Displayed precision for floating-point numbers
 # define	PRECISION	16
-
-// Use shortenings
-using namespace std;
 
 //****************************************************************************//
 //      Class "Range"                                                         //
@@ -284,18 +280,55 @@ public:
 };
 
 //****************************************************************************//
+//      Class "RangeSummary"                                                  //
+//****************************************************************************//
+class RangeSummary
+{
+//============================================================================//
+//      Members                                                               //
+//============================================================================//
+private:
+	const Range &object;			// Range object to describe
+
+//============================================================================//
+//      Public methods                                                        //
+//============================================================================//
+public:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructor                                                           //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	RangeSummary (
+		const Range &range			// Range object to describe
+	) :	object (range)
+	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Range info                                                            //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	PropGroup Info (void) const {
+
+		// Group name
+		PropGroup group ("Range");
+
+		// Properties
+		group.Add ("Min value", object.Min());
+		group.Add ("Max value", object.Max());
+		group.Add ("Range length", object.Length());
+		group.Add ("Middle point", object.MidRange());
+		return group;
+	}
+};
+
+//****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Range &range)
+ostream& operator << (ostream &stream, const Range &object)
 {
+	RangeSummary summary (object);
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << "\nRange:" << endl;
-	stream << "~~~~~~" << endl;
-	stream << "    Min value\t\t\t\t= " << range.Min() << endl;
-	stream << "    Max value\t\t\t\t= " << range.Max() << endl;
-	stream << "    Range length\t\t\t= " << range.Length() << endl;
-	stream << "    Middle point\t\t\t= " << range.MidRange() << endl;
+	stream << summary.Info();
 	stream.precision (restore);
 	return stream;
 }
