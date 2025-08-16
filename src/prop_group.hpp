@@ -13,6 +13,7 @@
 
 // Use shortenings
 using namespace std;
+using properties = vector <pair <string, double>>;
 
 //****************************************************************************//
 //      Class "PropGroup"                                                     //
@@ -23,8 +24,8 @@ class PropGroup
 //      Members                                                               //
 //============================================================================//
 private:
-	const string name;						// Name of the properties group
-	vector <pair <string, double>> props;	// List of the properties
+	const string name;				// Name of the properties group
+	properties props;				// List of the properties
 
 //============================================================================//
 //      Public methods                                                        //
@@ -35,16 +36,16 @@ public:
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	PropGroup (
-		const string &name					// Name of the properties group
+		const string &name			// Name of the properties group
 	) :	name (name)
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Add a property to the list                                            //
+//      Append a property to the list                                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	void Add (
-		const string &property,				// Object property name
-		double value						// Value of the object property
+	void Append (
+		const string &property,		// Object property name
+		double value				// Value of the object property
 	){
 		// Append the property to the list
 		props.push_back (pair <string, double> (property, value));
@@ -60,7 +61,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      List of the properties                                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const vector <pair <string, double>>& properties (void) const {
+	const properties& Properties (void) const {
 		return props;
 	}
 };
@@ -76,11 +77,11 @@ ostream& operator << (ostream &stream, const PropGroup &object)
 	stream << string (name.size() + 1, '~') << endl;
 
 	// Print all the properties in the group
-	const auto &props = object.properties();
+	const auto &props = object.Properties();
 	for (const auto &opt : props) {
-		const string opt_name = string ("    ") + opt.first;
-		stream.width (40);
-		stream << left << opt_name << "= "<< opt.second << endl;
+		stream << "    ";
+		stream.width (36);
+		stream << left << opt.first << "= "<< opt.second << endl;
 	}
 	return stream;
 }
