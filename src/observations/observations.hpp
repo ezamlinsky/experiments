@@ -473,6 +473,94 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	vector <PropGroup> Summary (void) const {
+
+		// Create the summary storage
+		vector <PropGroup> summary;
+
+		// Robust estimators
+		PropGroup robust ("Robust estimators");
+		robust.Append ("Median", Median());
+		robust.Append ("Lower quartile", LowerQuartile());
+		robust.Append ("Upper quartile", UpperQuartile());
+		robust.Append ("Inter-quartile range", InterQuartileRange());
+		robust.Append ("Midhinge", MidHinge());
+		robust.Append ("Tukey's trimean", TriMean());
+		robust.Append ("Quartile skewness", QuartileSkewness());
+		summary.push_back (robust);
+
+		// Standard estimators
+		PropGroup standard ("Standard estimators");
+		standard.Append ("Mean", Mean());
+		standard.Append ("Variance", Variance());
+		standard.Append ("Standard deviation", StdDev());
+		standard.Append ("Standard error", StdErr());
+		summary.push_back (standard);
+
+		// Deviations from the median value
+		PropGroup mean_dev ("Deviations from the median value");
+		mean_dev.Append ("Mean of squared deviations", MeanSqrDevFromMean());
+		mean_dev.Append ("Mean of absolute deviations", MeanAbsDevFromMean());
+		mean_dev.Append ("Median of squared deviations", MedianSqrDevFromMean());
+		mean_dev.Append ("Median of absolute deviations", MedianAbsDevFromMean());
+		mean_dev.Append ("Median of signed deviations", MedianSignDevFromMean());
+		summary.push_back (mean_dev);
+
+		// Deviations from the median value
+		PropGroup median_dev ("Deviations from the median value");
+		median_dev.Append ("Mean of squared deviations", MeanSqrDevFromMedian());
+		median_dev.Append ("Mean of absolute deviations", MeanAbsDevFromMedian());
+		median_dev.Append ("Mean of signed deviations", MeanSignDevFromMedian());
+		median_dev.Append ("Median of squared deviations", MedianSqrDevFromMedian());
+		median_dev.Append ("Median of absolute deviations", MedianAbsDevFromMedian());
+		median_dev.Append ("Median of signed deviations", MedianSignDevFromMedian());
+		summary.push_back (median_dev);
+
+		// Estimators around the mean value
+		PropGroup mean_est ("Estimators around the mean value");
+		mean_est.Append ("Variation", VariationAroundMean());
+		mean_est.Append ("Skewness", SkewnessAroundMean());
+		mean_est.Append ("Kurtosis", KurtosisAroundMean());
+		mean_est.Append ("Excess kurtosis", KurtosisExcessAroundMean());
+		summary.push_back (mean_est);
+
+		// Estimators around the median value
+		PropGroup median_est ("Estimators around the median value");
+		median_est.Append ("Variation", VariationAroundMedian());
+		median_est.Append ("Skewness", SkewnessAroundMedian());
+		median_est.Append ("Kurtosis", KurtosisAroundMedian());
+		median_est.Append ("Excess kurtosis", KurtosisExcessAroundMedian());
+		summary.push_back (median_est);
+
+		// Skewness
+		PropGroup skewness ("Skewness");
+		skewness.Append ("Pearson's skewness", PearsonSkewness());
+		skewness.Append ("Meeden's skewness", MeedenSkewness());
+		summary.push_back (skewness);
+
+		// Important quantiles
+		PropGroup quantiles ("Important quantiles");
+		quantiles.Append ("Quantile (1%)", Quantile (0.01));
+		quantiles.Append ("Quantile (5%)", Quantile (0.05));
+		quantiles.Append ("Quantile (95%)", Quantile (0.95));
+		quantiles.Append ("Quantile (99%)", Quantile (0.99));
+		summary.push_back (quantiles);
+
+		// Deciles
+		PropGroup deciles ("Deciles");
+		for (int i = 1; i <= 9; i++) {
+			const string name = string ("Decile (") + to_string (i * 10) + "%)";
+			deciles.Append (name, Quantile (i / 10.0));
+		}
+		summary.push_back (deciles);
+
+		// Return the summary
+		return summary;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double Variance (void) const = 0;
@@ -499,62 +587,8 @@ ostream& operator << (ostream &stream, const Observations &object)
 {
 	stream << "Data points\t\t\t\t= " << object.Size() << endl;
 	stream << object.Domain();
-	stream << "\nRobust estimators:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Median\t\t\t\t= " << object.Median() << endl;
-	stream << "    Lower quartile\t\t\t= " << object.LowerQuartile() << endl;
-	stream << "    Upper quartile\t\t\t= " << object.UpperQuartile() << endl;
-	stream << "    Inter-quartile range\t\t= " << object.InterQuartileRange() << endl;
-	stream << "    Midhinge\t\t\t\t= " << object.MidHinge() << endl;
-	stream << "    Tukey's trimean\t\t\t= " << object.TriMean() << endl;
-	stream << "    Quartile skewness\t\t\t= " << object.QuartileSkewness() << endl;
-	stream << "\nStandard estimators:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Mean\t\t\t\t= " << object.Mean() << endl;
-	stream << "    Variance\t\t\t\t= " << object.Variance() << endl;
-	stream << "    Standard deviation\t\t\t= " << object.StdDev() << endl;
-	stream << "    Standard error\t\t\t= " << object.StdErr() << endl;
-	stream << "\nDeviations from the mean value:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Mean of squared deviations\t\t= " << object.MeanSqrDevFromMean() << endl;
-	stream << "    Mean of absolute deviations\t\t= " <<  object.MeanAbsDevFromMean() << endl;
-	stream << "    Median of squared deviations\t= " << object.MedianSqrDevFromMean() << endl;
-	stream << "    Median of absolute deviations\t= " << object.MedianAbsDevFromMean() << endl;
-	stream << "    Median of signed deviations\t\t= " << object.MedianSignDevFromMean() << endl;
-	stream << "\nDeviations from the median value:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Mean of squared deviations\t\t= " << object.MeanSqrDevFromMedian() << endl;
-	stream << "    Mean of absolute deviations\t\t= " << object.MeanAbsDevFromMedian() << endl;
-	stream << "    Mean of signed deviations\t\t= " << object.MeanSignDevFromMedian() << endl;
-	stream << "    Median of squared deviations\t= " << object.MedianSqrDevFromMedian() << endl;
-	stream << "    Median of absolute deviations\t= " << object.MedianAbsDevFromMedian() << endl;
-	stream << "    Median of signed deviations\t\t= " << object.MedianSignDevFromMedian() << endl;
-	stream << "\nEstimators around the mean value:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Variation\t\t\t\t= " << object.VariationAroundMean() << endl;
-	stream << "    Skewness\t\t\t\t= " << object.SkewnessAroundMean() << endl;
-	stream << "    Kurtosis\t\t\t\t= " << object.KurtosisAroundMean() << endl;
-	stream << "    Excess kurtosis\t\t\t= " << object.KurtosisExcessAroundMean() << endl;
-	stream << "\nEstimators around the median value:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Variation\t\t\t\t= " << object.VariationAroundMedian() << endl;
-	stream << "    Skewness\t\t\t\t= " << object.SkewnessAroundMedian() << endl;
-	stream << "    Kurtosis\t\t\t\t= " << object.KurtosisAroundMedian() << endl;
-	stream << "    Excess kurtosis\t\t\t= " << object.KurtosisExcessAroundMedian() << endl;
-	stream << "\nSkewness:" << endl;
-	stream << "~~~~~~~~~" << endl;
-	stream << "    Pearson's skewness\t\t\t= " << object.PearsonSkewness() << endl;
-	stream << "    Meeden's skewness\t\t\t= " << object.MeedenSkewness() << endl;
-	stream << "\nQuantiles:" << endl;
-	stream << "~~~~~~~~~~" << endl;
-	stream << "    Quantile (1%)\t\t\t= " << object.Quantile (0.01) << endl;
-	stream << "    Quantile (5%)\t\t\t= " << object.Quantile (0.05) << endl;
-	stream << "    Quantile (95%)\t\t\t= " << object.Quantile (0.95) << endl;
-	stream << "    Quantile (99%)\t\t\t= " << object.Quantile (0.99) << endl;
-	stream << "\nDeciles:" << endl;
-	stream << "~~~~~~~~" << endl;
-	for (int i = 1; i <= 9; i++)
-		stream << "    Decile (" << i * 10 << "%)\t\t\t= " << object.Quantile (i / 10.0) << endl;
+	for (const auto &group : object.Summary())
+		stream << group;
 	return stream;
 }
 /*
