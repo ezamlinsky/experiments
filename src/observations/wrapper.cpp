@@ -47,6 +47,8 @@
 		"Quantile value for the target level")									\
 	.def ("data",				&class::data,	return_internal_reference <> (),\
 		"Extract internal data about observed values")							\
+	.def ("Show",				&class::Show,									\
+		"Show a GUI window with a summary")										\
 	.def (self_ns::str (self_ns::self))
 
 //****************************************************************************//
@@ -133,7 +135,7 @@ BOOST_PYTHON_MODULE (observations) {
 //============================================================================//
 	class_ <Population> ("Population",
 		"Statistical population",
-		init <const list&, double, double> (args ("data", "mean", "median"),
+		init <const pylist&, double, double> (args ("data", "mean", "median"),
 			"Initialize a statistical population from data"))
 		.def (init <const vector <double>&, double, double>
 			(args ("data", "mean", "median"),
@@ -150,23 +152,23 @@ BOOST_PYTHON_MODULE (observations) {
 //============================================================================//
 	class_ <Sample> ("Sample",
 		"Statistical sample",
-		init <const list&> (args ("data"),
+		init <const pylist&> (args ("data"),
 			"Initialize a statistical sample from data"))
 		.def (init <const vector <double>&> (args ("data"),
 			"Initialize a statistical sample from data"))
 
 		// Methods
 		BASE_CLASS_METHODS(Sample)
-		.def ("Abs",	&Sample::Abs,											\
-			"Absolute value transformation")									\
-		.def ("Log",	&Sample::Log,											\
-			"Logarithmic transformation")										\
-		.def ("Exp",	&Sample::Exp,											\
-			"Exponential transformation")										\
-		.def ("Pow",	&Sample::Pow,		args ("power"),						\
-			"Power transformation")												\
-		.def ("BoxCox",	&Sample::BoxCox,	args ("power"),						\
-			"Box-Cox transformation")											\
+		.def ("Abs",	&Sample::Abs,
+			"Absolute value transformation")
+		.def ("Log",	&Sample::Log,
+			"Logarithmic transformation")
+		.def ("Exp",	&Sample::Exp,
+			"Exponential transformation")
+		.def ("Pow",	&Sample::Pow,		args ("power"),
+			"Power transformation")
+		.def ("BoxCox",	&Sample::BoxCox,	args ("power"),
+			"Box-Cox transformation")
 
 		// Properties
 		BASE_CLASS_PROPERTIES(Sample);
