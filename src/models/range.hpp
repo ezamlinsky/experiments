@@ -277,46 +277,25 @@ public:
 	) const {
 		return source == min && source == max;
 	}
-};
-
-//****************************************************************************//
-//      Class "RangeSummary"                                                  //
-//****************************************************************************//
-class RangeSummary
-{
-//============================================================================//
-//      Members                                                               //
-//============================================================================//
-private:
-	const Range &object;			// Range object to describe
-
-//============================================================================//
-//      Public methods                                                        //
-//============================================================================//
-public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor                                                           //
+//      Summary of the object                                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	RangeSummary (
-		const Range &range			// Range object to describe
-	) :	object (range)
-	{}
+	vector <PropGroup> Summary (void) const {
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Range info                                                            //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	PropGroup Info (void) const {
+		// Create the summary storage
+		vector <PropGroup> summary;
 
-		// Group name
-		PropGroup group ("Range");
+		// Range info
+		PropGroup info ("Range");
+		info.Append ("Min value", Min());
+		info.Append ("Max value", Max());
+		info.Append ("Range length", Length());
+		info.Append ("Middle point", MidRange());
+		summary.push_back (info);
 
-		// Properties
-		group.Add ("Min value", object.Min());
-		group.Add ("Max value", object.Max());
-		group.Add ("Range length", object.Length());
-		group.Add ("Middle point", object.MidRange());
-		return group;
+		// Return the summary
+		return summary;
 	}
 };
 
@@ -325,10 +304,10 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const Range &object)
 {
-	RangeSummary summary (object);
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
-	stream << summary.Info();
+	for (const auto &group : object.Summary())
+		stream << group;
 	stream.precision (restore);
 	return stream;
 }
