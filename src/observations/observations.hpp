@@ -478,10 +478,10 @@ public:
 	vector <PropGroup> Summary (void) const {
 
 		// Create the summary storage
-		vector <PropGroup> summary;
+		vector <PropGroup> summary = Domain().Summary();
 
-		// Robust estimators
-		PropGroup robust ("Robust estimators");
+		// Robust estimations
+		PropGroup robust ("Robust estimations");
 		robust.Append ("Median", Median());
 		robust.Append ("Lower quartile", LowerQuartile());
 		robust.Append ("Upper quartile", UpperQuartile());
@@ -491,16 +491,24 @@ public:
 		robust.Append ("Quartile skewness", QuartileSkewness());
 		summary.push_back (robust);
 
-		// Standard estimators
-		PropGroup standard ("Standard estimators");
+		// Standard estimations
+		PropGroup standard ("Standard estimations");
 		standard.Append ("Mean", Mean());
 		standard.Append ("Variance", Variance());
 		standard.Append ("Standard deviation", StdDev());
 		standard.Append ("Standard error", StdErr());
 		summary.push_back (standard);
 
+		// Estimations around the mean value
+		PropGroup mean_est ("Estimations (around mean)");
+		mean_est.Append ("Variation", VariationAroundMean());
+		mean_est.Append ("Skewness", SkewnessAroundMean());
+		mean_est.Append ("Kurtosis", KurtosisAroundMean());
+		mean_est.Append ("Excess kurtosis", KurtosisExcessAroundMean());
+		summary.push_back (mean_est);
+
 		// Deviations from the median value
-		PropGroup mean_dev ("Deviations from the median value");
+		PropGroup mean_dev ("Deviations (from mean)");
 		mean_dev.Append ("Mean of squared deviations", MeanSqrDevFromMean());
 		mean_dev.Append ("Mean of absolute deviations", MeanAbsDevFromMean());
 		mean_dev.Append ("Median of squared deviations", MedianSqrDevFromMean());
@@ -508,8 +516,16 @@ public:
 		mean_dev.Append ("Median of signed deviations", MedianSignDevFromMean());
 		summary.push_back (mean_dev);
 
+		// Estimations around the median value
+		PropGroup median_est ("Estimations (around median)");
+		median_est.Append ("Variation", VariationAroundMedian());
+		median_est.Append ("Skewness", SkewnessAroundMedian());
+		median_est.Append ("Kurtosis", KurtosisAroundMedian());
+		median_est.Append ("Excess kurtosis", KurtosisExcessAroundMedian());
+		summary.push_back (median_est);
+
 		// Deviations from the median value
-		PropGroup median_dev ("Deviations from the median value");
+		PropGroup median_dev ("Deviations (from median)");
 		median_dev.Append ("Mean of squared deviations", MeanSqrDevFromMedian());
 		median_dev.Append ("Mean of absolute deviations", MeanAbsDevFromMedian());
 		median_dev.Append ("Mean of signed deviations", MeanSignDevFromMedian());
@@ -517,22 +533,6 @@ public:
 		median_dev.Append ("Median of absolute deviations", MedianAbsDevFromMedian());
 		median_dev.Append ("Median of signed deviations", MedianSignDevFromMedian());
 		summary.push_back (median_dev);
-
-		// Estimators around the mean value
-		PropGroup mean_est ("Estimators around the mean value");
-		mean_est.Append ("Variation", VariationAroundMean());
-		mean_est.Append ("Skewness", SkewnessAroundMean());
-		mean_est.Append ("Kurtosis", KurtosisAroundMean());
-		mean_est.Append ("Excess kurtosis", KurtosisExcessAroundMean());
-		summary.push_back (mean_est);
-
-		// Estimators around the median value
-		PropGroup median_est ("Estimators around the median value");
-		median_est.Append ("Variation", VariationAroundMedian());
-		median_est.Append ("Skewness", SkewnessAroundMedian());
-		median_est.Append ("Kurtosis", KurtosisAroundMedian());
-		median_est.Append ("Excess kurtosis", KurtosisExcessAroundMedian());
-		summary.push_back (median_est);
 
 		// Skewness
 		PropGroup skewness ("Skewness");
@@ -586,7 +586,6 @@ public:
 ostream& operator << (ostream &stream, const Observations &object)
 {
 	stream << "Data points\t\t\t\t= " << object.Size() << endl;
-	stream << object.Domain();
 	for (const auto &group : object.Summary())
 		stream << group;
 	return stream;
