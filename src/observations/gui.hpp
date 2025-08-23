@@ -8,13 +8,11 @@
 ################################################################################
 */
 # pragma	once
-# include	"sample.hpp"
 # include	"population.hpp"
+# include	"sample.hpp"
 # include	"../prop_table.hpp"
 
 // Use shortenings
-using namespace std;
-using namespace Gtk;
 using Glib::ustring;
 
 //****************************************************************************//
