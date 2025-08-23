@@ -577,7 +577,6 @@ public:
 	virtual double VariationAroundMedian (void) const = 0;
 	virtual double SkewnessAroundMedian (void) const = 0;
 	virtual double KurtosisAroundMedian (void) const = 0;
-	virtual void Show (void) const = 0;
 };
 
 //****************************************************************************//
