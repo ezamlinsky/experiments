@@ -8,7 +8,6 @@
 ################################################################################
 */
 # include	<boost/python.hpp>
-# include	"observations.hpp"
 # include	"population.hpp"
 # include	"sample.hpp"
 
@@ -47,8 +46,6 @@
 		"Quantile value for the target level")									\
 	.def ("data",				&class::data,	return_internal_reference <> (),\
 		"Extract internal data about observed values")							\
-	.def ("Show",				&class::Show,									\
-		"Show a GUI window with a summary")										\
 	.def (self_ns::str (self_ns::self))
 
 //****************************************************************************//
