@@ -18,6 +18,61 @@ using Glib::ustring;
 using Glib::RefPtr;
 
 //****************************************************************************//
+//      Popup menu                                                            //
+//****************************************************************************//
+class TableMenu : public Menu
+{
+//============================================================================//
+//      Members                                                               //
+//============================================================================//
+private:
+	TreeView &table;				// Tree view is connected with this popup menu
+	TreeModelColumn <ustring> col;	// Column to copy a value from
+	MenuItem copy_item;				// "Copy" popup menu item
+
+//============================================================================//
+//      Public methods                                                        //
+//============================================================================//
+public:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructor                                                           //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	TableMenu (
+		TreeView &viewer,				// Tree view is connected with this popup menu
+		TreeModelColumn <ustring> col	// Column to copy a value from
+	) :	table (viewer),
+		col (col),
+		copy_item ("_Copy", true)
+	{
+		// Set properties of "Copy" popup menu item
+		copy_item.signal_activate().connect (sigc::mem_fun (*this, &TableMenu::copy_value));
+		copy_item.set_tooltip_text ("Copy selected value to the clipboard");
+		append (copy_item);
+
+		// Set properties of popup menu
+		accelerate (viewer);
+
+		// Show control elements
+		show_all();
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Copy a selected row to the clipboard                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	void copy_value (void) const {
+
+		// Get the selected row
+		auto iter = table.get_selection() -> get_selected();
+		if (iter)
+		{
+			// Copy the value field to the clipboard
+			Clipboard::get() -> set_text (iter -> get_value (col));
+		}
+	}
+};
+
+//****************************************************************************//
 //      Class "PropTable"                                                     //
 //****************************************************************************//
 class PropTable : public TreeView
@@ -43,11 +98,11 @@ private:
 				add (value);
 			}
 		};
-		const Columns columns;		// Table columns
+		const Columns columns;			// Table columns
 
 		// Constructor
 		Storage (
-			const properties &props	// List of properties to display
+			const properties &props		// List of properties to display
 		){
 			// Set types of columns
 			set_column_types (columns);
@@ -60,7 +115,8 @@ private:
 			}
 		}
 	};
-	RefPtr <Storage> storage;		// Data storage for table data
+	RefPtr <Storage> storage;			// Data storage for table data
+	TableMenu menu;						// Popup menu for the table
 
 //============================================================================//
 //      Public methods                                                        //
@@ -68,11 +124,12 @@ private:
 public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructors                                                          //
+//      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	PropTable (
-		const properties &props		// List of properties to display
-	) : storage (new Storage (props))
+		const properties &props			// List of properties to display
+	) : storage (new Storage (props)),
+		menu (*this, storage -> columns.value)
 	{
 		// Set table data
 		set_model (storage);
@@ -101,6 +158,45 @@ public:
 		// Make values formatted well
 		CellRendererText *value_renderer = reinterpret_cast <CellRendererText*> (value_column -> get_first_cell());
 		value_renderer -> set_padding (10, 0);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Copy a selected row to the clipboard                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool on_key_press_event (
+		GdkEventKey* event				// Describes a key press
+	){
+		// Check for CTRL+C
+		if (event -> keyval == GDK_KEY_c && (event -> state & GDK_CONTROL_MASK))
+		{
+			// Get the selected row
+			auto iter = get_selection() -> get_selected();
+			if (iter)
+			{
+				// Copy the value field to the clipboard
+				Clipboard::get() -> set_text (iter -> get_value (storage -> columns.value));
+			}
+			return true;
+		}
+
+		// Allow other handlers to handle this signal
+		return false;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Show a pop-up menu when the user releases the right mouse button      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	bool on_button_release_event (
+		GdkEventButton* event			// Describes a button press
+	){
+		// Show the popup menu
+		if (event -> button == 3) {
+			menu.popup_at_pointer (reinterpret_cast <GdkEvent*> (event));
+			return true;
+		}
+
+		// Allow other handlers to handle this signal
+		return false;
 	}
 };
 /*
