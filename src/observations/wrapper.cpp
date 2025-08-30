@@ -156,16 +156,18 @@ BOOST_PYTHON_MODULE (observations) {
 
 		// Methods
 		BASE_CLASS_METHODS(Sample)
-		.def ("Abs",	&Sample::Abs,
+		.def ("Abs",					&Sample::Abs,
 			"Absolute value transformation")
-		.def ("Log",	&Sample::Log,
+		.def ("Log",					&Sample::Log,
 			"Logarithmic transformation")
-		.def ("Exp",	&Sample::Exp,
+		.def ("Exp",					&Sample::Exp,
 			"Exponential transformation")
-		.def ("Pow",	&Sample::Pow,		args ("power"),
+		.def ("Pow",					&Sample::Pow,		args ("power"),
 			"Power transformation")
-		.def ("BoxCox",	&Sample::BoxCox,	args ("power"),
+		.def ("BoxCox",					&Sample::BoxCox,	args ("power"),
 			"Box-Cox transformation")
+		.def ("MeanConfidenceInterval",	&Sample::MeanConfidenceInterval,	args ("level"),
+			"Confidence interval for the mean")
 
 		// Properties
 		BASE_CLASS_PROPERTIES(Sample);

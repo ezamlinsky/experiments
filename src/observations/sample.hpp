@@ -10,6 +10,8 @@
 # pragma	once
 # include	"../python_helpers.hpp"
 # include	"observations.hpp"
+# include	"../models/confidence_interval.hpp"
+# include	"../models/continuous/normal.hpp"
 
 //****************************************************************************//
 //      Class "Sample"                                                        //
@@ -244,6 +246,26 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual double KurtosisAroundMedian (void) const override final {
 		return Stats::KurtosisSample (array, size, Median());
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Confidence interval for the mean                                      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ConfidenceInterval MeanConfidenceInterval (
+		double level				// Confidence level
+	){
+		// Check if the level is correct
+		if (0.0 <= level && level <= 1.0) {
+			const auto dist = Normal (0.0, 1.0);
+			const double std_error = StdErr();
+			const double alpha = 1.0 - level;
+			const double quantile = dist.Quantile (1.0 - 0.5 * alpha);
+			const double lower = mean - std_error * quantile;
+			const double upper = mean + std_error * quantile;
+			return ConfidenceInterval (level, mean, Range (lower, upper));
+		}
+		else
+			throw invalid_argument ("Mean_ConfidenceInterval: The confidence level must be in the range [0..1]");
 	}
 };
 
