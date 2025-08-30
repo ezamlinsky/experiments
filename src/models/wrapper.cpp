@@ -443,7 +443,7 @@ BOOST_PYTHON_MODULE (models) {
 		// Methods
 		BASE_CLASS_METHODS (Exponential)
 		.def ("Mean_ConfidenceInterval",	&Exponential::Mean_ConfidenceInterval,
-			args ("level", "size"), "Confidence interval of the mean value")
+			args ("level", "size"), "Confidence interval for the mean value")
 
 		// Properties
 		BASE_CLASS_PROPERTIES (Exponential)
@@ -497,9 +497,9 @@ BOOST_PYTHON_MODULE (models) {
 		// Methods
 		BASE_CLASS_METHODS (Normal)
 		.def ("Mean_ConfidenceInterval",		&Normal::Mean_ConfidenceInterval,
-			args ("level", "size"), "Confidence interval of the mean")
+			args ("level", "size"), "Confidence interval for the mean")
 		.def ("Variance_ConfidenceInterval",	&Normal::Variance_ConfidenceInterval,
-			args ("level", "size"), "Confidence interval of the variance")
+			args ("level", "size"), "Confidence interval for the variance")
 
 		// Properties
 		CONTINUOUS_CLASS_PROPERTIES (Normal);
@@ -517,7 +517,7 @@ BOOST_PYTHON_MODULE (models) {
 		// Methods
 		BASE_CLASS_METHODS (Laplace)
 		.def ("MAD_ConfidenceInterval",	&Laplace::MAD_ConfidenceInterval,
-			args ("level", "size"), "Confidence interval of the Mean Absolute Deviation (MAD)")
+			args ("level", "size"), "Confidence interval for the Mean Absolute Deviation (MAD)")
 
 		// Properties
 		CONTINUOUS_CLASS_PROPERTIES (Laplace)

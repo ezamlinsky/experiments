@@ -89,7 +89,7 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Confidence interval of the Mean Absolute Deviation (MAD)              //
+//      Confidence interval for the Mean Absolute Deviation (MAD)             //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval MAD_ConfidenceInterval (
 		double level,				// Confidence level
