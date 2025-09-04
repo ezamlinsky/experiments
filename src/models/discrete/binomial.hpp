@@ -163,7 +163,7 @@ public:
 		// Common case
 		const size_t arg = floor (x);
 		const SpecialBeta beta (trials - arg, 1 + arg);
-		return beta.RegIncompleteBeta (probability);
+		return beta.RegIncompleteBeta (1.0 - probability);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
