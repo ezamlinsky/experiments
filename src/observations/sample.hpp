@@ -11,6 +11,7 @@
 # include	"../python_helpers.hpp"
 # include	"observations.hpp"
 # include	"../models/confidence_interval.hpp"
+# include	"../models/discrete/binomial.hpp"
 # include	"../models/continuous/normal.hpp"
 
 //****************************************************************************//
@@ -31,6 +32,29 @@ private:
 		size_t size					// Array size
 	) :	Observations (data, size)
 	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Confidence interval for the quantile                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ConfidenceInterval QuantileConfidenceInterval (
+		double p,					// Quantile level to estimate
+		double level				// Confidence level
+	){
+		// Check if the level is correct
+		if (0.0 <= level && level <= 1.0) {
+			const auto dist = Binomial (size, p);
+			const double value = Quantile (p);
+			const double alpha = 1.0 - level;
+			const size_t quantile1 = dist.Quantile (0.5 * alpha);
+			const size_t quantile2 = dist.Quantile (1.0 - 0.5 * alpha);
+			const double lower = array [quantile1];
+			const double upper = array [quantile2];
+			const double precise_level = dist.CDF (quantile2) - dist.CDF (quantile1);
+			return ConfidenceInterval (precise_level, value, Range (lower, upper));
+		}
+		else
+			throw invalid_argument ("QuantileConfidenceInterval: The confidence level must be in the range [0..1]");
+	}
 
 //============================================================================//
 //      Public methods                                                        //
@@ -251,7 +275,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Confidence interval for the mean                                      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ConfidenceInterval MeanConfidenceInterval (
+	ConfidenceInterval Mean_CI (
 		double level				// Confidence level
 	){
 		// Check if the level is correct
@@ -265,7 +289,34 @@ public:
 			return ConfidenceInterval (level, mean, Range (lower, upper));
 		}
 		else
-			throw invalid_argument ("Mean_ConfidenceInterval: The confidence level must be in the range [0..1]");
+			throw invalid_argument ("MeanConfidenceInterval: The confidence level must be in the range [0..1]");
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Confidence interval for the median                                    //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ConfidenceInterval Median_CI (
+		double level				// Confidence level
+	){
+		return QuantileConfidenceInterval (0.5, level);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Confidence interval for the lower quartile                            //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ConfidenceInterval LowerQuartile_CI (
+		double level				// Confidence level
+	){
+		return QuantileConfidenceInterval (0.25, level);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Confidence interval for the upper quartile                            //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ConfidenceInterval UpperQuartile_CI (
+		double level				// Confidence level
+	){
+		return QuantileConfidenceInterval (0.75, level);
 	}
 };
 
