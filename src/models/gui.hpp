@@ -31,11 +31,20 @@ class RangeWindow : public SummaryWindow
 public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor                                                           //
+//      Constructors                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	RangeWindow (
-		const Range &data			// The summary data to display
+		const Range &data			// The object to display
 	) :	SummaryWindow ("RANGE", make_managed <PropTable> (data.Summary()[0].Properties()))
+	{
+		// Show the window
+		show_all();
+	}
+
+	RangeWindow (
+		const ustring &name,		// Window name
+		const Range &data			// The object to display
+	) :	SummaryWindow (name, "RANGE", make_managed <PropTable> (data.Summary()[0].Properties()))
 	{
 		// Show the window
 		show_all();
