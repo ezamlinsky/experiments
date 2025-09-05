@@ -89,8 +89,8 @@ private:
 		struct Columns : public TreeModelColumnRecord
 		{
 			// Members
-			TreeModelColumn <ustring> property;
-			TreeModelColumn <ustring> value;
+			TreeModelColumn <ustring> property;		// Property name
+			TreeModelColumn <ustring> value;		// Property value (numeric)
 
 			// Constructor
 			Columns (void) {
