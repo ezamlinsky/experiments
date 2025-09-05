@@ -22,11 +22,29 @@ class SummaryWindow : public Window
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
+protected:
+	ActionBar bar;					// The action bar at the bottom of the window
+
 private:
 	VBox box;						// Layout widget
 
-protected:
-	ActionBar bar;					// The action bar at the bottom of the window
+//============================================================================//
+//      Private methods                                                       //
+//============================================================================//
+private:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Join the window name and title strings                                //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ustring Join (
+		const ustring &name,		// Window name
+		const ustring &title		// Window title
+	){
+		if (name.empty())
+			return title;
+		else
+			return name + " - " + title;
+	}
 
 //============================================================================//
 //      Public methods                                                        //
@@ -34,7 +52,7 @@ protected:
 public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor                                                           //
+//      Constructors                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	SummaryWindow (
 		const ustring &title,		// Window title
@@ -59,6 +77,13 @@ public:
 		// Add it to the window
 		add (box);
 	}
+
+	SummaryWindow (
+		const ustring &name,		// Window name
+		const ustring &title,		// Window title
+		Widget *content				// Summary content to display
+	) :	SummaryWindow (Join (name, title), content)
+	{}
 };
 /*
 ################################################################################
