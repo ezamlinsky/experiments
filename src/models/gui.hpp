@@ -34,17 +34,48 @@ public:
 //      Constructors                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	RangeWindow (
-		const Range &data			// The object to display
-	) :	SummaryWindow ("RANGE", make_managed <PropTable> (data.Summary()[0].Properties()))
+		const Range &data				// The object to display
+	) :	SummaryWindow ("Range", make_managed <PropTable> (data.Summary()[0].Properties()))
 	{
 		// Show the window
 		show_all();
 	}
 
 	RangeWindow (
-		const ustring &name,		// Window name
-		const Range &data			// The object to display
-	) :	SummaryWindow (name, "RANGE", make_managed <PropTable> (data.Summary()[0].Properties()))
+		const ustring &name,			// Window name
+		const Range &data				// The object to display
+	) :	SummaryWindow (name, "Range", make_managed <PropTable> (data.Summary()[0].Properties()))
+	{
+		// Show the window
+		show_all();
+	}
+};
+
+//****************************************************************************//
+//      Class "ConfidenceIntervalWindow"                                      //
+//****************************************************************************//
+class ConfidenceIntervalWindow : public SummaryWindow
+{
+//============================================================================//
+//      Public methods                                                        //
+//============================================================================//
+public:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructors                                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ConfidenceIntervalWindow (
+		const ConfidenceInterval &data	// The object to display
+	) :	SummaryWindow ("Confidence interval", make_managed <PropTable> (data.Summary()[0].Properties()))
+	{
+		// Show the window
+		show_all();
+	}
+
+	ConfidenceIntervalWindow (
+		const ustring &name,			// Window name
+		const ConfidenceInterval &data	// The object to display
+	) :	SummaryWindow (name, "Confidence interval", make_managed <PropTable> (data.Summary()[0].Properties()))
 	{
 		// Show the window
 		show_all();
