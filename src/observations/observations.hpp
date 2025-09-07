@@ -475,10 +475,10 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Summary of the object                                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	vector <PropGroup> Summary (void) const {
+	const groups Summary (void) const {
 
 		// Create the summary storage
-		vector <PropGroup> summary = Domain().Summary();
+		groups summary = Domain().Summary();
 
 		// Robust estimations
 		PropGroup robust ("Robust estimations");

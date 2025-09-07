@@ -62,6 +62,26 @@ public:
 	double RelError (void) const {
 		return Length() / value;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	const groups Summary (void) const {
+
+		// Create the summary storage
+		const Range &range = static_cast <const Range&> (*this);
+		groups summary = range.Summary();
+
+		// Confidence interval
+		PropGroup &group = summary[0];
+		group.Name ("Confidence interval");
+		group.Prepend ("Value", Value());
+		group.Prepend ("Confidence level (%)", Level() * 100);
+		group.Append ("Relative error (%)", RelError() * 100);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -73,10 +93,8 @@ ostream& operator << (ostream &stream, const ConfidenceInterval &interval)
 	stream.precision (PRECISION);
 	stream << "\nCONFIDENCE INTERVAL:" << endl;
 	stream << "====================" << endl;
-	stream << "Confidence level\t\t\t= " << interval.Level() << endl;
-	stream << "Value\t\t\t\t\t= " << interval.Value() << endl;
-	stream << "Relative error (%)\t\t\t= " << fixed << setprecision (3) << interval.RelError() * 100 << endl;
-	stream << static_cast <const Range&> (interval);
+	for (const auto &group : interval.Summary())
+		stream << group;
 	stream.precision (restore);
 	return stream;
 }

@@ -281,10 +281,10 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Summary of the object                                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	vector <PropGroup> Summary (void) const {
+	groups Summary (void) const {
 
 		// Create the summary storage
-		vector <PropGroup> summary;
+		groups summary;
 
 		// Range info
 		PropGroup info ("Range");
