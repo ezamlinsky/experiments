@@ -84,9 +84,6 @@ public:
 	const properties& Properties (void) const {
 		return props;
 	}
-	properties& Properties (void) {
-		return props;
-	}
 };
 using groups = deque <PropGroup>;
 
