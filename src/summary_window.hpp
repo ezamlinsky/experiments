@@ -62,13 +62,13 @@ public:
 		set_title (title);
 
 		// Create the close button
-		auto close_button = make_managed <Button> ("Close");
-		close_button -> set_image_from_icon_name ("window-close");
-		close_button -> set_tooltip_text ("Close the window");
-		close_button -> signal_clicked().connect (sigc::mem_fun (*this, &SummaryWindow::close));
+		auto button = make_managed <Button> ("Close");
+		button -> set_image_from_icon_name ("window-close");
+		button -> set_tooltip_text ("Close the window");
+		button -> signal_clicked().connect (sigc::mem_fun (*this, &SummaryWindow::close));
 
 		// Add it to the action bar
-		bar.pack_end (*close_button);
+		bar.pack_end (*button);
 
 		// Create the layout
 		box.pack_start (*content, true, true);
