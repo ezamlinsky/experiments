@@ -9,6 +9,7 @@
 */
 # include	<thread>
 # include	"observations/gui.hpp"
+# include	"models/gui.hpp"
 
 //****************************************************************************//
 //      Class "GUI"                                                           //
@@ -19,8 +20,8 @@ class GUI
 //      Members                                                               //
 //============================================================================//
 private:
-	RefPtr <Application> app;	// GTK application
-	thread *th;					// A thread for the GTK event loop
+	RefPtr <Application> app;		// GTK application
+	thread *th;						// A thread for the GTK event loop
 
 //============================================================================//
 //      Private methods                                                       //
@@ -38,7 +39,7 @@ private:
 //      A signal handler for a window remove event                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void remove (
-		Window *window			// The removed window
+		Window *window				// The removed window
 	){
 		delete window;
 	}
@@ -83,7 +84,7 @@ public:
 //      Add a GUI window to the GTK event loop                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void add (
-		Window &window			// The GUI window to display
+		Window &window				// The GUI window to display
 	){
 		// Add a new window to the Gtk event loop
 		app -> add_window (window);
@@ -95,17 +96,63 @@ public:
 //****************************************************************************//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Range                                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+void Show (
+	const ::Range &range			// The object to display
+){
+	gui.add (*new Model::RangeWindow (range));
+}
+void Show (
+	const string &name,				// Window name
+	const ::Range &range			// The object to display
+){
+	gui.add (*new Model::RangeWindow (name, range));
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Confidence Interval                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+void Show (
+	const ConfidenceInterval &ci	// The object to display
+){
+	gui.add (*new Model::ConfidenceIntervalWindow (ci));
+}
+void Show (
+	const string &name,				// Window name
+	const ConfidenceInterval &ci	// The object to display
+){
+	gui.add (*new Model::ConfidenceIntervalWindow (name, ci));
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Statistical population                                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-void Show (const Population &population) {
-	gui.add (*new SummaryWindow ("POPULATION", population));
+void Show (
+	const Population &population	// The summary data to display
+){
+	gui.add (*new Observation::PopulationWindow (population));
+}
+void Show (
+	const string &name,				// Window name
+	const Population &population	// The summary data to display
+){
+	gui.add (*new Observation::PopulationWindow (name, population));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Statistical sample                                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-void Show (const Sample &sample) {
-	gui.add (*new SummaryWindow ("SAMPLE", sample));
+void Show (
+	const Sample &sample			// The summary data to display
+){
+	gui.add (*new Observation::SampleWindow (sample));
+}
+void Show (
+	const string &name,				// Window name
+	const Sample &sample			// The summary data to display
+){
+	gui.add (*new Observation::SampleWindow (name, sample));
 }
 /*
 ################################################################################
