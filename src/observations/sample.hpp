@@ -39,7 +39,7 @@ private:
 	ConfidenceInterval QuantileConfidenceInterval (
 		double p,					// Quantile level to estimate
 		double level				// Confidence level
-	){
+	) const {
 		// Check if the level is correct
 		if (0.0 <= level && level <= 1.0) {
 			const auto dist = Binomial (size, p);
@@ -277,7 +277,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval Mean_CI (
 		double level				// Confidence level
-	){
+	) const {
 		// Check if the level is correct
 		if (0.0 <= level && level <= 1.0) {
 			const auto dist = Normal (0.0, 1.0);
@@ -297,7 +297,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval Median_CI (
 		double level				// Confidence level
-	){
+	) const {
 		return QuantileConfidenceInterval (0.5, level);
 	}
 
@@ -306,7 +306,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval LowerQuartile_CI (
 		double level				// Confidence level
-	){
+	) const {
 		return QuantileConfidenceInterval (0.25, level);
 	}
 
@@ -315,7 +315,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ConfidenceInterval UpperQuartile_CI (
 		double level				// Confidence level
-	){
+	) const {
 		return QuantileConfidenceInterval (0.75, level);
 	}
 };
