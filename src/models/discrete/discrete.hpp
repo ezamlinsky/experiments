@@ -119,6 +119,28 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Ceil quantile value for the target level                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double CeilQuantile (
+		double level		// Quantile level to estimate
+	) const {
+		double quantile = Quantile (level);
+		bool flag = quantile == max_index;
+		return flag ? quantile - 1.0 : quantile;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Floor quantile value for the target level                             //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double FloorQuantile (
+		double level		// Quantile level to estimate
+	) const {
+		double quantile = Quantile (level);
+		bool flag = cmf.at (quantile) > level && quantile > min_index;
+		return flag ? quantile - 1.0 : quantile;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Convert an instance of a derived class to the base class              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual const BaseDiscrete& data (void) const override final {
