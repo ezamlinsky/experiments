@@ -306,6 +306,8 @@ ostream& operator << (ostream &stream, const Range &object)
 {
 	auto restore = stream.precision();
 	stream.precision (PRECISION);
+	stream << "\nRANGE:" << endl;
+	stream << "======" << endl;
 	for (const auto &group : object.Summary())
 		stream << group;
 	stream.precision (restore);
