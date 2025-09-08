@@ -45,8 +45,8 @@ private:
 			const auto dist = Binomial (size, p);
 			const double value = Quantile (p);
 			const double alpha = 1.0 - level;
-			const size_t quantile1 = dist.Quantile (0.5 * alpha);
-			const size_t quantile2 = dist.Quantile (1.0 - 0.5 * alpha);
+			const size_t quantile1 = dist.FloorQuantile (0.5 * alpha);
+			const size_t quantile2 = dist.CeilQuantile (1.0 - 0.5 * alpha);
 			const double lower = array [quantile1];
 			const double upper = array [quantile2];
 			const double precise_level = dist.CDF (quantile2) - dist.CDF (quantile1);
