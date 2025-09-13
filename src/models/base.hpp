@@ -34,31 +34,44 @@ public:
 	virtual ~BaseModel (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Generate random values from the distribution                          //
+//      Generate random values from the distribution using the seed provided  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	vector <double> Generate (
-		size_t count			// Size of the sample to generate
+		size_t count,			// Size of the sample to generate
+		double seed				// The seed value
 	){
 		// The accumulator for random values
 		vector <double> result;
 
-		// Obtain a seed for the random number engine
-		random_device rd;
-
-		// Seed the standard mersenne twister engine
-		mt19937 gen (rd());
+		// Seed the standard Mersenne twister engine
+		mt19937 generator (seed);
 
 		// Collect uniformly distributed random values in the range [0, 1)
-		uniform_real_distribution <> uniform (0.0, 1.0);
+		uniform_real_distribution <double> uniform (0.0, 1.0);
 		while (count--) {
 
+			// Generate a random number in the range [0..1]
+			const double rnd = uniform (generator);
+
 			// Translate uniform distribution into the target distribution
-			const double rnd = uniform (gen);
 			result.push_back (Quantile (rnd));
 		}
 
 		// Return all the generated random values
 		return result;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Generate random values from the distribution                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	vector <double> Generate (
+		size_t count			// Size of the sample to generate
+	){
+		// Obtain a seed for the random number engine
+		random_device rd;
+
+		// Generate random values from the distribution using the seed provided
+		return Generate (count, rd());
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
