@@ -33,13 +33,22 @@
 # include	"continuous/asymmetric_laplace.hpp"
 
 //****************************************************************************//
+//      Random value generators                                               //
+//****************************************************************************//
+# define	GENERATORS(class)													\
+	vector <double> (class::*class##Generate1)(size_t count)				= &class::Generate;\
+	vector <double> (class::*class##Generate2)(size_t count, double seed)	= &class::Generate;
+
+//****************************************************************************//
 //      Methods are inherited from the base distribution class                //
 //****************************************************************************//
 # define	BASE_CLASS_METHODS(class) 											\
 	.def ("Domain",		&class::Domain,		return_internal_reference <> (),	\
 		"Function domain where the distribution exists")						\
-	.def ("Generate",	&class::Generate,	args ("count"),						\
+	.def ("Generate",	class##Generate1,	args ("count"),						\
 		"Generate random values from the distribution")							\
+	.def ("Generate",	class##Generate2,	args ("count", "seed"),				\
+		"Generate random values from the distribution using the seed provided")	\
 	.def ("Quantile",	&class::Quantile,	args ("level"),						\
 		"Quantile value for the target level")									\
 	.def ("PDF",		&class::PDF,		args ("x"),							\
@@ -158,6 +167,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "DiscreteUniform" class to Python                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (DiscreteUniform)
 	class_ <DiscreteUniform> ("DiscreteUniform",
 		"Model for a Discrete Uniform distribution",
 		init <int64_t, int64_t> (args ("min", "max"),
@@ -174,6 +184,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Bernoulli" class to Python                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Bernoulli)
 	class_ <Bernoulli> ("Bernoulli",
 		"Model for a Bernoulli distribution",
 		init <double> (args ("probability"),
@@ -192,6 +203,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Geometric" class to Python                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Geometric)
 	class_ <Geometric> ("Geometric",
 		"Model for a Geometric distribution",
 		init <double> (args ("probability"),
@@ -210,6 +222,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Binomial" class to Python                                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Binomial)
 	class_ <Binomial> ("Binomial",
 		"Model for a Binomial distribution",
 		init <size_t, double> (args ("trials", "probability"),
@@ -230,6 +243,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "NegativeBinomial" class to Python                             //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (NegativeBinomial)
 	class_ <NegativeBinomial> ("NegativeBinomial",
 		"Model for a Negative Binomial distribution",
 		init <size_t, double> (args ("successes", "probability"),
@@ -250,6 +264,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Poisson" class to Python                                      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Poisson)
 	class_ <Poisson> ("Poisson",
 		"Model for a Poisson distribution",
 		init <double> (args ("probability"),
@@ -272,6 +287,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Kolmogorov" class to Python                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Kolmogorov)
 	class_ <Kolmogorov> ("Kolmogorov",
 		"Model for a Kolmogorov distribution",
 		init <> ("Create a new Kolmogorov distribution"))
@@ -285,6 +301,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "DiscreteUniform" class to Python                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (ContinuousUniform)
 	class_ <ContinuousUniform> ("ContinuousUniform",
 		"Model for a Continuous Uniform distribution",
 		init <double, double> (args ("min", "max"),
@@ -301,6 +318,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "StandardT" class to Python                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (StandardT)
 	class_ <StandardT> ("StandardT",
 		"Model for a Student’s T-distribution",
 		init <size_t> (args ("df"),
@@ -317,6 +335,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "F" class to Python                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (F)
 	class_ <F> ("F",
 		"Model for a Snedecor's F-distribution",
 		init <size_t, size_t> (args ("df1", "df2"),
@@ -335,6 +354,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Beta" class to Python                                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Beta)
 	class_ <Beta> ("Beta",
 		"Model for the Beta distribution",
 		init <double, double> (args ("shape1", "shape2"),
@@ -355,6 +375,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Erlang" class to Python                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Erlang)
 	class_ <Erlang> ("Erlang",
 		"Model for an Erlang distribution",
 		init <size_t, double> (args ("shape", "scale"),
@@ -375,6 +396,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Chi-Squared" class to Python                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (ChiSquared)
 	class_ <ChiSquared> ("ChiSquared",
 		"Model for a Chi-Squared distribution",
 		init <size_t> (args ("df"),
@@ -393,6 +415,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Gamma" class to Python                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Gamma)
 	class_ <Gamma> ("Gamma",
 		"Model for a Gamma distribution",
 		init <double, double> (args ("shape", "scale"),
@@ -413,6 +436,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Pareto" class to Python                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Pareto)
 	class_ <Pareto> ("Pareto",
 		"Model for a Pareto distribution",
 		init <double, double> (args ("shape", "scale"),
@@ -433,6 +457,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Exponential" class to Python                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Exponential)
 	class_ <Exponential> ("Exponential",
 		"Model for an Exponential distribution",
 		init <double> (args ("scale"),
@@ -453,6 +478,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Rayleigh" class to Python                                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Rayleigh)
 	class_ <Rayleigh> ("Rayleigh",
 		"Model for an Rayleigh distribution",
 		init <double> (args ("scale"),
@@ -471,6 +497,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Logistic" class to Python                                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Logistic)
 	class_ <Logistic> ("Logistic",
 		"Model for a Logistic distribution",
 		init <double, double> (args ("location", "scale"),
@@ -487,6 +514,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Normal" class to Python                                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Normal)
 	class_ <Normal> ("Normal",
 		"Model for a Normal (Gaussian) distribution",
 		init <double, double> (args ("location", "scale"),
@@ -507,6 +535,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Laplace" class to Python                                      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Laplace)
 	class_ <Laplace> ("Laplace",
 		"Model for a Laplace distribution",
 		init <double, double> (args ("location", "scale"),
@@ -527,6 +556,7 @@ BOOST_PYTHON_MODULE (models) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "AsymmetricLaplace" class to Python                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (AsymmetricLaplace)
 	class_ <AsymmetricLaplace> ("AsymmetricLaplace",
 		"Model for an asymmetric Laplace distribution",
 		init <double, double, double> (args ("location", "scale", "asymmetry"),
