@@ -158,12 +158,7 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const Population &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nPOPULATION:" << endl;
-	stream << "===========" << endl;
-	stream << static_cast <const Observations&> (object);
-	stream.precision (restore);
+	stream << object.Summary ("Population");
 	return stream;
 }
 /*
