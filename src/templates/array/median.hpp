@@ -54,7 +54,11 @@ T Median (
 	T array[],				// Array data
 	size_t size				// Array size
 ){
-	Array::Sort (array, size);
+	if (size > 1) {
+		const size_t middle = size / 2;
+		nth_element (array, array + middle, array + size);
+		nth_element (array, array + middle - 1, array + size);
+	}
 	return MedianSorted (array, size);
 }
 
