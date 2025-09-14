@@ -79,13 +79,6 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Get count of object property groups                                   //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	size_t Size (void) const {
-		return grps.size();
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      List of object-specific properties                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	const properties& Properties (void) const {
@@ -122,17 +115,11 @@ ostream& operator << (ostream &stream, const ObjectSummary &object)
 	// Print all the object-specific properties
 	stream << object.Properties();
 
-	// Do not print the group name if the object contains exactly one group inside
-	if (object.Size() > 1)
+	// Print all the groups
+	for (const auto &group : object.Groups())
+		stream << group;
 
-		// Print all the groups
-		for (const auto &group : object.Groups())
-			stream << group;
-	else
-
-		// Print the only one group
-		stream << object.Groups()[0].Properties();
-
+	// Print a separating line after the object summary
 	stream << string (80, '~') << endl;
 
 	// Restore the precision
