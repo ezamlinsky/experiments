@@ -66,15 +66,15 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Summary of the object                                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const groups Summary (void) const {
+	const ObjectSummary Summary (void) const {
 
 		// Create the summary storage
 		const Range &range = static_cast <const Range&> (*this);
-		groups summary = range.Summary();
+		ObjectSummary summary = range.Summary();
+		summary.Name ("Confidence Interval");
 
 		// Confidence interval
-		PropGroup &group = summary[0];
-		group.Name ("Confidence interval");
+		PropGroup &group = summary.Groups()[0];
 		group.Prepend ("Value", Value());
 		group.Prepend ("Confidence level (%)", Level() * 100);
 		group.Append ("Relative error (%)", RelError() * 100);
@@ -87,15 +87,9 @@ public:
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const ConfidenceInterval &interval)
+ostream& operator << (ostream &stream, const ConfidenceInterval &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nCONFIDENCE INTERVAL:" << endl;
-	stream << "====================" << endl;
-	for (const auto &group : interval.Summary())
-		stream << group;
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*
