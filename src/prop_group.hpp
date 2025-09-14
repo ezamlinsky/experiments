@@ -53,7 +53,7 @@ public:
 		const string &name,		// Object property name
 		double value			// Value of the object property
 	){
-		// Append the property to the list
+		// Prepend the property to the list
 		props.push_front (property (name, value));
 	}
 
@@ -66,6 +66,15 @@ public:
 	){
 		// Append the property to the list
 		props.push_back (property (name, value));
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Set name of the properties group                                      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	void Name (
+		const string &name		// New name of the properties group
+	){
+		group_name = name;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//

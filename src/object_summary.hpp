@@ -25,7 +25,6 @@ class ObjectSummary
 //============================================================================//
 private:
 	string object_name;			// Object name
-	properties props;			// List of object-specific properties
 	groups grps;				// Groups of object properties
 
 //============================================================================//
@@ -42,14 +41,13 @@ public:
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Append a property to the list of object-specific properties           //
+//      Prepend a group to the list of groups                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	void Append (
-		const string &name,		// Object property name
-		double value			// Value of the object property
+	void Prepend (
+		const PropGroup &group	// The properties group to prepend
 	){
-		// Append the property to the list
-		props.push_back (property (name, value));
+		// Prepend the properties group to the list
+		grps.push_front (group);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -58,12 +56,12 @@ public:
 	void Append (
 		const PropGroup &group	// The properties group to append
 	){
-		// Append the property to the list
+		// Append the properties group to the list
 		grps.push_back (group);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Set name of the properties group                                      //
+//      Set name of the object                                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void Name (
 		const string &name		// New name of the object
@@ -76,13 +74,6 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	const string& Name (void) const {
 		return object_name;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      List of object-specific properties                                    //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const properties& Properties (void) const {
-		return props;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -111,9 +102,6 @@ ostream& operator << (ostream &stream, const ObjectSummary &object)
 	stream << endl << string (80, '=') << endl;
 	stream << "    " << name << ":" << endl;
 	stream << string (80, '=') << endl;
-
-	// Print all the object-specific properties
-	stream << object.Properties();
 
 	// Print all the groups
 	for (const auto &group : object.Groups())
