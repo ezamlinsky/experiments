@@ -11,11 +11,8 @@
 # include	<stdexcept>
 # include	<iomanip>
 # include	<algorithm>
-# include	"../prop_group.hpp"
+# include	"../object_summary.hpp"
 # include	"../templates/array.hpp"
-
-// Displayed precision for floating-point numbers
-# define	PRECISION	16
 
 //****************************************************************************//
 //      Class "Range"                                                         //
@@ -281,18 +278,18 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Summary of the object                                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	groups Summary (void) const {
+	ObjectSummary Summary (void) const {
 
-		// Create the summary storage
-		groups summary;
+		// Create the summary object
+		ObjectSummary summary ("Range");
 
 		// Range info
-		PropGroup info ("Range");
+		PropGroup info;
 		info.Append ("Min value", Min());
 		info.Append ("Max value", Max());
 		info.Append ("Range length", Length());
 		info.Append ("Middle point", MidRange());
-		summary.push_back (info);
+		summary.Append (info);
 
 		// Return the summary
 		return summary;
@@ -304,13 +301,7 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const Range &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nRANGE:" << endl;
-	stream << "======" << endl;
-	for (const auto &group : object.Summary())
-		stream << group;
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*
