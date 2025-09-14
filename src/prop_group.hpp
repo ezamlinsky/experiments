@@ -13,7 +13,8 @@
 
 // Use shortenings
 using namespace std;
-using properties = deque <pair <string, double>>;
+using property = pair <string, double>;
+using properties = deque <property>;
 
 //****************************************************************************//
 //      Class "PropGroup"                                                     //
@@ -44,22 +45,22 @@ public:
 //      Prepend a property to the list                                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void Prepend (
-		const string &property,	// Object property name
+		const string &name,		// Object property name
 		double value			// Value of the object property
 	){
 		// Append the property to the list
-		props.push_front (pair <string, double> (property, value));
+		props.push_front (property (name, value));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Append a property to the list                                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void Append (
-		const string &property,	// Object property name
+		const string &name,		// Object property name
 		double value			// Value of the object property
 	){
 		// Append the property to the list
-		props.push_back (pair <string, double> (property, value));
+		props.push_back (property (name, value));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -85,11 +86,25 @@ public:
 		return props;
 	}
 };
-using groups = deque <PropGroup>;
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
+ostream& operator << (ostream &stream, const property &prop)
+{
+	// Print the property
+	stream << "    ";
+	stream.width (36);
+	stream << left << prop.first << "= "<< prop.second;
+	return stream;
+}
+ostream& operator << (ostream &stream, const properties &props)
+{
+	// Print all the properties
+	for (const auto &opt : props)
+		stream << opt << endl;
+	return stream;
+}
 ostream& operator << (ostream &stream, const PropGroup &object)
 {
 	// Print the underlined group name
@@ -98,12 +113,7 @@ ostream& operator << (ostream &stream, const PropGroup &object)
 	stream << string (name.size() + 1, '~') << endl;
 
 	// Print all the properties in the group
-	const auto &props = object.Properties();
-	for (const auto &opt : props) {
-		stream << "    ";
-		stream.width (36);
-		stream << left << opt.first << "= "<< opt.second << endl;
-	}
+	stream << object.Properties();
 	return stream;
 }
 /*
