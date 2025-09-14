@@ -475,10 +475,19 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Summary of the object                                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const groups Summary (void) const {
+	ObjectSummary Summary (
+		const string &name			// Object name
+	) const {
 
 		// Create the summary storage
-		groups summary = Domain().Summary();
+		ObjectSummary summary = Domain().Summary();
+		summary.Name (name);
+		summary.Groups()[0].Name ("Data range");
+
+		// Size of the dataset
+		PropGroup size;
+		size.Append ("Data points", Size());
+		summary.Prepend (size);
 
 		// Robust estimations
 		PropGroup robust ("Robust estimations");
@@ -489,7 +498,7 @@ public:
 		robust.Append ("Midhinge", MidHinge());
 		robust.Append ("Tukey's trimean", TriMean());
 		robust.Append ("Quartile skewness", QuartileSkewness());
-		summary.push_back (robust);
+		summary.Append (robust);
 
 		// Standard estimations
 		PropGroup standard ("Standard estimations");
@@ -497,7 +506,7 @@ public:
 		standard.Append ("Variance", Variance());
 		standard.Append ("Standard deviation", StdDev());
 		standard.Append ("Standard error", StdErr());
-		summary.push_back (standard);
+		summary.Append (standard);
 
 		// Estimations around the mean value
 		PropGroup mean_est ("Estimations (around mean)");
@@ -505,7 +514,7 @@ public:
 		mean_est.Append ("Skewness", SkewnessAroundMean());
 		mean_est.Append ("Kurtosis", KurtosisAroundMean());
 		mean_est.Append ("Excess kurtosis", KurtosisExcessAroundMean());
-		summary.push_back (mean_est);
+		summary.Append (mean_est);
 
 		// Deviations from the median value
 		PropGroup mean_dev ("Deviations (from mean)");
@@ -514,7 +523,7 @@ public:
 		mean_dev.Append ("Median of squared deviations", MedianSqrDevFromMean());
 		mean_dev.Append ("Median of absolute deviations", MedianAbsDevFromMean());
 		mean_dev.Append ("Median of signed deviations", MedianSignDevFromMean());
-		summary.push_back (mean_dev);
+		summary.Append (mean_dev);
 
 		// Estimations around the median value
 		PropGroup median_est ("Estimations (around median)");
@@ -522,7 +531,7 @@ public:
 		median_est.Append ("Skewness", SkewnessAroundMedian());
 		median_est.Append ("Kurtosis", KurtosisAroundMedian());
 		median_est.Append ("Excess kurtosis", KurtosisExcessAroundMedian());
-		summary.push_back (median_est);
+		summary.Append (median_est);
 
 		// Deviations from the median value
 		PropGroup median_dev ("Deviations (from median)");
@@ -532,13 +541,13 @@ public:
 		median_dev.Append ("Median of squared deviations", MedianSqrDevFromMedian());
 		median_dev.Append ("Median of absolute deviations", MedianAbsDevFromMedian());
 		median_dev.Append ("Median of signed deviations", MedianSignDevFromMedian());
-		summary.push_back (median_dev);
+		summary.Append (median_dev);
 
 		// Skewness
 		PropGroup skewness ("Skewness");
 		skewness.Append ("Pearson's skewness", PearsonSkewness());
 		skewness.Append ("Meeden's skewness", MeedenSkewness());
-		summary.push_back (skewness);
+		summary.Append (skewness);
 
 		// Important quantiles
 		PropGroup quantiles ("Important quantiles");
@@ -546,7 +555,7 @@ public:
 		quantiles.Append ("Quantile (5%)", Quantile (0.05));
 		quantiles.Append ("Quantile (95%)", Quantile (0.95));
 		quantiles.Append ("Quantile (99%)", Quantile (0.99));
-		summary.push_back (quantiles);
+		summary.Append (quantiles);
 
 		// Deciles
 		PropGroup deciles ("Deciles");
@@ -554,7 +563,7 @@ public:
 			const string name = string ("Decile (") + to_string (i * 10) + "%)";
 			deciles.Append (name, Quantile (i / 10.0));
 		}
-		summary.push_back (deciles);
+		summary.Append (deciles);
 
 		// Return the summary
 		return summary;
@@ -578,17 +587,6 @@ public:
 	virtual double SkewnessAroundMedian (void) const = 0;
 	virtual double KurtosisAroundMedian (void) const = 0;
 };
-
-//****************************************************************************//
-//      Translate the object to a string                                      //
-//****************************************************************************//
-ostream& operator << (ostream &stream, const Observations &object)
-{
-	stream << "Data points\t\t\t\t= " << object.Size() << endl;
-	for (const auto &group : object.Summary())
-		stream << group;
-	return stream;
-}
 /*
 ################################################################################
 #                                 END OF FILE                                  #
