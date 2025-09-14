@@ -34,6 +34,11 @@ private:
 public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Default constructor                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	PropGroup (void) = default;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	PropGroup (
@@ -61,15 +66,6 @@ public:
 	){
 		// Append the property to the list
 		props.push_back (property (name, value));
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Set name of the properties group                                      //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	void Name (
-		const string &name		// New name of the properties group
-	){
-		group_name = name;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -107,10 +103,12 @@ ostream& operator << (ostream &stream, const properties &props)
 }
 ostream& operator << (ostream &stream, const PropGroup &object)
 {
-	// Print the underlined group name
+	// Print the underlined group name if set
 	const string &name = object.Name();
-	stream << endl << name << ":" << endl;
-	stream << string (name.size() + 1, '~') << endl;
+	if (name.length()) {
+		stream << endl << name << ":" << endl;
+		stream << string (name.size() + 1, '~') << endl;
+	}
 
 	// Print all the properties in the group
 	stream << object.Properties();
