@@ -205,14 +205,14 @@ public:
 	ObservationsWindow (
 		const ustring &title,		// Window title
 		const Observations &data	// The summary data to display
-	) : SummaryWindow (title + " (" + to_string (data.Size()) + " data points)", make_managed <PropNotebook> (data.Summary()))
+	) : SummaryWindow (title + " (" + to_string (data.Size()) + " data points)", make_managed <PropNotebook> (data.Summary(title).Groups()))
 	{}
 
 	ObservationsWindow (
 		const ustring &name,		// Window name
 		const ustring &title,		// Window title
 		const Observations &data	// The summary data to display
-	) : SummaryWindow (name, title + " (" + to_string (data.Size()) + " data points)", make_managed <PropNotebook> (data.Summary()))
+	) : SummaryWindow (name, title + " (" + to_string (data.Size()) + " data points)", make_managed <PropNotebook> (data.Summary(title).Groups()))
 	{}
 };
 
@@ -293,22 +293,22 @@ private:
 
 					// Mean value
 					case CI_button::MEAN:
-						get_application() -> add_window (*new Model::ConfidenceIntervalWindow ("Mean", sample.Mean_CI (level)));
+						get_application() -> add_window (*new Model::SimpleSummary ("Mean", sample.Mean_CI (level).Summary()));
 						break;
 
 					// Median value
 					case CI_button::MEDIAN:
-						get_application() -> add_window (*new Model::ConfidenceIntervalWindow ("Median", sample.Median_CI (level)));
+						get_application() -> add_window (*new Model::SimpleSummary ("Median", sample.Median_CI (level).Summary()));
 						break;
 
 					// Lower quartile value
 					case CI_button::LOWER_QUARTILE:
-						get_application() -> add_window (*new Model::ConfidenceIntervalWindow ("Lower quartile", sample.LowerQuartile_CI (level)));
+						get_application() -> add_window (*new Model::SimpleSummary ("Lower quartile", sample.LowerQuartile_CI (level).Summary()));
 						break;
 
 					// Upper quartile value
 					case CI_button::UPPER_QUARTILE:
-						get_application() -> add_window (*new Model::ConfidenceIntervalWindow ("Upper quartile", sample.UpperQuartile_CI (level)));
+						get_application() -> add_window (*new Model::SimpleSummary ("Upper quartile", sample.UpperQuartile_CI (level).Summary()));
 						break;
 
 					// Nothing selected
