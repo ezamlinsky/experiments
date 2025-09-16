@@ -101,13 +101,13 @@ public:
 void Show (
 	const ::Range &range			// The object to display
 ){
-	gui.add (*new Model::RangeWindow (range));
+	gui.add (*new Model::SimpleSummary (range.Summary()));
 }
 void Show (
 	const string &name,				// Window name
 	const ::Range &range			// The object to display
 ){
-	gui.add (*new Model::RangeWindow (name, range));
+	gui.add (*new Model::SimpleSummary (name, range.Summary()));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -116,13 +116,13 @@ void Show (
 void Show (
 	const ConfidenceInterval &ci	// The object to display
 ){
-	gui.add (*new Model::ConfidenceIntervalWindow (ci));
+	gui.add (*new Model::SimpleSummary (ci.Summary()));
 }
 void Show (
 	const string &name,				// Window name
 	const ConfidenceInterval &ci	// The object to display
 ){
-	gui.add (*new Model::ConfidenceIntervalWindow (name, ci));
+	gui.add (*new Model::SimpleSummary (name, ci.Summary()));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
