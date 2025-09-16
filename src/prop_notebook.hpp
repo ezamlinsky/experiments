@@ -34,19 +34,25 @@ public:
 		set_tab_pos (PositionType::POS_LEFT);
 
 		// Process all the available property groups
-		const size_t size = props.size();
-		for (size_t i = 0; i < size; i++) {
+		size_t i = 1;
+		for (const auto &item : props) {
 
-			// Use a group name as a tab label, and make this text bold
-			auto label = make_managed <Label> ("<b>" + to_string (i + 1) + ". " + props[i].Name() + "</b>");
-			label -> set_use_markup (true);
-			label -> set_xalign (0.0);
+			// Show only groups with a name
+			const string &name = item.Name();
+			if (name.length()) {
 
-			// Put one properties table per page
-			auto table = make_managed <PropTable> (props[i].Properties());
+				// Use a group name as a tab label, and make this text bold
+				auto label = make_managed <Label> ("<b>" + to_string (i) + ". " + name + "</b>");
+				label -> set_use_markup (true);
+				label -> set_xalign (0.0);
 
-			// Create a page with the group properties aggregated
-			append_page (*table, *label);
+				// Put one properties table per page
+				auto table = make_managed <PropTable> (item.Properties());
+
+				// Create a page with the group properties aggregated
+				append_page (*table, *label);
+				i++;
+			}
 		}
 	}
 };
