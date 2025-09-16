@@ -203,16 +203,16 @@ public:
 //      Universal constructors                                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ObservationsWindow (
-		const ustring &title,		// Window title
-		const Observations &data	// The summary data to display
-	) : SummaryWindow (title + " (" + to_string (data.Size()) + " data points)", make_managed <PropNotebook> (data.Summary(title).Groups()))
+		const ObjectSummary &summary,	// Summary info to display
+		size_t size						// Data size
+	) :	SummaryWindow (summary.Name() + " (" + to_string (size) + " data points)", make_managed <PropNotebook> (summary.Groups()))
 	{}
 
 	ObservationsWindow (
-		const ustring &name,		// Window name
-		const ustring &title,		// Window title
-		const Observations &data	// The summary data to display
-	) : SummaryWindow (name, title + " (" + to_string (data.Size()) + " data points)", make_managed <PropNotebook> (data.Summary(title).Groups()))
+		const ustring &name,			// Window name
+		const ObjectSummary &summary,	// Summary info to display
+		size_t size						// Data size
+	) :	SummaryWindow (name, summary.Name() + " (" + to_string (size) + " data points)", make_managed <PropNotebook> (summary.Groups()))
 	{}
 };
 
@@ -237,7 +237,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	PopulationWindow (
 		const Population &data		// The summary data to display
-	) :	ObservationsWindow ("Population", data),
+	) :	ObservationsWindow (data.Summary("Population"), data.Size()),
 		population (data)
 	{
 		// Show the window
@@ -247,7 +247,7 @@ public:
 	PopulationWindow (
 		const ustring &name,		// Window name
 		const Population &data		// The summary data to display
-	) :	ObservationsWindow (name, "Population", data),
+	) :	ObservationsWindow (name, data.Summary("Population"), data.Size()),
 		population (data)
 	{
 		// Show the window
@@ -349,7 +349,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	SampleWindow (
 		const Sample &data			// The summary data to display
-	) :	ObservationsWindow ("Sample", data),
+	) :	ObservationsWindow (data.Summary("Sample"), data.Size()),
 		sample (data)
 	{
 		// Add the confidence interval button
@@ -362,7 +362,7 @@ public:
 	SampleWindow (
 		const ustring &name,		// Window name
 		const Sample &data			// The summary data to display
-	) :	ObservationsWindow (name, "Sample", data),
+	) :	ObservationsWindow (name, data.Summary("Sample"), data.Size()),
 		sample (data)
 	{
 		// Add the confidence interval button
