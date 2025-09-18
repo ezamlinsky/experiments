@@ -226,6 +226,28 @@ public:
 		const double q = temp1 * (temp + 2.0) * (temp + 3.0);
 		return 3.0 + p / q;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Beta distribution");
+
+		// Continuous distribution info
+		const BaseContinuous &continuous = static_cast <const BaseContinuous&> (*this);
+		PropGroup info = continuous.Info();
+
+		// Additional info
+		info.Append ("Shape #1", Shape1());
+		info.Append ("Shape #2", Shape2());
+		summary.Prepend (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -237,17 +259,9 @@ const size_t Beta::params = 2;
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Beta &model)
+ostream& operator << (ostream &stream, const Beta &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nBETA DISTRIBUTION:" << std::endl;
-	stream << "==================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << "    Shape #1\t\t\t\t= " << model.Shape1() << endl;
-	stream << "    Shape #2\t\t\t\t= " << model.Shape2() << endl;
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

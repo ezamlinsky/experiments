@@ -79,6 +79,23 @@ public:
 	virtual double Mode (void) const override final {
 		return location;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Trivial information about the object                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	PropGroup Info (void) const {
+
+		// Continuous distribution info
+		const BaseContinuous &continuous = static_cast <const BaseContinuous&> (*this);
+		PropGroup info = continuous.Info();
+
+		// Additional info
+		info.Append ("Location", Location());
+		info.Append ("Scale", Scale());
+
+		// Return the info
+		return info;
+	}
 };
 
 //****************************************************************************//

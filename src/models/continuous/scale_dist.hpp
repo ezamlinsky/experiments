@@ -70,6 +70,22 @@ public:
 	virtual size_t Parameters (void) const override final {
 		return params;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Trivial information about the object                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	PropGroup Info (void) const {
+
+		// Continuous distribution info
+		const BaseContinuous &continuous = static_cast <const BaseContinuous&> (*this);
+		PropGroup info = continuous.Info();
+
+		// Additional info
+		info.Append ("Scale", Scale());
+
+		// Return the info
+		return info;
+	}
 };
 
 //****************************************************************************//
@@ -77,15 +93,6 @@ public:
 //****************************************************************************//
 const Range ScaleDist::range = Range (0.0, INFINITY);
 const size_t ScaleDist::params = 1;
-
-//****************************************************************************//
-//      Translate the object to a string                                      //
-//****************************************************************************//
-ostream& operator << (ostream &stream, const ScaleDist &model)
-{
-	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
-	return stream;
-}
 /*
 ################################################################################
 #                                 END OF FILE                                  #

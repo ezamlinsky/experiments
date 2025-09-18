@@ -210,6 +210,27 @@ public:
 		const double q = temp4 + temp4;
 		return p / q;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Asymmetric laplace distribution");
+
+		// Continuous distribution info
+		const Continuous &continuous = static_cast <const Continuous&> (*this);
+		PropGroup info = continuous.Info();
+
+		// Additional info
+		info.Append ("Asymmetry", Asymmetry());
+		summary.Prepend (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -220,17 +241,9 @@ const size_t AsymmetricLaplace::params = 3;
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const AsymmetricLaplace &model)
+ostream& operator << (ostream &stream, const AsymmetricLaplace &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nASYMMETRIC LAPLACE DISTRIBUTION:" << std::endl;
-	stream << "================================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << static_cast <const Continuous&> (model);
-	stream << "    Asymmetry\t\t\t\t= " << model.Asymmetry() << endl;
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

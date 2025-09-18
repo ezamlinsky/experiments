@@ -265,6 +265,23 @@ public:
 		constexpr double q = variance * variance;
 		return p / q;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Kolmogorov distribution");
+
+		// Continuous distribution info
+		const BaseContinuous &continuous = static_cast <const BaseContinuous&> (*this);
+		summary.Prepend (continuous.Info());
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -278,15 +295,9 @@ const double Kolmogorov::mode = Kolmogorov::FindMode();
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Kolmogorov &model)
+ostream& operator << (ostream &stream, const Kolmogorov &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nKOLMOGOROV DISTRIBUTION:" << std::endl;
-	stream << "========================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

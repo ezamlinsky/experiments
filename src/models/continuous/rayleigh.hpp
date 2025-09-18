@@ -146,21 +146,31 @@ public:
 		const double q = temp * temp;
 		return p / q;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Rayleigh distribution");
+
+		// Scale distribution info
+		const ScaleDist &scale = static_cast <const ScaleDist&> (*this);
+		summary.Prepend (scale.Info());
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Rayleigh &model)
+ostream& operator << (ostream &stream, const Rayleigh &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nRAYLEIGH DISTRIBUTION:" << std::endl;
-	stream << "======================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << static_cast <const ScaleDist&> (model);
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

@@ -140,6 +140,23 @@ public:
 	virtual double Kurtosis (void) const override final {
 		return 21.0 / 5.0;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Logistic distribution");
+
+		// Continuous distribution info
+		const Continuous &continuous = static_cast <const Continuous&> (*this);
+		summary.Prepend (continuous.Info());
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -150,16 +167,9 @@ const size_t Logistic::params = 2;
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Logistic &model)
+ostream& operator << (ostream &stream, const Logistic &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nLOGISTIC DISTRIBUTION:" << std::endl;
-	stream << "======================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << static_cast <const Continuous&> (model);
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

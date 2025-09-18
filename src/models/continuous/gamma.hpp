@@ -174,6 +174,23 @@ public:
 	virtual double Kurtosis (void) const override final {
 		return 3.0 + 6.0 / shape;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Gamma distribution");
+
+		// Shape and scale distribution info
+		const ShapeScale &shape = static_cast <const ShapeScale&> (*this);
+		summary.Prepend (shape.Info());
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -184,16 +201,9 @@ const Range Gamma::range = Range (0.0, INFINITY);
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Gamma &model)
+ostream& operator << (ostream &stream, const Gamma &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nGAMMA DISTRIBUTION:" << std::endl;
-	stream << "===================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << static_cast <const ShapeScale&> (model);
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

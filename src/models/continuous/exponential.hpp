@@ -162,21 +162,31 @@ public:
 	virtual double Kurtosis (void) const override final {
 		return 9.0;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Exponential distribution");
+
+		// Scale distribution info
+		const ScaleDist &scale = static_cast <const ScaleDist&> (*this);
+		summary.Prepend (scale.Info());
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Exponential &model)
+ostream& operator << (ostream &stream, const Exponential &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nEXPONENTIAL DISTRIBUTION:" << std::endl;
-	stream << "=========================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << static_cast <const ScaleDist&> (model);
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

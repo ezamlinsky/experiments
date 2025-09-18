@@ -124,6 +124,23 @@ public:
 	virtual double Kurtosis (void) const override final {
 		return 1.8;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Uniform distribution");
+
+		// Continuous distribution info
+		const BaseContinuous &continuous = static_cast <const BaseContinuous&> (*this);
+		summary.Prepend (continuous.Info());
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -134,15 +151,9 @@ const size_t ContinuousUniform::params = 2;
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const ContinuousUniform &model)
+ostream& operator << (ostream &stream, const ContinuousUniform &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nUNIFORM DISTRIBUTION:" << std::endl;
-	stream << "=====================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

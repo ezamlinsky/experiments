@@ -65,22 +65,29 @@ public:
 	virtual size_t Parameters (void) const override final {
 		return params;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Trivial information about the object                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	PropGroup Info (void) const {
+
+		// Continuous distribution info
+		const BaseContinuous &continuous = static_cast <const BaseContinuous&> (*this);
+		PropGroup info = continuous.Info();
+
+		// Additional info
+		info.Append ("Shape", Shape());
+		info.Append ("Scale", Scale());
+
+		// Return the info
+		return info;
+	}
 };
 
 //****************************************************************************//
 //      Internal constants used by the class                                  //
 //****************************************************************************//
 const size_t ShapeScale::params = 2;
-
-//****************************************************************************//
-//      Translate the object to a string                                      //
-//****************************************************************************//
-ostream& operator << (ostream &stream, const ShapeScale &model)
-{
-	stream << "    Shape\t\t\t\t= " << model.Shape() << endl;
-	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
-	return stream;
-}
 /*
 ################################################################################
 #                                 END OF FILE                                  #

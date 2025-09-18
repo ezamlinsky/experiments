@@ -85,6 +85,28 @@ public:
 	virtual size_t Parameters (void) const override final {
 		return params;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Erlang distribution");
+
+		// Continuous distribution info
+		const BaseContinuous &continuous = static_cast <const BaseContinuous&> (*this);
+		PropGroup info = continuous.Info();
+
+		// Additional info
+		info.Append ("Shape", Shape());
+		info.Append ("Scale", Scale());
+		summary.Prepend (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -95,17 +117,9 @@ const size_t Erlang::params = 2;
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Erlang &model)
+ostream& operator << (ostream &stream, const Erlang &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nERLANG DISTRIBUTION:" << std::endl;
-	stream << "====================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << "    Shape\t\t\t\t= " << model.Shape() << endl;
-	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

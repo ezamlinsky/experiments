@@ -88,6 +88,27 @@ public:
 	virtual size_t Parameters (void) const override final {
 		return params;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Chi-squared distribution");
+
+		// Continuous distribution info
+		const BaseContinuous &continuous = static_cast <const BaseContinuous&> (*this);
+		PropGroup info = continuous.Info();
+
+		// Additional info
+		info.Append ("Degrees of freedom", DF());
+		summary.Prepend (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -98,16 +119,9 @@ const size_t ChiSquared::params = 1;
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const ChiSquared &model)
+ostream& operator << (ostream &stream, const ChiSquared &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nCHI-SQUARED DISTRIBUTION:" << std::endl;
-	stream << "=========================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << "    Degrees of freedom\t\t\t= " << model.DF() << endl;
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

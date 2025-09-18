@@ -178,6 +178,28 @@ public:
 		else
 			return INFINITY;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Snedecor's f-distribution");
+
+		// Continuous distribution info
+		const BaseContinuous &continuous = static_cast <const BaseContinuous&> (*this);
+		PropGroup info = continuous.Info();
+
+		// Additional info
+		info.Append ("Degrees of freedom #1", DF1());
+		info.Append ("Degrees of freedom #2", DF2());
+		summary.Prepend (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -189,17 +211,9 @@ const size_t F::params = 2;
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const F &model)
+ostream& operator << (ostream &stream, const F &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nSNEDECOR'S F-DISTRIBUTION:" << std::endl;
-	stream << "==========================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << "    Degrees of freedom #1\t\t= " << model.DF1() << endl;
-	stream << "    Degrees of freedom #2\t\t= " << model.DF2() << endl;
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

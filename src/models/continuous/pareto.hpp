@@ -170,21 +170,31 @@ public:
 		else
 			return INFINITY;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Pareto distribution");
+
+		// Shape and scale distribution info
+		const ShapeScale &shape = static_cast <const ShapeScale&> (*this);
+		summary.Prepend (shape.Info());
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Pareto &model)
+ostream& operator << (ostream &stream, const Pareto &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nPARETO DISTRIBUTION:" << std::endl;
-	stream << "====================" << std::endl;
-	stream << static_cast <const BaseContinuous&> (model);
-	stream << static_cast <const ShapeScale&> (model);
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*
