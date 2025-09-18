@@ -280,7 +280,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ObjectSummary Summary (void) const {
 
-		// Create the summary object
+		// Create the summary storage
 		ObjectSummary summary ("Range");
 
 		// Range info
