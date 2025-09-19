@@ -124,8 +124,9 @@ public:
 	double CeilQuantile (
 		double level		// Quantile level to estimate
 	) const {
-		double quantile = Quantile (level);
-		bool flag = quantile == max_index;
+		const double quantile = Quantile (level);
+		const size_t index = quantile;
+		const bool flag = index == max_index;
 		return flag ? quantile - 1.0 : quantile;
 	}
 
@@ -135,9 +136,23 @@ public:
 	double FloorQuantile (
 		double level		// Quantile level to estimate
 	) const {
-		double quantile = Quantile (level);
-		bool flag = cmf.at (quantile) > level && quantile > min_index;
+		const double quantile = Quantile (level);
+		const size_t index = quantile - min_index;
+		const bool flag = cmf.at (index) > level && index > 0;
 		return flag ? quantile - 1.0 : quantile;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Trivial information about the object                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	PropGroup Info (void) const {
+
+		// Trivial info
+		PropGroup info ("Discrete distribution");
+		info.Append ("Parameters count", Parameters());
+
+		// Return the info
+		return info;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -147,17 +162,6 @@ public:
 		return *this;
 	}
 };
-
-//****************************************************************************//
-//      Translate the object to a string                                      //
-//****************************************************************************//
-ostream& operator << (ostream &stream, const BaseDiscrete &model)
-{
-	stream << "\nDiscrete distribution:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Parameters count\t\t\t= " << model.Parameters() << endl;
-	return stream;
-}
 /*
 ################################################################################
 #                                 END OF FILE                                  #

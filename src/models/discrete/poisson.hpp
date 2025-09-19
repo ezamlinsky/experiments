@@ -182,6 +182,27 @@ public:
 		const double q = rate;
 		return 3.0 + p / q;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Poisson distribution");
+
+		// Continuous distribution info
+		const BaseDiscrete &discrete = static_cast <const BaseDiscrete&> (*this);
+		PropGroup info = discrete.Info();
+
+		// Additional info
+		info.Append ("Expected rate of occurrences", Rate());
+		summary.Prepend (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -193,16 +214,9 @@ const size_t Poisson::params = 1;
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Poisson &model)
+ostream& operator << (ostream &stream, const Poisson &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nPOISSON DISTRIBUTION:" << std::endl;
-	stream << "=====================" << std::endl;
-	stream << static_cast <const BaseDiscrete&> (model);
-	stream << "    Expected rate of occurrences\t= " << model.Rate() << endl;
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*

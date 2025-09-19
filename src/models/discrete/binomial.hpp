@@ -207,6 +207,28 @@ public:
 		const double q = trials * probability * temp;
 		return p / q;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		const BaseModel &base = static_cast <const BaseModel&> (*this);
+		ObjectSummary summary = base.Summary ("Binomial distribution");
+
+		// Continuous distribution info
+		const BaseDiscrete &discrete = static_cast <const BaseDiscrete&> (*this);
+		PropGroup info = discrete.Info();
+
+		// Additional info
+		info.Append ("Success probability", Probability());
+		info.Append ("Number of trials", Trials());
+		summary.Prepend (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -217,17 +239,9 @@ const size_t Binomial::params = 2;
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const Binomial &model)
+ostream& operator << (ostream &stream, const Binomial &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nBINOMIAL DISTRIBUTION:" << std::endl;
-	stream << "======================" << std::endl;
-	stream << static_cast <const BaseDiscrete&> (model);
-	stream << "    Success probability\t\t\t= " << model.Probability() << endl;
-	stream << "    Number of trials\t\t\t= " << model.Trials() << endl;
-	stream << static_cast <const BaseModel&> (model);
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*
