@@ -11,14 +11,19 @@
 # include	"continuous.hpp"
 
 // TS elements to compute for PDF and CDF approximation
-# define	KOLMOGOROV_N	6
+# define	KOLMOGOROV_N		6
 
 // Adjusted distribution moments
-# define	MEAN		sqrt (M_PI_2) * M_LN2
-# define	VARIANCE	M_PI_2 * (M_PI / 6 - M_LN2 * M_LN2)
-# define	M3			sqrt (M_PI_2) * 0.6761570080272717
-# define	M4			M_PI * M_PI * M_PI * M_PI * 7.0 / 720.0
+# define	KOLMOGOROV_MEAN		sqrt (M_PI_2) * M_LN2
+# define	KOLMOGOROV_VARIANCE	M_PI_2 * (M_PI / 6 - M_LN2 * M_LN2)
+# define	KOLMOGOROV_M3		sqrt (M_PI_2) * 0.6761570080272717
+# define	KOLMOGOROV_M4		M_PI * M_PI * M_PI * M_PI * 7.0 / 720.0
 
+//****************************************************************************//
+//      Name space "Model"                                                    //
+//****************************************************************************//
+namespace Model
+{
 //****************************************************************************//
 //      Class "Kolmogorov"                                                    //
 //****************************************************************************//
@@ -46,7 +51,7 @@ private:
 
 		// The edge points are 0 and the mean value
 		double left = 0.0;
-		double right = MEAN;
+		double right = KOLMOGOROV_MEAN;
 
 		// The "Golden ratio"
 		const double fib = 0.5 * sqrt (5.0) - 0.5;
@@ -232,24 +237,24 @@ public:
 //      Mean of the distribution                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual constexpr double Mean (void) const override final {
-		return MEAN;
+		return KOLMOGOROV_MEAN;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Variance of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual constexpr double Variance (void) const override final {
-		return VARIANCE;
+		return KOLMOGOROV_VARIANCE;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Skewness of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual constexpr double Skewness (void) const override final {
-		constexpr double mean = MEAN;
-		constexpr double variance = VARIANCE;
+		constexpr double mean = KOLMOGOROV_MEAN;
+		constexpr double variance = KOLMOGOROV_VARIANCE;
 		constexpr double temp = mean * mean;
-		constexpr double p = M3 + mean * (2.0 * temp - M_PI_2 * M_PI_2);
+		constexpr double p = KOLMOGOROV_M3 + mean * (2.0 * temp - M_PI_2 * M_PI_2);
 		constexpr double q = variance * sqrt (variance);
 		return p / q;
 	}
@@ -258,10 +263,10 @@ public:
 //      Kurtosis of the distribution                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual constexpr double Kurtosis (void) const override final {
-		constexpr double mean = MEAN;
-		constexpr double variance = VARIANCE;
+		constexpr double mean = KOLMOGOROV_MEAN;
+		constexpr double variance = KOLMOGOROV_VARIANCE;
 		constexpr double temp = mean * mean;
-		constexpr double p = M4 - (4.0 * M3 * mean + temp * (3.0 * temp - M_PI * M_PI_2));
+		constexpr double p = KOLMOGOROV_M4 - (4.0 * KOLMOGOROV_M3 * mean + temp * (3.0 * temp - M_PI * M_PI_2));
 		constexpr double q = variance * variance;
 		return p / q;
 	}
@@ -299,6 +304,7 @@ ostream& operator << (ostream &stream, const Kolmogorov &object)
 {
 	stream << object.Summary();
 	return stream;
+}
 }
 /*
 ################################################################################
