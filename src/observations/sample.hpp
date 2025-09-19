@@ -36,13 +36,13 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Confidence interval for the quantile                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ConfidenceInterval QuantileConfidenceInterval (
+	Model::ConfidenceInterval QuantileConfidenceInterval (
 		double p,					// Quantile level to estimate
 		double level				// Confidence level
 	) const {
 		// Check if the level is correct
 		if (0.0 <= level && level <= 1.0) {
-			const auto dist = Binomial (size, p);
+			const auto dist = Model::Binomial (size, p);
 			const double value = Quantile (p);
 			const double alpha = 1.0 - level;
 			const size_t quantile1 = dist.FloorQuantile (0.5 * alpha);
@@ -50,7 +50,7 @@ private:
 			const double lower = array [quantile1];
 			const double upper = array [quantile2];
 			const double precise_level = dist.CDF (quantile2) - dist.CDF (quantile1);
-			return ConfidenceInterval (precise_level, value, Range (lower, upper));
+			return Model::ConfidenceInterval (precise_level, value, Model::Range (lower, upper));
 		}
 		else
 			throw invalid_argument ("QuantileConfidenceInterval: The confidence level must be in the range [0..1]");
@@ -275,18 +275,18 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Confidence interval for the mean                                      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ConfidenceInterval Mean_CI (
+	Model::ConfidenceInterval Mean_CI (
 		double level				// Confidence level
 	) const {
 		// Check if the level is correct
 		if (0.0 <= level && level <= 1.0) {
-			const auto dist = Normal (0.0, 1.0);
+			const auto dist = Model::Normal (0.0, 1.0);
 			const double std_error = StdErr();
 			const double alpha = 1.0 - level;
 			const double quantile = dist.Quantile (1.0 - 0.5 * alpha);
 			const double lower = mean - std_error * quantile;
 			const double upper = mean + std_error * quantile;
-			return ConfidenceInterval (level, mean, Range (lower, upper));
+			return Model::ConfidenceInterval (level, mean, Model::Range (lower, upper));
 		}
 		else
 			throw invalid_argument ("MeanConfidenceInterval: The confidence level must be in the range [0..1]");
@@ -295,7 +295,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Confidence interval for the median                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ConfidenceInterval Median_CI (
+	Model::ConfidenceInterval Median_CI (
 		double level				// Confidence level
 	) const {
 		return QuantileConfidenceInterval (0.5, level);
@@ -304,7 +304,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Confidence interval for the lower quartile                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ConfidenceInterval LowerQuartile_CI (
+	Model::ConfidenceInterval LowerQuartile_CI (
 		double level				// Confidence level
 	) const {
 		return QuantileConfidenceInterval (0.25, level);
@@ -313,7 +313,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Confidence interval for the upper quartile                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ConfidenceInterval UpperQuartile_CI (
+	Model::ConfidenceInterval UpperQuartile_CI (
 		double level				// Confidence level
 	) const {
 		return QuantileConfidenceInterval (0.75, level);

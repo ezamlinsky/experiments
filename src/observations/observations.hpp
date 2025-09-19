@@ -21,7 +21,7 @@ class Observations
 //      Members                                                               //
 //============================================================================//
 protected:
-	Range range;					// Values range
+	Model::Range range;				// Values range
 	double *array;					// Array of observed values
 	size_t size;					// Array size
 	double mean;					// Mean value
@@ -303,7 +303,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Values range                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const Range& Domain (void) const {
+	const Model::Range& Domain (void) const {
 		return range;
 	}
 

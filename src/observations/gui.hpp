@@ -10,7 +10,6 @@
 # pragma	once
 # include	"population.hpp"
 # include	"sample.hpp"
-# include	"../prop_table.hpp"
 # include	"../prop_notebook.hpp"
 # include	"../summary_window.hpp"
 # include	"../models/gui.hpp"
@@ -200,7 +199,7 @@ class ObservationsWindow : public SummaryWindow
 public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Universal constructors                                                //
+//      Constructors                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ObservationsWindow (
 		const ObjectSummary &summary,	// Summary info to display
