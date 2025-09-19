@@ -166,48 +166,62 @@ public:
 	virtual double Skewness (void) const = 0;
 	virtual double Kurtosis (void) const = 0;
 	virtual const BaseModel& data (void) const = 0;
-};
 
-//****************************************************************************//
-//      Translate the object to a string                                      //
-//****************************************************************************//
-ostream& operator << (ostream &stream, const BaseModel &model)
-{
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << model.Domain();
-	stream << "\nStandard estimators:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Mode\t\t\t\t= " << model.Mode() << endl;
-	stream << "    Mean\t\t\t\t= " << model.Mean() << endl;
-	stream << "    Variance\t\t\t\t= " << model.Variance() << endl;
-	stream << "    Standard deviation\t\t\t= " << model.StdDev() << endl;
-	stream << "    Variation\t\t\t\t= " << model.Variation() << endl;
-	stream << "    Skewness\t\t\t\t= " << model.Skewness() << endl;
-	stream << "    Kurtosis\t\t\t\t= " << model.Kurtosis() << endl;
-	stream << "    Excess kurtosis\t\t\t= " << model.KurtosisExcess() << endl;
-	stream << "\nRobust estimators:" << endl;
-	stream << "~~~~~~~~~~~~~~~~~~" << endl;
-	stream << "    Median\t\t\t\t= " << model.Median() << endl;
-	stream << "    Lower quartile\t\t\t= " << model.LowerQuartile() << endl;
-	stream << "    Upper quartile\t\t\t= " << model.UpperQuartile() << endl;
-	stream << "    Inter-quartile range\t\t= " << model.InterQuartileRange() << endl;
-	stream << "    Midhinge\t\t\t\t= " << model.MidHinge() << endl;
-	stream << "    Tukey's trimean\t\t\t= " << model.TriMean() << endl;
-	stream << "    Quartile skewness\t\t\t= " << model.QuartileSkewness() << endl;
-	stream << "\nQuantiles:" << endl;
-	stream << "~~~~~~~~~~" << endl;
-	stream << "    Quantile (1%)\t\t\t= " << model.Quantile (0.01) << endl;
-	stream << "    Quantile (5%)\t\t\t= " << model.Quantile (0.05) << endl;
-	stream << "    Quantile (95%)\t\t\t= " << model.Quantile (0.95) << endl;
-	stream << "    Quantile (99%)\t\t\t= " << model.Quantile (0.99) << endl;
-	stream << "\nDeciles:" << endl;
-	stream << "~~~~~~~~" << endl;
-	for (int i = 1; i <= 9; i++)
-		stream << "    Decile (" << i * 10 << "%)\t\t\t= " << model.Quantile (i / 10.0) << endl;
-	stream.precision (restore);
-	return stream;
-}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual ObjectSummary Summary (
+		const string &name			// Object name
+	) const {
+
+		// Create the summary storage
+		ObjectSummary summary = Domain().Summary();
+		summary.Name (name);
+		summary.Groups()[0].Name ("Support");
+
+		// Robust estimations
+		PropGroup robust ("Robust estimations");
+		robust.Append ("Median", Median());
+		robust.Append ("Lower quartile", LowerQuartile());
+		robust.Append ("Upper quartile", UpperQuartile());
+		robust.Append ("Inter-quartile range", InterQuartileRange());
+		robust.Append ("Midhinge", MidHinge());
+		robust.Append ("Tukey's trimean", TriMean());
+		robust.Append ("Quartile skewness", QuartileSkewness());
+		summary.Append (robust);
+
+		// Standard estimations
+		PropGroup standard ("Standard estimations");
+		standard.Append ("Mode", Mode());
+		standard.Append ("Mean", Mean());
+		standard.Append ("Variance", Variance());
+		standard.Append ("Standard deviation", StdDev());
+		standard.Append ("Variation", Variation());
+		standard.Append ("Skewness", Skewness());
+		standard.Append ("Kurtosis", Kurtosis());
+		standard.Append ("Excess kurtosis", KurtosisExcess());
+		summary.Append (standard);
+
+		// Important quantiles
+		PropGroup quantiles ("Important quantiles");
+		quantiles.Append ("Quantile (1%)", Quantile (0.01));
+		quantiles.Append ("Quantile (5%)", Quantile (0.05));
+		quantiles.Append ("Quantile (95%)", Quantile (0.95));
+		quantiles.Append ("Quantile (99%)", Quantile (0.99));
+		summary.Append (quantiles);
+
+		// Deciles
+		PropGroup deciles ("Deciles");
+		for (int i = 1; i <= 9; i++) {
+			const string name = string ("Decile (") + to_string (i * 10) + "%)";
+			deciles.Append (name, Quantile (i / 10.0));
+		}
+		summary.Append (deciles);
+
+		// Return the summary
+		return summary;
+	}
+};
 /*
 ################################################################################
 #                                 END OF FILE                                  #
