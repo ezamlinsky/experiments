@@ -11,6 +11,11 @@
 # include	"continuous.hpp"
 
 //****************************************************************************//
+//      Name space "Model"                                                    //
+//****************************************************************************//
+namespace Model
+{
+//****************************************************************************//
 //      Special class to encapsulate a distribution location and scale        //
 //****************************************************************************//
 class Continuous : public BaseContinuous
@@ -102,15 +107,6 @@ public:
 //      Internal constants used by the class                                  //
 //****************************************************************************//
 const Range Continuous::range = Range (-INFINITY, INFINITY);
-
-//****************************************************************************//
-//      Translate the object to a string                                      //
-//****************************************************************************//
-ostream& operator << (ostream &stream, const Continuous &model)
-{
-	stream << "    Location\t\t\t\t= " << model.Location() << endl;
-	stream << "    Scale\t\t\t\t= " << model.Scale() << endl;
-	return stream;
 }
 /*
 ################################################################################

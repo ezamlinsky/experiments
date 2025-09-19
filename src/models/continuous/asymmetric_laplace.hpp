@@ -11,6 +11,11 @@
 # include	"continuous_distribution.hpp"
 
 //****************************************************************************//
+//      Name space "Model"                                                    //
+//****************************************************************************//
+namespace Model
+{
+//****************************************************************************//
 //      Class "AsymmetricLaplace"                                             //
 //****************************************************************************//
 class AsymmetricLaplace final : public Continuous
@@ -245,6 +250,7 @@ ostream& operator << (ostream &stream, const AsymmetricLaplace &object)
 {
 	stream << object.Summary();
 	return stream;
+}
 }
 /*
 ################################################################################
