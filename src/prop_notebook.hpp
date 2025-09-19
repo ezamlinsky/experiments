@@ -9,7 +9,7 @@
 */
 # pragma	once
 # include	<gtkmm.h>
-# include	"prop_group.hpp"
+# include	"prop_table.hpp"
 
 // Use shortenings
 using namespace Gtk;
