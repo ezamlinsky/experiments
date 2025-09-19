@@ -12,6 +12,48 @@
 # include	"models/gui.hpp"
 
 //****************************************************************************//
+//      Show a simple GUI window with summary information                     //
+//****************************************************************************//
+# define	SHOW_SIMPLE_SUMMARY1(class)											\
+void Show (																		\
+	const Model::class &object													\
+){																				\
+	gui.add (*new Model::SimpleSummary (object.Summary()));						\
+}
+
+//****************************************************************************//
+//      Show a simple GUI window with summary information and a custom title  //
+//****************************************************************************//
+# define	SHOW_SIMPLE_SUMMARY2(class)											\
+void Show (																		\
+	const string &name,															\
+	const Model::class &range													\
+){																				\
+	gui.add (*new Model::SimpleSummary (name, range.Summary()));				\
+}
+
+//****************************************************************************//
+//      Show a GUI window with the distribution information                   //
+//****************************************************************************//
+# define	SHOW_DISTRIBUTION_SUMMARY1(class)									\
+void Show (																		\
+	const Model::class &object													\
+){																				\
+	gui.add (*new Model::DistributionWindow (object.Summary()));				\
+}
+
+//****************************************************************************//
+//      Show a GUI window with the distribution information and a custom title//
+//****************************************************************************//
+# define	SHOW_DISTRIBUTION_SUMMARY2(class)									\
+void Show (																		\
+	const string &name,															\
+	const Model::class &object													\
+){																				\
+	gui.add (*new Model::DistributionWindow (name, object.Summary()));			\
+}
+
+//****************************************************************************//
 //      Class "GUI"                                                           //
 //****************************************************************************//
 class GUI
@@ -95,39 +137,155 @@ public:
 //      Show summary GUI windows for different objects                        //
 //****************************************************************************//
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//============================================================================//
 //      Range                                                                 //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-void Show (
-	const ::Range &range			// The object to display
-){
-	gui.add (*new Model::SimpleSummary (range.Summary()));
-}
-void Show (
-	const string &name,				// Window name
-	const ::Range &range			// The object to display
-){
-	gui.add (*new Model::SimpleSummary (name, range.Summary()));
-}
+//============================================================================//
+SHOW_SIMPLE_SUMMARY1 (Range)
+SHOW_SIMPLE_SUMMARY2 (Range)
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//============================================================================//
 //      Confidence Interval                                                   //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-void Show (
-	const ConfidenceInterval &ci	// The object to display
-){
-	gui.add (*new Model::SimpleSummary (ci.Summary()));
-}
-void Show (
-	const string &name,				// Window name
-	const ConfidenceInterval &ci	// The object to display
-){
-	gui.add (*new Model::SimpleSummary (name, ci.Summary()));
-}
+//============================================================================//
+SHOW_SIMPLE_SUMMARY1 (ConfidenceInterval)
+SHOW_SIMPLE_SUMMARY2 (ConfidenceInterval)
+
+//============================================================================//
+//      Discrete distributions                                                //
+//============================================================================//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Statistical population                                                //
+//      Discrete uniform distribution                                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (DiscreteUniform)
+SHOW_DISTRIBUTION_SUMMARY2 (DiscreteUniform)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Bernoulli distribution                                                //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Bernoulli)
+SHOW_DISTRIBUTION_SUMMARY2 (Bernoulli)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Geometric distribution                                                //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Geometric)
+SHOW_DISTRIBUTION_SUMMARY2 (Geometric)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Binomial distribution                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Binomial)
+SHOW_DISTRIBUTION_SUMMARY2 (Binomial)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Negative Binomial distribution                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (NegativeBinomial)
+SHOW_DISTRIBUTION_SUMMARY2 (NegativeBinomial)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Poisson distribution                                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Poisson)
+SHOW_DISTRIBUTION_SUMMARY2 (Poisson)
+
+//============================================================================//
+//      Continuous distributions                                              //
+//============================================================================//
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Kolmogorov distribution                                               //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Kolmogorov)
+SHOW_DISTRIBUTION_SUMMARY2 (Kolmogorov)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Continuous uniform distribution                                       //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (ContinuousUniform)
+SHOW_DISTRIBUTION_SUMMARY2 (ContinuousUniform)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Rayleigh distribution                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Rayleigh)
+SHOW_DISTRIBUTION_SUMMARY2 (Rayleigh)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Exponential distribution                                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Exponential)
+SHOW_DISTRIBUTION_SUMMARY2 (Exponential)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Erlang distribution                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Erlang)
+SHOW_DISTRIBUTION_SUMMARY2 (Erlang)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Chi-Squared distribution                                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (ChiSquared)
+SHOW_DISTRIBUTION_SUMMARY2 (ChiSquared)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Gamma distribution                                                    //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Gamma)
+SHOW_DISTRIBUTION_SUMMARY2 (Gamma)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Pareto distribution                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Pareto)
+SHOW_DISTRIBUTION_SUMMARY2 (Pareto)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Beta distribution                                                     //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Beta)
+SHOW_DISTRIBUTION_SUMMARY2 (Beta)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      F distribution                                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (F)
+SHOW_DISTRIBUTION_SUMMARY2 (F)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      StandardT distribution                                                //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (StandardT)
+SHOW_DISTRIBUTION_SUMMARY2 (StandardT)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Logistic distribution                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Logistic)
+SHOW_DISTRIBUTION_SUMMARY2 (Logistic)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Normal distribution                                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Normal)
+SHOW_DISTRIBUTION_SUMMARY2 (Normal)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Laplace distribution                                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (Laplace)
+SHOW_DISTRIBUTION_SUMMARY2 (Laplace)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      AsymmetricLaplace distribution                                        //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+SHOW_DISTRIBUTION_SUMMARY1 (AsymmetricLaplace)
+SHOW_DISTRIBUTION_SUMMARY2 (AsymmetricLaplace)
+
+//============================================================================//
+//      Statistical population                                                //
+//============================================================================//
 void Show (
 	const Population &population	// The summary data to display
 ){
@@ -140,9 +298,9 @@ void Show (
 	gui.add (*new Observation::PopulationWindow (name, population));
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//============================================================================//
 //      Statistical sample                                                    //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//============================================================================//
 void Show (
 	const Sample &sample			// The summary data to display
 ){

@@ -8,8 +8,28 @@
 ################################################################################
 */
 # pragma	once
-# include	"range.hpp"
-# include	"../prop_table.hpp"
+# include	"discrete/uniform.hpp"
+# include	"discrete/bernoulli.hpp"
+# include	"discrete/geometric.hpp"
+# include	"discrete/binomial.hpp"
+# include	"discrete/negative_binomial.hpp"
+# include	"discrete/poisson.hpp"
+# include	"continuous/kolmogorov.hpp"
+# include	"continuous/uniform.hpp"
+# include	"continuous/standard_t.hpp"
+# include	"continuous/fisher_snedecor.hpp"
+# include	"continuous/beta.hpp"
+# include	"continuous/erlang.hpp"
+# include	"continuous/chi_squared.hpp"
+# include	"continuous/gamma.hpp"
+# include	"continuous/pareto.hpp"
+# include	"continuous/exponential.hpp"
+# include	"continuous/rayleigh.hpp"
+# include	"continuous/logistic.hpp"
+# include	"continuous/normal.hpp"
+# include	"continuous/laplace.hpp"
+# include	"continuous/asymmetric_laplace.hpp"
+# include	"../prop_notebook.hpp"
 # include	"../summary_window.hpp"
 
 //****************************************************************************//
@@ -42,6 +62,37 @@ public:
 		const ustring &name,			// Window name
 		const ObjectSummary &summary	// Summary info to display
 	) :	SummaryWindow (name, summary.Name(), make_managed <PropTable> (summary.Groups()[0].Properties()))
+	{
+		// Show the window
+		show_all();
+	}
+};
+
+//****************************************************************************//
+//      Class "DistributionWindow"                                            //
+//****************************************************************************//
+class DistributionWindow : public SummaryWindow
+{
+//============================================================================//
+//      Public methods                                                        //
+//============================================================================//
+public:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructors                                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	DistributionWindow (
+		const ObjectSummary &summary	// Summary info to display
+	) :	SummaryWindow (summary.Name(), make_managed <PropNotebook> (summary.Groups()))
+	{
+		// Show the window
+		show_all();
+	}
+
+	DistributionWindow (
+		const ustring &name,			// Window name
+		const ObjectSummary &summary	// Summary info to display
+	) :	SummaryWindow (name, summary.Name(), make_managed <PropNotebook> (summary.Groups()))
 	{
 		// Show the window
 		show_all();

@@ -18,15 +18,15 @@
 # include	"discrete/poisson.hpp"
 # include	"continuous/kolmogorov.hpp"
 # include	"continuous/uniform.hpp"
-# include	"continuous/standard_t.hpp"
-# include	"continuous/fisher_snedecor.hpp"
-# include	"continuous/beta.hpp"
+# include	"continuous/rayleigh.hpp"
+# include	"continuous/exponential.hpp"
 # include	"continuous/erlang.hpp"
 # include	"continuous/chi_squared.hpp"
 # include	"continuous/gamma.hpp"
 # include	"continuous/pareto.hpp"
-# include	"continuous/exponential.hpp"
-# include	"continuous/rayleigh.hpp"
+# include	"continuous/beta.hpp"
+# include	"continuous/fisher_snedecor.hpp"
+# include	"continuous/standard_t.hpp"
 # include	"continuous/logistic.hpp"
 # include	"continuous/normal.hpp"
 # include	"continuous/laplace.hpp"
@@ -111,6 +111,7 @@ BOOST_PYTHON_MODULE (models) {
 
 	// Use shortenings
 	using namespace boost::python;
+	using namespace Model;
 
 //============================================================================//
 //      Expose vector <double> to Python                                      //
@@ -299,7 +300,7 @@ BOOST_PYTHON_MODULE (models) {
 		BASE_CLASS_PROPERTIES (Kolmogorov);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose "DiscreteUniform" class to Python                              //
+//      Expose "ContinuousUniform" class to Python                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	GENERATORS (ContinuousUniform)
 	class_ <ContinuousUniform> ("ContinuousUniform",
@@ -316,61 +317,44 @@ BOOST_PYTHON_MODULE (models) {
 		BASE_CLASS_PROPERTIES (ContinuousUniform);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose "StandardT" class to Python                                    //
+//      Expose "Rayleigh" class to Python                                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	GENERATORS (StandardT)
-	class_ <StandardT> ("StandardT",
-		"Model for a Student’s T-distribution",
-		init <size_t> (args ("df"),
-			"Create a new Student’s T-distribution"))
-
-		// Methods
-		BASE_CLASS_METHODS (StandardT)
-
-		// Properties
-		BASE_CLASS_PROPERTIES (StandardT)
-		.add_property ("DF",	&StandardT::DF,
-			"Degrees of freedom of the distribution");
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose "F" class to Python                                            //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	GENERATORS (F)
-	class_ <F> ("F",
-		"Model for a Snedecor's F-distribution",
-		init <size_t, size_t> (args ("df1", "df2"),
-			"Create a new Snedecor's F-distribution"))
-
-		// Methods
-		BASE_CLASS_METHODS (F)
-
-		// Properties
-		BASE_CLASS_PROPERTIES (F)
-		.add_property ("DF1",	&F::DF1,
-			"The first degrees of freedom of the distribution")
-		.add_property ("DF2",	&F::DF2,
-			"The second degrees of freedom of the distribution");
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose "Beta" class to Python                                         //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	GENERATORS (Beta)
-	class_ <Beta> ("Beta",
-		"Model for the Beta distribution",
-		init <double, double> (args ("shape1", "shape2"),
-			"Create a new Beta distribution"))
+	GENERATORS (Rayleigh)
+	class_ <Rayleigh> ("Rayleigh",
+		"Model for an Rayleigh distribution",
+		init <double> (args ("scale"),
+			"Create a new Rayleigh distribution"))
 		.def (init <const Observations &> (args ("data"),
-			"Create a new Beta distribution from empirical data"))
+			"Create a new Rayleigh distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS (Beta)
+		BASE_CLASS_METHODS (Rayleigh)
 
 		// Properties
-		BASE_CLASS_PROPERTIES (Beta)
-		.add_property ("Shape1",	&Beta::Shape1,
-			"The first shape parameter of the distribution")
-		.add_property ("Shape2",	&Beta::Shape2,
-			"The second shape parameter of the distribution");
+		BASE_CLASS_PROPERTIES (Rayleigh)
+		.add_property ("Scale",				&Rayleigh::Scale,
+			"Scale of the distrsibution");
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "Exponential" class to Python                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (Exponential)
+	class_ <Exponential> ("Exponential",
+		"Model for an Exponential distribution",
+		init <double> (args ("scale"),
+			"Create a new Exponential distribution"))
+		.def (init <const Observations &> (args ("data"),
+			"Create a new Exponential distribution from empirical data"))
+
+		// Methods
+		BASE_CLASS_METHODS (Exponential)
+		.def ("Mean_ConfidenceInterval",	&Exponential::Mean_ConfidenceInterval,
+			args ("level", "size"), "Confidence interval for the mean value")
+
+		// Properties
+		BASE_CLASS_PROPERTIES (Exponential)
+		.add_property ("Scale",				&Exponential::Scale,
+			"Scale of the distrsibution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Erlang" class to Python                                       //
@@ -455,44 +439,61 @@ BOOST_PYTHON_MODULE (models) {
 			"Scale of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose "Exponential" class to Python                                  //
+//      Expose "Beta" class to Python                                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	GENERATORS (Exponential)
-	class_ <Exponential> ("Exponential",
-		"Model for an Exponential distribution",
-		init <double> (args ("scale"),
-			"Create a new Exponential distribution"))
+	GENERATORS (Beta)
+	class_ <Beta> ("Beta",
+		"Model for the Beta distribution",
+		init <double, double> (args ("shape1", "shape2"),
+			"Create a new Beta distribution"))
 		.def (init <const Observations &> (args ("data"),
-			"Create a new Exponential distribution from empirical data"))
+			"Create a new Beta distribution from empirical data"))
 
 		// Methods
-		BASE_CLASS_METHODS (Exponential)
-		.def ("Mean_ConfidenceInterval",	&Exponential::Mean_ConfidenceInterval,
-			args ("level", "size"), "Confidence interval for the mean value")
+		BASE_CLASS_METHODS (Beta)
 
 		// Properties
-		BASE_CLASS_PROPERTIES (Exponential)
-		.add_property ("Scale",				&Exponential::Scale,
-			"Scale of the distrsibution");
+		BASE_CLASS_PROPERTIES (Beta)
+		.add_property ("Shape1",	&Beta::Shape1,
+			"The first shape parameter of the distribution")
+		.add_property ("Shape2",	&Beta::Shape2,
+			"The second shape parameter of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Expose "Rayleigh" class to Python                                     //
+//      Expose "F" class to Python                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	GENERATORS (Rayleigh)
-	class_ <Rayleigh> ("Rayleigh",
-		"Model for an Rayleigh distribution",
-		init <double> (args ("scale"),
-			"Create a new Rayleigh distribution"))
-		.def (init <const Observations &> (args ("data"),
-			"Create a new Rayleigh distribution from empirical data"))
+	GENERATORS (F)
+	class_ <F> ("F",
+		"Model for a Snedecor's F-distribution",
+		init <size_t, size_t> (args ("df1", "df2"),
+			"Create a new Snedecor's F-distribution"))
 
 		// Methods
-		BASE_CLASS_METHODS (Rayleigh)
+		BASE_CLASS_METHODS (F)
 
 		// Properties
-		BASE_CLASS_PROPERTIES (Rayleigh)
-		.add_property ("Scale",				&Rayleigh::Scale,
-			"Scale of the distrsibution");
+		BASE_CLASS_PROPERTIES (F)
+		.add_property ("DF1",	&F::DF1,
+			"The first degrees of freedom of the distribution")
+		.add_property ("DF2",	&F::DF2,
+			"The second degrees of freedom of the distribution");
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Expose "StandardT" class to Python                                    //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	GENERATORS (StandardT)
+	class_ <StandardT> ("StandardT",
+		"Model for a Student’s T-distribution",
+		init <size_t> (args ("df"),
+			"Create a new Student’s T-distribution"))
+
+		// Methods
+		BASE_CLASS_METHODS (StandardT)
+
+		// Properties
+		BASE_CLASS_PROPERTIES (StandardT)
+		.add_property ("DF",	&StandardT::DF,
+			"Degrees of freedom of the distribution");
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Expose "Logistic" class to Python                                     //
