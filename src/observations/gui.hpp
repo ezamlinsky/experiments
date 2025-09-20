@@ -204,14 +204,29 @@ public:
 	ObservationsWindow (
 		const ObjectSummary &summary,	// Summary info to display
 		size_t size						// Data size
-	) :	SummaryWindow (summary.Name() + " (" + to_string (size) + " data points)", make_managed <PropNotebook> (summary.Groups()))
+	) :	SummaryWindow (
+		summary.Name() + " (" + to_string (size) + " data points)",
+		make_managed <PropNotebook> (
+			summary.Header(),
+			summary.Groups(),
+			summary.Precision()
+		)
+	)
 	{}
 
 	ObservationsWindow (
 		const ustring &name,			// Window name
 		const ObjectSummary &summary,	// Summary info to display
 		size_t size						// Data size
-	) :	SummaryWindow (name, summary.Name() + " (" + to_string (size) + " data points)", make_managed <PropNotebook> (summary.Groups()))
+	) :	SummaryWindow (
+		name,
+		summary.Name() + " (" + to_string (size) + " data points)",
+		make_managed <PropNotebook> (
+			summary.Header(),
+			summary.Groups(),
+			summary.Precision()
+		)
+	)
 	{}
 };
 
@@ -236,7 +251,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	PopulationWindow (
 		const Population &data		// The summary data to display
-	) :	ObservationsWindow (data.Summary("Population"), data.Size()),
+	) :	ObservationsWindow (data.Summary ("Population"), data.Size()),
 		population (data)
 	{
 		// Show the window
@@ -246,7 +261,7 @@ public:
 	PopulationWindow (
 		const ustring &name,		// Window name
 		const Population &data		// The summary data to display
-	) :	ObservationsWindow (name, data.Summary("Population"), data.Size()),
+	) :	ObservationsWindow (name, data.Summary ("Population"), data.Size()),
 		population (data)
 	{
 		// Show the window
@@ -292,22 +307,42 @@ private:
 
 					// Mean value
 					case CI_button::MEAN:
-						get_application() -> add_window (*new Model::SimpleSummary ("Mean", sample.Mean_CI (level).Summary()));
+						get_application() -> add_window (
+							*new SimpleSummary (
+								"Mean",
+								sample.Mean_CI (level).Summary()
+							)
+						);
 						break;
 
 					// Median value
 					case CI_button::MEDIAN:
-						get_application() -> add_window (*new Model::SimpleSummary ("Median", sample.Median_CI (level).Summary()));
+						get_application() -> add_window (
+							*new SimpleSummary (
+								"Median",
+								sample.Median_CI (level).Summary()
+							)
+						);
 						break;
 
 					// Lower quartile value
 					case CI_button::LOWER_QUARTILE:
-						get_application() -> add_window (*new Model::SimpleSummary ("Lower quartile", sample.LowerQuartile_CI (level).Summary()));
+						get_application() -> add_window (
+							*new SimpleSummary (
+								"Lower quartile",
+								sample.LowerQuartile_CI (level).Summary()
+							)
+						);
 						break;
 
 					// Upper quartile value
 					case CI_button::UPPER_QUARTILE:
-						get_application() -> add_window (*new Model::SimpleSummary ("Upper quartile", sample.UpperQuartile_CI (level).Summary()));
+						get_application() -> add_window (
+							*new SimpleSummary (
+								"Upper quartile",
+								sample.UpperQuartile_CI (level).Summary()
+							)
+						);
 						break;
 
 					// Nothing selected
@@ -348,7 +383,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	SampleWindow (
 		const Sample &data			// The summary data to display
-	) :	ObservationsWindow (data.Summary("Sample"), data.Size()),
+	) :	ObservationsWindow (data.Summary ("Sample"), data.Size()),
 		sample (data)
 	{
 		// Add the confidence interval button
@@ -361,7 +396,7 @@ public:
 	SampleWindow (
 		const ustring &name,		// Window name
 		const Sample &data			// The summary data to display
-	) :	ObservationsWindow (name, data.Summary("Sample"), data.Size()),
+	) :	ObservationsWindow (name, data.Summary ("Sample"), data.Size()),
 		sample (data)
 	{
 		// Add the confidence interval button
