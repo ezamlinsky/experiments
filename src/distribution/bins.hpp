@@ -10,6 +10,7 @@
 # pragma	once
 # include	<cmath>
 # include	<stdexcept>
+# include	"../object_summary.hpp"
 
 // Use shortenings
 using namespace std;
@@ -75,6 +76,23 @@ public:
 	size_t TerrellScott (void) const {
 		return ceil (cbrt (2 * count));
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary ("Bins divider");
+
+		// General info
+		PropGroup info;
+		info.Append ("Observations", Raw());
+		summary.Append (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -82,11 +100,7 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const Bins &object)
 {
-	auto restore = stream.precision();
-	stream << "\nBINS SLITTER:" << endl;
-	stream << "=============" << endl;
-	stream << "Observations\t\t\t\t= " << object.Raw() << endl;
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*
