@@ -216,6 +216,22 @@ BOOST_PYTHON_MODULE (gui) {
 	void (*SampleShow2)(const string &name, const Sample &sample)	= &Show;
 	def ("show", SampleShow1, "Show a GUI window with a sample summary");
 	def ("show", SampleShow2, "Show a GUI window with a sample summary and a custom title");
+
+//============================================================================//
+//      Expose "Show" functions for the "KolmogorovScoreTable" object         //
+//============================================================================//
+	void (*KolmogorovScoreShow1)(const KolmogorovScoreTable &table)								= &Show;
+	void (*KolmogorovScoreShow2)(const string &name, const KolmogorovScoreTable &population)	= &Show;
+	def ("show", KolmogorovScoreShow1, "Show a GUI window with the Kolmogorov score table");
+	def ("show", KolmogorovScoreShow2, "Show a GUI window with the Kolmogorov score table and a custom title");
+
+//============================================================================//
+//      Expose "Show" functions for the "PearsonScoreTable" object            //
+//============================================================================//
+	void (*PearsonScoreShow1)(const PearsonScoreTable &table)						= &Show;
+	void (*PearsonScoreShow2)(const string &name, const PearsonScoreTable &sample)	= &Show;
+	def ("show", PearsonScoreShow1, "Show a GUI window with the Pearson score table");
+	def ("show", PearsonScoreShow2, "Show a GUI window with the Pearson score table and a custom title");
 }
 /*
 ################################################################################
