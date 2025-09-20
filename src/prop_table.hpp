@@ -102,7 +102,8 @@ private:
 
 		// Constructor
 		Storage (
-			const properties &props		// List of properties to display
+			const properties &props,	// List of properties to display
+			size_t digits				// Number of decimal digits to display for numbers
 		){
 			// Set types of columns
 			set_column_types (columns);
@@ -111,7 +112,7 @@ private:
 			for (const auto &opt : props) {
 				auto row = *append();
 				row.set_value (columns.property, ustring (opt.first + ":"));
-				row.set_value (columns.value, ustring (format("{:.15g}", opt.second)));
+				row.set_value (columns.value, ustring (format ("{:.{}g}", opt.second, digits)));
 			}
 		}
 	};
@@ -127,8 +128,10 @@ public:
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	PropTable (
-		const properties &props			// List of properties to display
-	) : storage (new Storage (props)),
+		const header &columns,			// Column names to display
+		const properties &props,		// List of properties to display
+		size_t digits					// Number of decimal digits to display for numbers
+	) : storage (new Storage (props, digits)),
 		menu (*this, storage -> columns.value)
 	{
 		// Set table data
@@ -139,13 +142,13 @@ public:
 		set_rubber_banding (true);
 
 		// Create "Property" column
-		append_column ("Property", storage -> columns.property);
+		append_column (columns.first, storage -> columns.property);
 		TreeView::Column *prop_column = get_column (0);
 		prop_column -> set_min_width (220);
 		prop_column -> set_expand (false);
 
 		// Create "Value" column
-		append_column ("Value", storage -> columns.value);
+		append_column (columns.second, storage -> columns.value);
 		TreeView::Column *value_column = get_column (1);
 		value_column -> set_min_width (180);
 		value_column -> set_expand (true);
