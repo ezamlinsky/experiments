@@ -11,10 +11,10 @@
 # include	<cmath>
 # include	"distribution.hpp"
 # include	"../models/discrete/uniform.hpp"
-# include	"../models/discrete/binomial.hpp"
-# include	"../models/discrete/negative_binomial.hpp"
 # include	"../models/discrete/bernoulli.hpp"
 # include	"../models/discrete/geometric.hpp"
+# include	"../models/discrete/binomial.hpp"
+# include	"../models/discrete/negative_binomial.hpp"
 # include	"../models/discrete/poisson.hpp"
 # include	"../models/continuous/chi_squared.hpp"
 
@@ -29,6 +29,31 @@ struct PearsonScore
 	// Check two instances for equality (required by the vector template)
 	bool operator== (const PearsonScore &obj) const {
 		return (name == obj.name && score == obj.score);
+	}
+};
+
+//****************************************************************************//
+//      Class "PearsonScoreTable"                                             //
+//****************************************************************************//
+struct PearsonScoreTable : vector <PearsonScore>
+{
+	// Summary of the object
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary ("Pearson chi-squared score table", "Distribution name", "Score value (%)");
+
+		// Set precision for score values
+		summary.Precision (3);
+
+		// Scores
+		PropGroup scores;
+		for (const auto &item : *this)
+			scores.Append (item.name, item.score * 100);
+		summary.Append (scores);
+
+		// Return the summary
+		return summary;
 	}
 };
 
@@ -56,7 +81,7 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	template <typename T>
 	void TestModel (
-		vector <PearsonScore> &table,	// Score table
+		PearsonScoreTable &table,			// Score table
 		const Observations &data,			// Observations of a random value
 		const string name					// Distribution model name
 	)
@@ -76,7 +101,7 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	template <typename T>
 	void TestModelWithRange (
-		vector <PearsonScore> &table,	// Score table
+		PearsonScoreTable &table,			// Score table
 		const Observations &data,			// Observations of a random value
 		const string name					// Distribution model name
 	)
@@ -111,6 +136,9 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double PearsonLevel (void) const {
 
+		// Use shortenings
+		using namespace Model;
+
 		// Compute the value of the Pearson's chi-squared test
 		const double criteria = PearsonCriteria();
 
@@ -134,6 +162,9 @@ private:
 	bool PearsonTest (
 		double alpha				// Rejection level of the null hypothesis
 	) const {
+
+		// Use shortenings
+		using namespace Model;
 
 		// Compute the value of the Pearson's chi-squared test
 		const double criteria = PearsonCriteria();
@@ -218,7 +249,7 @@ public:
 	// Discrete distribution
 	DistComparator (
 		const Observations &data,			// Observations of a random value
-		const BaseDiscrete &model			// Theoretical model
+		const Model::BaseDiscrete &model	// Theoretical model
 	) : DistComparator (data)
 	{
 		ReferenceModel (model);
@@ -227,7 +258,7 @@ public:
 	// Discrete distribution
 	DistComparator (
 		const vector <double> &data,		// Empirical data
-		const BaseDiscrete &model			// Theoretical model
+		const Model::BaseDiscrete &model	// Theoretical model
 	) : DistComparator (data)
 	{
 		ReferenceModel (model);
@@ -236,14 +267,14 @@ public:
 	// Discrete distribution
 	DistComparator (
 		const pylist &py_list,				// Empirical data
-		const BaseDiscrete &model			// Theoretical model
+		const Model::BaseDiscrete &model	// Theoretical model
 	) : DistComparator (to_vector (py_list), model)
 	{}
 
 	// Continuous distribution
 	DistComparator (
 		const Observations &data,			// Observations of a random value
-		const BaseContinuous &model,		// Theoretical model
+		const Model::BaseContinuous &model,	// Theoretical model
 		size_t bins							// Bins count for a histogram
 	) : DistComparator (data, bins)
 	{
@@ -253,7 +284,7 @@ public:
 	// Continuous distribution
 	DistComparator (
 		const vector <double> &data,		// Empirical data
-		const BaseContinuous &model,		// Theoretical model
+		const Model::BaseContinuous &model,	// Theoretical model
 		size_t bins							// Bins count for a histogram
 	) : DistComparator (data, bins)
 	{
@@ -263,7 +294,7 @@ public:
 	// Continuous distribution
 	DistComparator (
 		const pylist &py_list,				// Empirical data
-		const BaseContinuous &model,		// Theoretical model
+		const Model::BaseContinuous &model,	// Theoretical model
 		size_t bins							// Bins count for a histogram
 	) : DistComparator (to_vector (py_list), model, bins)
 	{}
@@ -288,16 +319,16 @@ public:
 
 	// Discrete distribution
 	void ReferenceModel (
-		const BaseDiscrete &model			// Theoretical model
+		const Model::BaseDiscrete &model	// Theoretical model
 	){
-		ReferenceModel <BaseDiscrete> (model);
+		ReferenceModel <Model::BaseDiscrete> (model);
 	}
 
 	// Continuous distribution
 	void ReferenceModel (
-		const BaseContinuous &model			// Theoretical model
+		const Model::BaseContinuous &model	// Theoretical model
 	){
-		ReferenceModel <BaseContinuous> (model);
+		ReferenceModel <Model::BaseContinuous> (model);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -369,22 +400,25 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Score table (confidence level) for different distribution models      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	static const vector <PearsonScore> ScoreTable (
+	static const PearsonScoreTable ScoreTable (
 		const Observations &data			// Observations of a random value
 	){
+		// Use shortenings
+		using namespace Model;
+
 		// Distribution comparator
 		DistComparator temp (data);
 
 		// Score table
-		vector <PearsonScore> table;
+		PearsonScoreTable table;
 
 		// Test available distribution models
-		temp.TestModel <DiscreteUniform> (table, data, "Discrete Uniform\t= ");
-		temp.TestModel <Binomial> (table, data, "Binomial\t\t= ");
-		temp.TestModel <NegativeBinomial> (table, data, "NegativeBinomial\t= ");
-		temp.TestModelWithRange <Bernoulli> (table, data, "Bernoulli\t\t= ");
-		temp.TestModelWithRange <Geometric> (table, data, "Geometric\t\t= ");
-		temp.TestModelWithRange <Poisson> (table, data, "Poisson\t\t\t= ");
+		temp.TestModel <DiscreteUniform> (table, data, "Discrete Uniform");
+		temp.TestModel <Binomial> (table, data, "Binomial");
+		temp.TestModel <NegativeBinomial> (table, data, "NegativeBinomial");
+		temp.TestModelWithRange <Bernoulli> (table, data, "Bernoulli");
+		temp.TestModelWithRange <Geometric> (table, data, "Geometric");
+		temp.TestModelWithRange <Poisson> (table, data, "Poisson");
 
 		// Compare function to sort the scores in descending order
 		auto comp = [] (PearsonScore a, PearsonScore b) {
@@ -395,32 +429,37 @@ public:
 		sort (table.begin(), table.end(), comp);
 		return table;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary ("Distribution comparator");
+
+		// General info
+		PropGroup info;
+		info.Append ("Sample data points", Sample().Bins());
+		info.Append ("Reference data points", Reference().Bins());
+		summary.Append (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
 //      Translate the objects to a string                                     //
 //****************************************************************************//
-const string pearson_score_to_string (const vector <PearsonScore> &table)
+ostream& operator << (ostream &stream, const PearsonScoreTable &object)
 {
-	stringstream stream;
-	stream.precision (PRECISION);
-	stream << "PEARSON CHI-SQUARED SCORE TABLE:" << std::endl;
-	stream << "===============================================" << std::endl;
-	stream << "Distribution name\tScore value (%)" << std::endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~\t~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-	for (const auto &item : table)
-		stream << item.name << fixed << setprecision (3) << item.score * 100 <<endl;
-	return stream.str();
+	stream << object.Summary();
+	return stream;
 }
 ostream& operator << (ostream &stream, const DistComparator &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nDISTRIBUTION COMPARATOR:" << endl;
-	stream << "========================" << endl;
-	stream << "Sample data points\t\t\t= " << object.Sample().Bins() << endl;
-	stream << "Reference data points\t\t\t= " << object.Reference().Bins() << endl;
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*
