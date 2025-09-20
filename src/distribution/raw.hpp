@@ -12,6 +12,7 @@
 # include	"../models/discrete/discrete.hpp"
 # include	"../models/continuous/continuous.hpp"
 # include	"../observations/observations.hpp"
+# include	"../object_summary.hpp"
 
 // Bins count to instantiate a continuous theoretical model
 # define	BINS	1000
@@ -36,7 +37,7 @@ public:
 //============================================================================//
 private:
 	DistType type;						// CDF function type
-	Range range;						// Values range
+	Model::Range range;					// Values range
 	vector <double> values;				// Unique values
 	vector <double> cdf;				// Computed values of a CDF function
 
@@ -49,7 +50,7 @@ private:
 //      Calculate theoretical CDF values                                      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void Init (
-		const BaseModel &model			// Theoretical model
+		const Model::BaseModel &model	// Theoretical model
 	){
 		// Fill the theoretical CDF table
 		for (const auto x : values)
@@ -105,11 +106,11 @@ public:
 	RawCDF (void) : type (NONE) {}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor from a theoretical model                                  //
+//      Constructors from a theoretical model                                 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	RawCDF (
-		const BaseModel &model,			// Theoretical model
-		const vector <double> &values	// Unique values
+		const Model::BaseModel &model,		// Theoretical model
+		const vector <double> &values		// Unique values
 	) :	type (THEORETICAL),
 		range (values),
 		values (values)
@@ -120,7 +121,7 @@ public:
 
 	// Discrete model
 	RawCDF (
-		const BaseDiscrete &model		// Theoretical model
+		const Model::BaseDiscrete &model	// Theoretical model
 	) :	type (THEORETICAL),
 		range (model.DistLocation()),
 		values (range.Linear())
@@ -131,7 +132,7 @@ public:
 
 	// Continuous model
 	RawCDF (
-		const BaseContinuous &model		// Theoretical model
+		const Model::BaseContinuous &model	// Theoretical model
 	) :	type (THEORETICAL),
 		range (model.DistLocation()),
 		values (range.Split (BINS))
@@ -195,7 +196,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Domain of the raw CDF values                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const Range& Domain (void) const {
+	const Model::Range& Domain (void) const {
 		return range;
 	}
 
@@ -231,6 +232,42 @@ public:
 		const size_t index = Array::BinSearchLessOrEqual (values.data(), values.size(), x);
 		return index != static_cast <size_t> (-1) ? cdf [index] : 0.0;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary = Domain().Summary();
+
+		// Check the distribution type
+		switch (Type())
+		{
+			case RawCDF::EMPIRICAL:
+				summary.Name ("Empirical CDF function");
+				summary.Groups()[0].Name ("Data range");
+				break;
+
+			case RawCDF::THEORETICAL:
+				summary.Name ("Theoretical CDF function");
+				summary.Groups()[0].Name ("Support");
+				break;
+
+			default:
+				summary.Name ("CDF function");
+				summary.Groups()[0].Name ("Data range");
+				break;
+		}
+
+		// Data size
+		PropGroup size;
+		size.Append ("Values", Size());
+		summary.Prepend (size);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -238,25 +275,7 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const RawCDF &object)
 {
-	switch (object.Type())
-	{
-		case RawCDF::EMPIRICAL:
-			stream << "\nEMPIRICAL CDF FUNCTION:" << endl;
-			stream << "=======================" << endl;
-			break;
-
-		case RawCDF::THEORETICAL:
-			stream << "\nTHEORETICAL CDF FUNCTION:" << endl;
-			stream << "=========================" << endl;
-			break;
-
-		default:
-			stream << "\nCDF FUNCTION:" << endl;
-			stream << "=============" << endl;
-			break;
-	}
-	stream << "    Values\t\t\t\t= " << object.Size() << endl;
-	stream << object.Domain();
+	stream << object.Summary();
 	return stream;
 }
 /*
