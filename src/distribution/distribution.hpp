@@ -63,9 +63,13 @@ private:
 //      Calculate empirical discrete PDF and CDF values                       //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void InitDiscrete (
-		const vector <double> &data,	// Empirical values for the calculation
-		const vector <double> &func		// Empirical discrete CDF function
+		const RawCDF &raw				// Raw CDF function
 	){
+		// Get raw CDF values
+		const vector <double> &data = raw.Values();
+		const vector <double> &func = raw.CDF();
+		const size_t raw_size = raw.Size();
+
 		// Compute the PDF and CDF functions using discrete points
 		double last_cdf = 0.0;
 		size_t j = 0;
@@ -76,7 +80,7 @@ private:
 			const double x = values [i];
 
 			// Skip all the values that are less than or equal to the X value
-			while (floor (data [j]) <= x) ++j;
+			while (j < raw_size && floor (data [j]) <= x) ++j;
 
 			// Get the last CDF point where the skip condition was correct
 			const double cur_cdf = func [j - 1];
@@ -101,9 +105,13 @@ private:
 // INFO:	We do linear interpolation when a value resides between
 //			two empirical points
 	void InitContinuous (
-		const vector <double> &data,	// Empirical values for the calculation
-		const vector <double> &func		// Empirical discrete CDF function
+		const RawCDF &raw				// Raw CDF function
 	){
+		// Get raw CDF values
+		const vector <double> &data = raw.Values();
+		const vector <double> &func = raw.CDF();
+		const size_t raw_size = raw.Size();
+
 		// Compute the PDF and CDF functions using created bins
 		double last_cdf = NAN;
 		size_t j = 0;
@@ -114,7 +122,7 @@ private:
 			const double x = values [i];
 
 			// Skip all the values that are less than or equal to the X value
-			while (data [j] <= x) ++j;
+			while (j < raw_size && data [j] <= x) ++j;
 
 			// Get the last CDF point where the skip condition was correct
 			const double less_x = data [j - 1];
@@ -215,7 +223,7 @@ public:
 		RawCDF raw (data);
 
 		// Calculate empirical discrete PDF and CDF values
-		InitDiscrete (raw.Values(), raw.CDF());
+		InitDiscrete (raw);
 	}
 
 	// Discrete distribution
@@ -229,7 +237,7 @@ public:
 		RawCDF raw (move (vector <double> (data)));
 
 		// Calculate empirical discrete PDF and CDF values
-		InitDiscrete (raw.Values(), raw.CDF());
+		InitDiscrete (raw);
 	}
 
 	// Discrete distribution
@@ -250,7 +258,7 @@ public:
 		RawCDF raw (data);
 
 		// Calculate empirical continuous PDF and CDF values
-		InitContinuous (raw.Values(), raw.CDF());
+		InitContinuous (raw);
 	}
 
 	// Continuous distribution
@@ -265,7 +273,7 @@ public:
 		RawCDF raw (move (vector <double> (data)));
 
 		// Calculate empirical continuous PDF and CDF values
-		InitContinuous (raw.Values(), raw.CDF());
+		InitContinuous (raw);
 	}
 
 	// Continuous distribution
