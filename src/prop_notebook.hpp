@@ -28,7 +28,9 @@ public:
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	PropNotebook (
-		const groups &props		// Groups of properties an object has
+		const header &columns,	// Column names to display
+		const groups &props,	// Groups of properties an object has
+		size_t digits			// Number of decimal digits to display for numbers
 	){
 		// Set position of the tabs
 		set_tab_pos (PositionType::POS_LEFT);
@@ -47,7 +49,7 @@ public:
 				label -> set_xalign (0.0);
 
 				// Put one properties table per page
-				auto table = make_managed <PropTable> (item.Properties());
+				auto table = make_managed <PropTable> (columns, item.Properties(), digits);
 
 				// Create a page with the group properties aggregated
 				append_page (*table, *label);
