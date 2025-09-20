@@ -11,12 +11,11 @@
 # include	<cmath>
 # include	"raw.hpp"
 # include	"../models/discrete/uniform.hpp"
-# include	"../models/discrete/binomial.hpp"
-# include	"../models/discrete/negative_binomial.hpp"
 # include	"../models/discrete/bernoulli.hpp"
 # include	"../models/discrete/geometric.hpp"
+# include	"../models/discrete/binomial.hpp"
+# include	"../models/discrete/negative_binomial.hpp"
 # include	"../models/discrete/poisson.hpp"
-# include	"../models/continuous/chi_squared.hpp"
 # include	"../models/continuous/kolmogorov.hpp"
 # include	"../models/continuous/uniform.hpp"
 # include	"../models/continuous/rayleigh.hpp"
@@ -46,6 +45,31 @@ struct KolmogorovScore
 };
 
 //****************************************************************************//
+//      Class "KolmogorovScoreTable"                                          //
+//****************************************************************************//
+struct KolmogorovScoreTable : vector <KolmogorovScore>
+{
+	// Summary of the object
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary ("Kolmogorov score table", "Distribution name", "Score value (%)");
+
+		// Set precision for score values
+		summary.Precision (3);
+
+		// Scores
+		PropGroup scores;
+		for (const auto &item : *this)
+			scores.Append (item.name, item.score * 100);
+		summary.Append (scores);
+
+		// Return the summary
+		return summary;
+	}
+};
+
+//****************************************************************************//
 //      Class "CDF"                                                           //
 //****************************************************************************//
 class CDF
@@ -67,7 +91,7 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	template <typename T>
 	void TestModel (
-		vector <KolmogorovScore> &table,	// Score table
+		KolmogorovScoreTable &table,		// Score table
 		const Observations &data,			// Observations of a random value
 		const string name					// Distribution model name
 	)
@@ -87,7 +111,7 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	template <typename T>
 	void TestModelWithRange (
-		vector <KolmogorovScore> &table,	// Score table
+		KolmogorovScoreTable &table,		// Score table
 		const Observations &data,			// Observations of a random value
 		const string name					// Distribution model name
 	)
@@ -153,6 +177,9 @@ private:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	double KolmogorovLevel (void) const {
 
+		// Use shortenings
+		using namespace Model;
+
 		// Compute the value of the one-sample Kolmogorov-Smirnov test
 		const double criteria = KolmogorovCriteria1();
 
@@ -167,6 +194,9 @@ private:
 	bool OneSampleTest (
 		double alpha				// Rejection level of the null hypothesis
 	) const {
+
+		// Use shortenings
+		using namespace Model;
 
 		// Compute the value of the one-sample Kolmogorov-Smirnov test
 		const double criteria = KolmogorovCriteria1 ();
@@ -185,6 +215,9 @@ private:
 	bool TwoSampleTest (
 		double alpha				// Rejection level of the null hypothesis
 	) const {
+
+		// Use shortenings
+		using namespace Model;
 
 		// Compute the value of the two-sample Kolmogorov-Smirnov test
 		const double criteria = KolmogorovCriteria2();
@@ -227,7 +260,7 @@ public:
 	// Discrete distribution
 	CDF (
 		const Observations &data,			// Observations of a random value
-		const BaseDiscrete &model			// Theoretical model
+		const Model::BaseDiscrete &model	// Theoretical model
 	) : CDF (data)
 	{
 		ReferenceModel (model);
@@ -236,7 +269,7 @@ public:
 	// Discrete distribution
 	CDF (
 		const vector <double> &data,		// Empirical data
-		const BaseDiscrete &model			// Theoretical model
+		const Model::BaseDiscrete &model	// Theoretical model
 	) : CDF (data)
 	{
 		ReferenceModel (model);
@@ -245,14 +278,14 @@ public:
 	// Discrete distribution
 	CDF (
 		const pylist &py_list,				// Empirical data
-		const BaseDiscrete &model			// Theoretical model
+		const Model::BaseDiscrete &model	// Theoretical model
 	) : CDF (to_vector (py_list), model)
 	{}
 
 	// Continuous distribution
 	CDF (
 		const Observations &data,			// Observations of a random value
-		const BaseContinuous &model			// Theoretical model
+		const Model::BaseContinuous &model	// Theoretical model
 	) : CDF (data)
 	{
 		ReferenceModel (model);
@@ -261,7 +294,7 @@ public:
 	// Continuous distribution
 	CDF (
 		const vector <double> &data,		// Empirical data
-		const BaseContinuous &model			// Theoretical model
+		const Model::BaseContinuous &model	// Theoretical model
 	) : CDF (data)
 	{
 		ReferenceModel (model);
@@ -270,7 +303,7 @@ public:
 	// Continuous distribution
 	CDF (
 		const pylist &py_list,				// Empirical data
-		const BaseContinuous &model			// Theoretical model
+		const Model::BaseContinuous &model	// Theoretical model
 	) : CDF (to_vector (py_list), model)
 	{}
 
@@ -303,7 +336,7 @@ public:
 //      Load a CDF model as a reference for the distribution test             //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void ReferenceModel (
-		const BaseModel &model				// Theoretical model
+		const Model::BaseModel &model		// Theoretical model
 	){
 		// Check if empirical data range is inside the model domain
 		if (model.Domain() >= sample.Domain()) {
@@ -399,36 +432,39 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Score table (confidence level) for different distribution models      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	static const vector <KolmogorovScore> ScoreTable (
+	static const KolmogorovScoreTable ScoreTable (
 		const Observations &data			// Observations of a random value
 	){
+		// Use shortenings
+		using namespace Model;
+
 		// Distribution comparator
 		CDF temp (data);
 
 		// Score table
-		vector <KolmogorovScore> table;
+		KolmogorovScoreTable table;
 
 		// Test available discrete distribution models
-		temp.TestModel <DiscreteUniform> (table, data, "Discrete Uniform\t= ");
-		temp.TestModel <Binomial> (table, data, "Binomial\t\t= ");
-		temp.TestModel <NegativeBinomial> (table, data, "NegativeBinomial\t= ");
-		temp.TestModelWithRange <Bernoulli> (table, data, "Bernoulli\t\t= ");
-		temp.TestModelWithRange <Geometric> (table, data, "Geometric\t\t= ");
-		temp.TestModelWithRange <Poisson> (table, data, "Poisson\t\t\t= ");
+		temp.TestModel <DiscreteUniform> (table, data, "Discrete Uniform");
+		temp.TestModelWithRange <Bernoulli> (table, data, "Bernoulli");
+		temp.TestModelWithRange <Geometric> (table, data, "Geometric");
+		temp.TestModelWithRange <Poisson> (table, data, "Poisson");
+		temp.TestModel <Binomial> (table, data, "Binomial");
+		temp.TestModel <NegativeBinomial> (table, data, "NegativeBinomial");
 
 		// Test available continuous distribution models
-		temp.TestModel <ContinuousUniform> (table, data, "Continuous Uniform\t= ");
-		temp.TestModel <Pareto> (table, data, "Pareto\t\t\t= ");
-		temp.TestModelWithRange <Rayleigh> (table, data, "Rayleigh\t\t= ");
-		temp.TestModelWithRange <Exponential> (table, data, "Exponential\t\t= ");
-		temp.TestModelWithRange <Erlang> (table, data, "Erlang\t\t\t= ");
-		temp.TestModelWithRange <ChiSquared> (table, data, "Chi-squared\t\t= ");
-		temp.TestModelWithRange <Gamma> (table, data, "Gamma\t\t\t= ");
-		temp.TestModelWithRange <Beta> (table, data, "Beta\t\t\t= ");
-		temp.TestModelWithRange <Logistic> (table, data, "Logistic\t\t= ");
-		temp.TestModelWithRange <Normal> (table, data, "Normal\t\t\t= ");
-		temp.TestModelWithRange <Laplace> (table, data, "Laplace\t\t\t= ");
-		temp.TestModelWithRange <AsymmetricLaplace> (table, data, "Asymmetric Laplace\t= ");
+		temp.TestModel <ContinuousUniform> (table, data, "Continuous Uniform");
+		temp.TestModel <Pareto> (table, data, "Pareto");
+		temp.TestModelWithRange <Rayleigh> (table, data, "Rayleigh");
+		temp.TestModelWithRange <Exponential> (table, data, "Exponential");
+		temp.TestModelWithRange <Erlang> (table, data, "Erlang");
+		temp.TestModelWithRange <ChiSquared> (table, data, "Chi-squared");
+		temp.TestModelWithRange <Gamma> (table, data, "Gamma");
+		temp.TestModelWithRange <Beta> (table, data, "Beta");
+		temp.TestModelWithRange <Logistic> (table, data, "Logistic");
+		temp.TestModelWithRange <Normal> (table, data, "Normal");
+		temp.TestModelWithRange <Laplace> (table, data, "Laplace");
+		temp.TestModelWithRange <AsymmetricLaplace> (table, data, "Asymmetric Laplace");
 
 		// Compare function to sort the scores in descending order
 		auto comp = [] (KolmogorovScore a, KolmogorovScore b) {
@@ -439,32 +475,37 @@ public:
 		sort (table.begin(), table.end(), comp);
 		return table;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary ("CDF comparator");
+
+		// General info
+		PropGroup info;
+		info.Append ("Sample CDF values", Sample().Size());
+		info.Append ("Reference CDF values", Reference().Size());
+		summary.Append (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-const string kolmogorov_score_to_string (const vector <KolmogorovScore> &table)
+ostream& operator << (ostream &stream, const KolmogorovScoreTable &object)
 {
-	stringstream stream;
-	stream.precision (PRECISION);
-	stream << "\nKOLMOGOROV SCORE TABLE:" << std::endl;
-	stream << "===============================================" << std::endl;
-	stream << "Distribution name\tScore value (%)" << std::endl;
-	stream << "~~~~~~~~~~~~~~~~~~~~~~~\t~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-	for (const auto &item : table)
-		stream << item.name << fixed << setprecision (3) << item.score * 100 <<endl;
-	return stream.str();
+	stream << object.Summary();
+	return stream;
 }
 ostream& operator << (ostream &stream, const CDF &object)
 {
-	auto restore = stream.precision();
-	stream.precision (PRECISION);
-	stream << "\nCDF COMPARATOR:" << endl;
-	stream << "===============" << endl;
-	stream << "Sample CDF values\t\t\t= " << object.Sample().Size() << endl;
-	stream << "Reference CDF values\t\t\t= " << object.Reference().Size() << endl;
-	stream.precision (restore);
+	stream << object.Summary();
 	return stream;
 }
 /*
