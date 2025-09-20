@@ -8,8 +8,9 @@
 ################################################################################
 */
 # pragma	once
-# include	"../filters/smooth.hpp"
 # include	"raw.hpp"
+# include	"../filters/smooth.hpp"
+# include	"../object_summary.hpp"
 
 //****************************************************************************//
 //      Class "Distribution"                                                  //
@@ -32,7 +33,7 @@ public:
 //============================================================================//
 private:
 	DistType type;						// Distribution type
-	Range range;						// Values range
+	Model::Range range;					// Values range
 	vector <double> values;				// Unique values
 	vector <double> pdf;				// Computed values of a PDF function
 	vector <double> cdf;				// Computed values of a CDF function
@@ -46,7 +47,7 @@ private:
 //      Calculate theoretical PDF and CDF values for a distribution           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void InitModel (
-		const BaseModel &model,			// Theoretical model
+		const Model::BaseModel &model,	// Theoretical model
 		double last_cdf					// Initial point of the CDF function
 	){
 		// Fill the theoretical CDF table
@@ -155,8 +156,8 @@ public:
 
 	// Discrete distribution
 	Distribution (
-		const BaseDiscrete &model,		// Theoretical model
-		const vector <double> &values	// Unique values
+		const Model::BaseDiscrete &model,	// Theoretical model
+		const vector <double> &values		// Unique values
 	) :	type (THEORETICAL_DISCRETE),
 		range (values),
 		values (values)
@@ -167,7 +168,7 @@ public:
 
 	// Discrete distribution
 	Distribution (
-		const BaseDiscrete &model		// Theoretical model
+		const Model::BaseDiscrete &model	// Theoretical model
 	) :	type (THEORETICAL_DISCRETE),
 		range (model.DistLocation()),
 		values (range.Linear())
@@ -178,8 +179,8 @@ public:
 
 	// Continuous distribution
 	Distribution (
-		const BaseContinuous &model,	// Theoretical model
-		const vector <double> &values	// Unique values
+		const Model::BaseContinuous &model,	// Theoretical model
+		const vector <double> &values		// Unique values
 	) :	type (THEORETICAL_CONTINUOUS),
 		range (values),
 		values (values)
@@ -190,7 +191,7 @@ public:
 
 	// Continuous distribution
 	Distribution (
-		const BaseContinuous &model		// Theoretical model
+		const Model::BaseContinuous &model	// Theoretical model
 	) :	type (THEORETICAL_CONTINUOUS),
 		range (model.DistLocation()),
 		values (range.Split (BINS))
@@ -284,7 +285,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Domain of the distribution                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const Range& Domain (void) const {
+	const Model::Range& Domain (void) const {
 		return range;
 	}
 
@@ -349,6 +350,47 @@ public:
 		const size_t index = Array::BinSearchLessOrEqual (values.data(), values.size(), x);
 		return index != static_cast <size_t> (-1) ? pdf [index] : 0.0;
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary = Domain().Summary();
+
+		// Check the distribution type
+		switch (Type())
+		{
+			case Distribution::EMPIRICAL:
+				summary.Name ("Empirical distribution");
+				summary.Groups()[0].Name ("Data range");
+				break;
+
+			case Distribution::THEORETICAL_DISCRETE:
+				summary.Name ("Theoretical discrete distribution");
+				summary.Groups()[0].Name ("Support");
+				break;
+
+			case Distribution::THEORETICAL_CONTINUOUS:
+				summary.Name ("Theoretical continuous distribution");
+				summary.Groups()[0].Name ("Support");
+				break;
+
+			default:
+				summary.Name ("Distribution");
+				summary.Groups()[0].Name ("Data range");
+				break;
+		}
+
+		// Bins count
+		PropGroup bins;
+		bins.Append ("Bins", Bins());
+		summary.Prepend (bins);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -356,30 +398,7 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const Distribution &object)
 {
-	switch (object.Type())
-	{
-		case Distribution::EMPIRICAL:
-			stream << "\nEMPIRICAL DISTRIBUTION:" << endl;
-			stream << "=======================" << endl;
-			break;
-
-		case Distribution::THEORETICAL_DISCRETE:
-			stream << "\nTHEORETICAL DISCRETE DISTRIBUTION:" << endl;
-			stream << "==================================" << endl;
-			break;
-
-		case Distribution::THEORETICAL_CONTINUOUS:
-			stream << "\nTHEORETICAL CONTINUOUS DISTRIBUTION:" << endl;
-			stream << "====================================" << endl;
-			break;
-
-		default:
-			stream << "\nDISTRIBUTION:" << endl;
-			stream << "=============" << endl;
-			break;
-	}
-	stream << "    Bins\t\t\t\t= " << object.Bins() << endl;
-	stream << object.Domain();
+	stream << object.Summary();
 	return stream;
 }
 /*
