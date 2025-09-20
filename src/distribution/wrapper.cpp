@@ -24,35 +24,23 @@ BOOST_PYTHON_MODULE (distribution) {
 	using namespace boost::python;
 
 //============================================================================//
-//      Expose "KolmogorovScore" to Python                                    //
+//      Expose "KolmogorovScoreTable" class to Python                         //
 //============================================================================//
-	class_ <KolmogorovScore> ("KolmogorovScore")
-		.def_readonly ("name", &KolmogorovScore::name)
-		.def_readonly ("score", &KolmogorovScore::score);
+	class_ <KolmogorovScoreTable> ("KolmogorovScoreTable",
+		"Show the score of the one-sample Kolmogorov-Smirnov test for different distribution models",
+		init <> ())
+		.def (self_ns::str (self_ns::self));
 
 //============================================================================//
-//      Expose "PearsonScore" to Python                                       //
+//      Expose "PearsonScoreTable" class to Python                            //
 //============================================================================//
-	class_ <PearsonScore> ("PearsonScore")
-		.def_readonly ("name", &PearsonScore::name)
-		.def_readonly ("score", &PearsonScore::score);
+	class_ <PearsonScoreTable> ("PearsonScoreTable",
+		"Show the score of the Pearson's chi-squared test for different distribution models",
+		init <> ())
+		.def (self_ns::str (self_ns::self));
 
 //============================================================================//
-//      Expose vector <KolmogorovScoreVector> to Python                       //
-//============================================================================//
-	class_ <vector <KolmogorovScore>> ("KolmogorovScoreVector")
-		.def (vector_indexing_suite <vector <KolmogorovScore> > ())
-		.def ("__str__", kolmogorov_score_to_string);
-
-//============================================================================//
-//      Expose vector <PearsonScoreVector> to Python                          //
-//============================================================================//
-	class_ <vector <PearsonScore>> ("PearsonScoreVector")
-		.def (vector_indexing_suite <vector <PearsonScore> > ())
-		.def ("__str__", pearson_score_to_string);
-
-//============================================================================//
-//      Expose Bins class to Python                                           //
+//      Expose "Bins" class to Python                                         //
 //============================================================================//
 	class_ <Bins> ("Bins",
 		"Calculate the optimal number of bins for the observation",
@@ -78,9 +66,9 @@ BOOST_PYTHON_MODULE (distribution) {
 		init <> ())
 
 		// Constructor from a theoretical model
-		.def (init <const BaseDiscrete&> (args ("model"),
+		.def (init <const Model::BaseDiscrete&> (args ("model"),
 			"Calculate theoretical raw CDF values for a discrete model"))
-		.def (init <const BaseContinuous&> (args ("model"),
+		.def (init <const Model::BaseContinuous&> (args ("model"),
 			"Calculate theoretical raw CDF values for a continuous model"))
 
 		// Constructors from empirical data
@@ -114,9 +102,9 @@ BOOST_PYTHON_MODULE (distribution) {
 		init <> ())
 
 		// Constructor from a theoretical model
-		.def (init <const BaseDiscrete&> (args ("model"),
+		.def (init <const Model::BaseDiscrete&> (args ("model"),
 			"Calculate theoretical PDF and CDF values for a discrete model"))
-		.def (init <const BaseContinuous&> (args ("model"),
+		.def (init <const Model::BaseContinuous&> (args ("model"),
 			"Calculate theoretical PDF and CDF values for a continuous model"))
 
 		// Constructors from empirical data
@@ -170,22 +158,22 @@ void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample
 			"Init the sample from empirical data"))
 
 		// Constructors from empirical data and a theoretical model
-		.def (init <const pylist&, const BaseDiscrete&>
+		.def (init <const pylist&, const Model::BaseDiscrete&>
 			(args ("data", "model"),
 			"Init CDF functions from empirical data and a discrete theoretical model"))
-		.def (init <const vector <double>&, const BaseDiscrete&>
+		.def (init <const vector <double>&, const Model::BaseDiscrete&>
 			(args ("data", "model"),
 			"Init CDF functions from empirical data and a discrete theoretical model"))
-		.def (init <const Observations&, const BaseDiscrete&>
+		.def (init <const Observations&, const Model::BaseDiscrete&>
 			(args ("data", "model"),
 			"Init CDF functions from empirical data and a discrete theoretical model"))
-		.def (init <const pylist&, const BaseContinuous&>
+		.def (init <const pylist&, const Model::BaseContinuous&>
 			(args ("data", "model"),
 			"Init CDF functions from empirical data and a continuous theoretical model"))
-		.def (init <const vector <double>&, const BaseContinuous&>
+		.def (init <const vector <double>&, const Model::BaseContinuous&>
 			(args ("data", "model"),
 			"Init CDF functions from empirical data and a continuous theoretical model"))
-		.def (init <const Observations&, const BaseContinuous&>
+		.def (init <const Observations&, const Model::BaseContinuous&>
 			(args ("data", "model"),
 			"Init CDF functions from empirical data and a continuous theoretical model"))
 
@@ -229,8 +217,8 @@ void (CDF::*ReferenceSample3)(const Observations &data)		= &CDF::ReferenceSample
 //============================================================================//
 //      Expose "DistComparator" class to Python                               //
 //============================================================================//
-void (DistComparator::*ReferenceModel1)(const BaseDiscrete &model)		= &DistComparator::ReferenceModel;
-void (DistComparator::*ReferenceModel2)(const BaseContinuous &model)	= &DistComparator::ReferenceModel;
+void (DistComparator::*ReferenceModel1)(const Model::BaseDiscrete &model)	= &DistComparator::ReferenceModel;
+void (DistComparator::*ReferenceModel2)(const Model::BaseContinuous &model)	= &DistComparator::ReferenceModel;
 	class_ <DistComparator> ("DistComparator",
 		"Compare two distributions functions with one another",
 		init <const pylist&> (args ("data"),
@@ -247,22 +235,22 @@ void (DistComparator::*ReferenceModel2)(const BaseContinuous &model)	= &DistComp
 			"Init the sample as a continuous distribution from empirical data"))
 
 		// Constructors from empirical data and a theoretical model
-		.def (init <const pylist&, const BaseDiscrete&>
+		.def (init <const pylist&, const Model::BaseDiscrete&>
 			(args ("data", "model"),
 			"Init discrete distributions from empirical data and a theoretical model"))
-		.def (init <const vector <double>&, const BaseDiscrete&>
+		.def (init <const vector <double>&, const Model::BaseDiscrete&>
 			(args ("data", "model"),
 			"Init discrete distributions from empirical data and a theoretical model"))
-		.def (init <const Observations&, const BaseDiscrete&>
+		.def (init <const Observations&, const Model::BaseDiscrete&>
 			(args ("data", "model"),
 			"Init discrete distributions from empirical data and a theoretical model"))
-		.def (init <const pylist&, const BaseContinuous&, size_t>
+		.def (init <const pylist&, const Model::BaseContinuous&, size_t>
 			(args ("data", "model", "bins"),
 			"Init continuous distributions from empirical data and a theoretical model"))
-		.def (init <const vector <double>&, const BaseContinuous&, size_t>
+		.def (init <const vector <double>&, const Model::BaseContinuous&, size_t>
 			(args ("data", "model", "bins"),
 			"Init continuous distributions from empirical data and a theoretical model"))
-		.def (init <const Observations&, const BaseContinuous&, size_t>
+		.def (init <const Observations&, const Model::BaseContinuous&, size_t>
 			(args ("data", "model", "bins"),
 			"Init continuous distributions from empirical data and a theoretical model"))
 
