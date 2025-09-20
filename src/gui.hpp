@@ -10,15 +10,17 @@
 # include	<thread>
 # include	"observations/gui.hpp"
 # include	"models/gui.hpp"
+# include	"distribution/cdf.hpp"
+# include	"distribution/comparator.hpp"
 
 //****************************************************************************//
 //      Show a simple GUI window with summary information                     //
 //****************************************************************************//
 # define	SHOW_SIMPLE_SUMMARY1(class)											\
 void Show (																		\
-	const Model::class &object													\
+	const class &object															\
 ){																				\
-	gui.add (*new Model::SimpleSummary (object.Summary()));						\
+	gui.add (*new SimpleSummary (object.Summary()));							\
 }
 
 //****************************************************************************//
@@ -27,9 +29,9 @@ void Show (																		\
 # define	SHOW_SIMPLE_SUMMARY2(class)											\
 void Show (																		\
 	const string &name,															\
-	const Model::class &range													\
+	const class &object															\
 ){																				\
-	gui.add (*new Model::SimpleSummary (name, range.Summary()));				\
+	gui.add (*new SimpleSummary (name, object.Summary()));						\
 }
 
 //****************************************************************************//
@@ -140,14 +142,14 @@ public:
 //============================================================================//
 //      Range                                                                 //
 //============================================================================//
-SHOW_SIMPLE_SUMMARY1 (Range)
-SHOW_SIMPLE_SUMMARY2 (Range)
+SHOW_SIMPLE_SUMMARY1 (Model::Range)
+SHOW_SIMPLE_SUMMARY2 (Model::Range)
 
 //============================================================================//
 //      Confidence Interval                                                   //
 //============================================================================//
-SHOW_SIMPLE_SUMMARY1 (ConfidenceInterval)
-SHOW_SIMPLE_SUMMARY2 (ConfidenceInterval)
+SHOW_SIMPLE_SUMMARY1 (Model::ConfidenceInterval)
+SHOW_SIMPLE_SUMMARY2 (Model::ConfidenceInterval)
 
 //============================================================================//
 //      Discrete distributions                                                //
@@ -312,6 +314,18 @@ void Show (
 ){
 	gui.add (*new Observation::SampleWindow (name, sample));
 }
+
+//============================================================================//
+//      Kolmogorov score table                                                //
+//============================================================================//
+SHOW_SIMPLE_SUMMARY1 (KolmogorovScoreTable)
+SHOW_SIMPLE_SUMMARY2 (KolmogorovScoreTable)
+
+//============================================================================//
+//      Pearson score table                                                   //
+//============================================================================//
+SHOW_SIMPLE_SUMMARY1 (PearsonScoreTable)
+SHOW_SIMPLE_SUMMARY2 (PearsonScoreTable)
 /*
 ################################################################################
 #                                 END OF FILE                                  #
