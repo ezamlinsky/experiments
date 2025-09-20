@@ -98,16 +98,19 @@ public:
 ostream& operator << (ostream &stream, const property &prop)
 {
 	// Print the property
-	stream << "    ";
-	stream.width (36);
-	stream << left << prop.first << "= "<< prop.second;
+	stream << "║   ";
+	stream.width (35);
+	stream << left << prop.first;
+	stream << "│ ";
+	stream.width (38);
+	stream << left << prop.second << "║" << endl;
 	return stream;
 }
 ostream& operator << (ostream &stream, const properties &props)
 {
 	// Print all the properties
 	for (const auto &opt : props)
-		stream << opt << endl;
+		stream << opt;
 	return stream;
 }
 ostream& operator << (ostream &stream, const PropGroup &object)
@@ -115,8 +118,16 @@ ostream& operator << (ostream &stream, const PropGroup &object)
 	// Print the underlined group name if set
 	const string &name = object.Name();
 	if (name.length()) {
-		stream << endl << name << ":" << endl;
-		stream << string (name.size() + 1, '~') << endl;
+		stream << "║                                      │";
+		stream << "                                       ║" << endl;
+		stream << "║ ";
+		stream.width (37);
+		stream << left << name + ":";
+		stream << "│                                       ║" << endl;
+		stream << "║ ";
+		stream.width (37);
+		stream << left << string (name.size() + 1, '~');
+		stream << "│                                       ║" << endl;
 	}
 
 	// Print all the properties in the group

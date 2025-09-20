@@ -12,7 +12,11 @@
 # include	<algorithm>
 # include	"prop_group.hpp"
 
+// Default number of decimal digits to display for floating-point numbers
+# define	DIGITS		16
+
 // Use shortenings
+using header = pair <string, string>;
 using groups = deque <PropGroup>;
 
 //****************************************************************************//
@@ -25,7 +29,9 @@ class ObjectSummary
 //============================================================================//
 private:
 	string object_name;			// Object name
+	header header_str;			// Header line to show before object properties
 	groups grps;				// Groups of object properties
+	size_t digits;				// Number of decimal digits to display for numbers
 
 //============================================================================//
 //      Public methods                                                        //
@@ -35,14 +41,24 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Default constructor                                                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	ObjectSummary (void) = default;
+	ObjectSummary (void) : digits (DIGITS)
+	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructor                                                           //
+//      Constructors                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	ObjectSummary (
+		const string &name,		// Object name
+		const string &pname,	// Header for property name
+		const string &pvalue	// Header for property value
+	) :	object_name (name),
+		header_str (pname, pvalue),
+		digits (DIGITS)
+	{}
+
+	ObjectSummary (
 		const string &name		// Object name
-	) :	object_name (name)
+	) :	ObjectSummary (name, "Property", "Value")
 	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -66,6 +82,26 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Set precision for numeric values                                      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	void Precision (
+		size_t precision		// Precision value for the floating-point numbers
+	){
+		if (precision > DIGITS)
+			throw invalid_argument (string ("ObjectSummary: Max precision value is ") + to_string (DIGITS));
+
+		// Change the precision value
+		digits = precision;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Get precision for numeric values                                      //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	size_t Precision (void) const {
+		return digits;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Set name of the object                                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void Name (
@@ -79,6 +115,13 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	const string& Name (void) const {
 		return object_name;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Header line to show before object properties                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	const header& Header (void) const {
+		return header_str;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -99,21 +142,49 @@ ostream& operator << (ostream &stream, const ObjectSummary &object)
 {
 	// Remember the precision to restore it later
 	auto restore = stream.precision();
-	stream.precision (16);
+	stream.precision (object.Precision());
 
-	// Print the underlined object name
+	// Print the object name
 	string name = object.Name();
 	transform (name.begin(), name.end(), name.begin(), [](unsigned char c) { return toupper(c); });
-	stream << endl << string (80, '=') << endl;
-	stream << "    " << name << ":" << endl;
-	stream << string (80, '=') << endl;
+	stream << "╔═══════════════════════════════════════";
+	stream << "═══════════════════════════════════════╗" << endl;
+	stream << "║   ";
+	stream.width (75);
+	stream << left << name + ":" << "║" <<  endl;
+	stream << "╠══════════════════════════════════════╤";
+	stream << "═══════════════════════════════════════╣" << endl;
+
+	// Print the header string
+	const header &table_header = object.Header();
+	stream << "║ ";
+	stream.width (37);
+	stream << left << table_header.first;
+	stream << "│ ";
+	stream.width (38);
+	stream << left << table_header.second << "║" << endl;
+	stream << "╟──────────────────────────────────────┼";
+	stream << "───────────────────────────────────────╢" << endl;
 
 	// Print all the groups
-	for (const auto &group : object.Groups())
-		stream << group;
+	const groups &grps = object.Groups();
+	const size_t size = grps.size();
+	const size_t last = size - 1;
+	for (size_t i = 0; i < size; i++) {
 
-	// Print a separating line after the object summary
-	stream << string (80, '~') << endl;
+		// Print the group
+		stream << grps[i];
+
+		// Print the group separating line
+		if (i == last) {
+			stream << "╚══════════════════════════════════════╧";
+			stream << "═══════════════════════════════════════╝" << endl;
+		}
+		else {
+			stream << "╟──────────────────────────────────────┼";
+			stream << "───────────────────────────────────────╢" << endl;
+		}
+	}
 
 	// Restore the precision
 	stream.precision (restore);
