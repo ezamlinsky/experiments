@@ -38,37 +38,6 @@
 namespace Model
 {
 //****************************************************************************//
-//      Class "SimpleSummary"                                                 //
-//****************************************************************************//
-class SimpleSummary : public SummaryWindow
-{
-//============================================================================//
-//      Public methods                                                        //
-//============================================================================//
-public:
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Constructors                                                          //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	SimpleSummary (
-		const ObjectSummary &summary	// Summary info to display
-	) :	SummaryWindow (summary.Name(), make_managed <PropTable> (summary.Groups()[0].Properties()))
-	{
-		// Show the window
-		show_all();
-	}
-
-	SimpleSummary (
-		const ustring &name,			// Window name
-		const ObjectSummary &summary	// Summary info to display
-	) :	SummaryWindow (name, summary.Name(), make_managed <PropTable> (summary.Groups()[0].Properties()))
-	{
-		// Show the window
-		show_all();
-	}
-};
-
-//****************************************************************************//
 //      Class "DistributionWindow"                                            //
 //****************************************************************************//
 class DistributionWindow : public SummaryWindow
@@ -83,7 +52,14 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	DistributionWindow (
 		const ObjectSummary &summary	// Summary info to display
-	) :	SummaryWindow (summary.Name(), make_managed <PropNotebook> (summary.Groups()))
+	) :	SummaryWindow (
+		summary.Name(),
+		make_managed <PropNotebook> (
+			summary.Header(),
+			summary.Groups(),
+			summary.Precision()
+		)
+	)
 	{
 		// Show the window
 		show_all();
@@ -92,7 +68,15 @@ public:
 	DistributionWindow (
 		const ustring &name,			// Window name
 		const ObjectSummary &summary	// Summary info to display
-	) :	SummaryWindow (name, summary.Name(), make_managed <PropNotebook> (summary.Groups()))
+	) :	SummaryWindow (
+		name,
+		summary.Name(),
+		make_managed <PropNotebook> (
+			summary.Header(),
+			summary.Groups(),
+			summary.Precision()
+		)
+	)
 	{
 		// Show the window
 		show_all();

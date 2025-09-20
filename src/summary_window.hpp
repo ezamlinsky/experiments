@@ -85,6 +85,52 @@ public:
 	) :	SummaryWindow (Join (name, title), content)
 	{}
 };
+
+//****************************************************************************//
+//      Class "SimpleSummary"                                                 //
+//****************************************************************************//
+class SimpleSummary : public SummaryWindow
+{
+//============================================================================//
+//      Public methods                                                        //
+//============================================================================//
+public:
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Constructors                                                          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	SimpleSummary (
+		const ObjectSummary &summary	// Summary info to display
+	) :	SummaryWindow (
+		summary.Name(),
+		make_managed <PropTable> (
+			summary.Header(),
+			summary.Groups()[0].Properties(),
+			summary.Precision()
+		)
+	)
+	{
+		// Show the window
+		show_all();
+	}
+
+	SimpleSummary (
+		const ustring &name,			// Window name
+		const ObjectSummary &summary	// Summary info to display
+	) :	SummaryWindow (
+		name,
+		summary.Name(),
+		make_managed <PropTable> (
+			summary.Header(),
+			summary.Groups()[0].Properties(),
+			summary.Precision()
+		)
+	)
+	{
+		// Show the window
+		show_all();
+	}
+};
 /*
 ################################################################################
 #                                 END OF FILE                                  #
