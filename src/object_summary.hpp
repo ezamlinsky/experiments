@@ -29,7 +29,7 @@ class ObjectSummary
 //============================================================================//
 private:
 	string object_name;			// Object name
-	header header_str;			// Header line to show before object properties
+	header headers;				// Header line to show before object properties
 	groups grps;				// Groups of object properties
 	size_t digits;				// Number of decimal digits to display for numbers
 
@@ -52,7 +52,7 @@ public:
 		const string &pname,	// Header for property name
 		const string &pvalue	// Header for property value
 	) :	object_name (name),
-		header_str (pname, pvalue),
+		headers (pname, pvalue),
 		digits (DIGITS)
 	{}
 
@@ -121,7 +121,7 @@ public:
 //      Header line to show before object properties                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	const header& Header (void) const {
-		return header_str;
+		return headers;
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
