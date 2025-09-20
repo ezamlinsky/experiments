@@ -53,7 +53,7 @@ struct KolmogorovScoreTable : vector <KolmogorovScore>
 	ObjectSummary Summary (void) const {
 
 		// Create the summary storage
-		ObjectSummary summary ("Kolmogorov score table", "Distribution name", "Score value (%)");
+		ObjectSummary summary ("Kolmogorov score table", "Distribution type", "Score value (%)");
 
 		// Set precision for score values
 		summary.Precision (3);

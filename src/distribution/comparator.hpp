@@ -41,7 +41,7 @@ struct PearsonScoreTable : vector <PearsonScore>
 	ObjectSummary Summary (void) const {
 
 		// Create the summary storage
-		ObjectSummary summary ("Pearson chi-squared score table", "Distribution name", "Score value (%)");
+		ObjectSummary summary ("Pearson chi-squared score table", "Distribution type", "Score value (%)");
 
 		// Set precision for score values
 		summary.Precision (3);
