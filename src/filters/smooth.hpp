@@ -11,6 +11,7 @@
 # include	<stdexcept>
 # include	"data_cleaner.hpp"
 # include	"filter.hpp"
+# include	"../object_summary.hpp"
 # include	"../python_helpers.hpp"
 
 //****************************************************************************//
@@ -91,6 +92,24 @@ public:
 	) const {
 		return Apply (to_vector (py_list));
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary ("Smooth filter");
+
+		// General info
+		PropGroup info;
+		info.Append ("Smoothing points", Points());
+		info.Append ("Impulse response length", Size());
+		summary.Append (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -98,10 +117,7 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const SmoothFilter &object)
 {
-	stream << "\nSMOOTH FILTER:" << endl;
-	stream << "==============" << endl;
-	stream << "Smoothing points\t\t\t= " << object.Points() << endl;
-	stream << "Impulse response length\t\t\t= " << object.Size() << endl;
+	stream << object.Summary();
 	return stream;
 }
 /*
