@@ -92,6 +92,24 @@ public:
 	) const {
 		return Apply (to_vector (py_list));
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary ("Minimum delay filter");
+
+		// General info
+		PropGroup info;
+		info.Append ("Delay points", Points());
+		info.Append ("Impulse response length", Size());
+		summary.Append (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -99,10 +117,7 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const MinDelayFilter &object)
 {
-	stream << "\nMINIMUM DELAY FILTER:" << endl;
-	stream << "=====================" << endl;
-	stream << "Delay points\t\t\t\t= " << object.Points() << endl;
-	stream << "Impulse response length\t\t\t= " << object.Size() << endl;
+	stream << object.Summary();
 	return stream;
 }
 /*
