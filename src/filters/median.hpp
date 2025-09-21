@@ -10,6 +10,7 @@
 # pragma	once
 # include	<stdexcept>
 # include	"data_cleaner.hpp"
+# include	"../object_summary.hpp"
 # include	"../python_helpers.hpp"
 
 //****************************************************************************//
@@ -87,6 +88,23 @@ public:
 	) const {
 		return Apply (to_vector (py_list));
 	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Summary of the object                                                 //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	ObjectSummary Summary (void) const {
+
+		// Create the summary storage
+		ObjectSummary summary ("Median filter");
+
+		// General info
+		PropGroup info;
+		info.Append ("Neighbor smoothing points", Points());
+		summary.Append (info);
+
+		// Return the summary
+		return summary;
+	}
 };
 
 //****************************************************************************//
@@ -94,9 +112,7 @@ public:
 //****************************************************************************//
 ostream& operator << (ostream &stream, const MedianFilter &object)
 {
-	stream << "\nMEDIAN FILTER:" << endl;
-	stream << "==============" << endl;
-	stream << "Median points\t\t\t\t= " << object.Points() << endl;
+	stream << object.Summary();
 	return stream;
 }
 /*
