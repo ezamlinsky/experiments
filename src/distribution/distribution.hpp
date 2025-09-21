@@ -372,24 +372,23 @@ public:
 		{
 			case Distribution::EMPIRICAL:
 				summary.Name ("Empirical distribution");
-				summary.Groups()[0].Name ("Data range");
 				break;
 
 			case Distribution::THEORETICAL_DISCRETE:
 				summary.Name ("Theoretical discrete distribution");
-				summary.Groups()[0].Name ("Support");
 				break;
 
 			case Distribution::THEORETICAL_CONTINUOUS:
 				summary.Name ("Theoretical continuous distribution");
-				summary.Groups()[0].Name ("Support");
 				break;
 
 			default:
 				summary.Name ("Distribution");
-				summary.Groups()[0].Name ("Data range");
 				break;
 		}
+
+		// Data range
+		summary.Groups()[0].Name ("Data range");
 
 		// Bins count
 		PropGroup bins;

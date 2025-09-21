@@ -246,19 +246,19 @@ public:
 		{
 			case RawCDF::EMPIRICAL:
 				summary.Name ("Empirical CDF function");
-				summary.Groups()[0].Name ("Data range");
 				break;
 
 			case RawCDF::THEORETICAL:
 				summary.Name ("Theoretical CDF function");
-				summary.Groups()[0].Name ("Support");
 				break;
 
 			default:
 				summary.Name ("CDF function");
-				summary.Groups()[0].Name ("Data range");
 				break;
 		}
+
+		// Data range
+		summary.Groups()[0].Name ("Data range");
 
 		// Data size
 		PropGroup size;
