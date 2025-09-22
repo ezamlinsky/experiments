@@ -194,26 +194,11 @@ T SumHcubeDiff (
 	return sum;
 }
 
-//****************************************************************************//
-//      Sum of multiplied values                                              //
-//****************************************************************************//
+//============================================================================//
+//      Sum of multiplied differences                                         //
+//============================================================================//
 template <typename T>
-T SumMul (
-	const T array1[],		// The first array
-	const T array2[],		// The second array
-	size_t size				// Array size
-){
-	T sum = 0;
-	for (size_t i = 0; i < size; i++)
-		sum += array1[i] * array2[i];
-	return sum;
-}
-
-//****************************************************************************//
-//      Covariance                                                            //
-//****************************************************************************//
-template <typename T>
-T Covariance (
+T SumMulDiff (
 	const T array1[],		// The first array
 	T value1,				// Mean value of the first array
 	const T array2[],		// The second array
@@ -226,6 +211,21 @@ T Covariance (
 		const T temp2 = array2[i] - value2;
 		sum += temp1 * temp2;
 	}
+	return sum;
+}
+
+//****************************************************************************//
+//      Sum of multiplied values (dot product)                                //
+//****************************************************************************//
+template <typename T>
+T SumMul (
+	const T array1[],		// The first array
+	const T array2[],		// The second array
+	size_t size				// Array size
+){
+	T sum = 0;
+	for (size_t i = 0; i < size; i++)
+		sum += array1[i] * array2[i];
 	return sum;
 }
 }
