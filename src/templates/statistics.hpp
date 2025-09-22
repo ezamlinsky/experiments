@@ -72,6 +72,36 @@ DEVIATION_SAMPLE(AbsDevSample, Array::SumAbsDiff)
 DEVIATION_POPULATION(SignDevPopulation, Array::SumSignDiff)
 DEVIATION_SAMPLE(SignDevSample, Array::SumSignDiff)
 
+//============================================================================//
+//      Covariance                                                            //
+//============================================================================//
+template <typename T>
+T CovariancePopulation (
+	const T array1[],		// The first array
+	T value1,				// Mean value of the first array
+	const T array2[],		// The second array
+	T value2,				// Mean value of the second array
+	size_t size				// Array size
+){
+	if (size > 0)
+		return SumMulDiff (array1, value1, array2, value2, size) / size;
+	else
+		return NAN;
+}
+template <typename T>
+T CovarianceSample (
+	const T array1[],		// The first array
+	T value1,				// Mean value of the first array
+	const T array2[],		// The second array
+	T value2,				// Mean value of the second array
+	size_t size				// Array size
+){
+	if (size > 1)
+		return SumMulDiff (array1, value1, array2, value2, size) / (size - 1);
+	else
+		return NAN;
+}
+
 //****************************************************************************//
 //      Standard deviation                                                    //
 //****************************************************************************//
@@ -302,6 +332,31 @@ T MaxSqrDev (
 	}
 	else
 		return NAN;
+}
+
+//****************************************************************************//
+//      Correlation                                                           //
+//****************************************************************************//
+template <typename T>
+T Correlation (
+	const T array1[],		// The first array
+	T value1,				// Mean value of the first array
+	const T array2[],		// The second array
+	T value2,				// Mean value of the second array
+	size_t size				// Array size
+){
+	T var1 = 0;
+	T var2 = 0;
+	T covar = 0;
+	for (size_t i = 0; i < size; i++) {
+		const T temp1 = array1[i] - value1;
+		const T temp2 = array2[i] - value2;
+		var1 += temp1 * temp1;
+		var2 += temp2 * temp2;
+		covar += temp1 * temp2;
+	}
+	const T temp = sqrt (var1) * sqrt (var2);
+	return covar / temp;
 }
 }
 /*
