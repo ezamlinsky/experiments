@@ -247,7 +247,7 @@ T MedianSignDev (
 	size_t size,			// Array size
 	T value					// The central value
 ){
-	T *temp = new T[size];
+	T *temp = new T [size];
 	for (size_t i = 0; i < size; i++)
 		temp[i] = array[i] - value;
 	const T median = Array::Median (temp, size);
@@ -264,7 +264,7 @@ T MedianAbsDev (
 	size_t size,			// Array size
 	T value					// The central value
 ){
-	T *temp = new T[size];
+	T *temp = new T [size];
 	for (size_t i = 0; i < size; i++)
 		temp[i] = fabs (array[i] - value);
 	const T median = Array::Median (temp, size);
@@ -281,7 +281,7 @@ T MedianSqrDev (
 	size_t size,			// Array size
 	T value					// The central value
 ){
-	T *temp = new T[size];
+	T *temp = new T [size];
 	for (size_t i = 0; i < size; i++) {
 		const T val = array[i] - value;
 		temp[i] = val * val;

@@ -70,7 +70,7 @@ T Median (
 	const T array[],		// Array data
 	size_t size				// Array size
 ){
-	T *temp = new T[size];
+	T *temp = new T [size];
 	Array::Copy (temp, array, size);
 	const T median = Median (temp, size);
 	delete [] temp;
