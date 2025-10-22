@@ -148,6 +148,42 @@ T* fname																		\
 }
 
 //****************************************************************************//
+//      Scaled arithmetic operations                                          //
+//****************************************************************************//
+
+// In-place operation
+# define	SCALED_INPLACE(fname, operation)									\
+template <typename T>															\
+T* fname																		\
+(																				\
+	T array[],																	\
+	const T source[],															\
+	size_t size,																\
+	T value																		\
+){																				\
+	for (size_t i = 0; i < size; i++)											\
+		array[i] operation source[i] * value;									\
+	return array;																\
+}
+
+// Normal operation
+# define	SCALED_NORMAL(fname, operation)										\
+template <typename T>															\
+T* fname																		\
+(																				\
+	T result[],																	\
+	const T source1[],															\
+	const T source2[],															\
+	size_t size,																\
+	T value																		\
+){																				\
+	for (size_t i = 0; i < size; i++)											\
+		result[i] = source1[i] operation source2[i] * value;					\
+	return result;																\
+}
+
+
+//****************************************************************************//
 //      Initialization                                                        //
 //****************************************************************************//
 SCALAR_INPLACE_FORWARD(Init, =)
@@ -168,6 +204,16 @@ SCALAR_NORMAL_FORWARD(Add, +)
 // Vector addition
 VECTOR_INPLACE_FORWARD(Add, +=)
 VECTOR_NORMAL_FORWARD(Add, +)
+
+//****************************************************************************//
+//      Scaled addition                                                       //
+//****************************************************************************//
+
+// In-place operation
+SCALED_INPLACE(ScaledAdd, +=)
+
+// Normal operation
+SCALED_NORMAL(ScaledAdd, +)
 
 //****************************************************************************//
 //      Subtraction                                                           //
@@ -192,6 +238,16 @@ SCALAR_NORMAL_REVERSE(ReverseSub, -)
 // Vector reverse subtraction
 VECTOR_INPLACE_REVERSE(ReverseSub, -)
 VECTOR_NORMAL_REVERSE(ReverseSub, -)
+
+//****************************************************************************//
+//      Scaled subtraction                                                    //
+//****************************************************************************//
+
+// In-place operation
+SCALED_INPLACE(ScaledSub, -=)
+
+// Normal operation
+SCALED_NORMAL(ScaledSub, -)
 
 //****************************************************************************//
 //      Multiplication                                                        //
@@ -242,6 +298,36 @@ T* Pow (
 	for (size_t i = 0; i < size; i++)
 		result[i] = pow (source[i], power);
 	return result;
+}
+
+//****************************************************************************//
+//      Check for equality                                                    //
+//****************************************************************************//
+template <typename T>
+bool IsEqual (
+	const T source1[],
+	const T source2[],
+	size_t size
+){
+	for (size_t i = 0; i < size; i++)
+		if (source1[i] != source2[i])
+			return false;
+	return true;
+}
+
+//****************************************************************************//
+//      Check for not equality                                                //
+//****************************************************************************//
+template <typename T>
+bool IsNotEqual (
+	const T source1[],
+	const T source2[],
+	size_t size
+){
+	for (size_t i = 0; i < size; i++)
+		if (source1[i] != source2[i])
+			return true;
+	return false;
 }
 }
 /*
