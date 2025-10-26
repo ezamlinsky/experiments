@@ -560,8 +560,8 @@ public:
 		// Deciles
 		PropGroup deciles ("Deciles");
 		for (int i = 1; i <= 9; i++) {
-			const string name = string ("Decile (") + to_string (i * 10) + "%)";
-			deciles.Append (name, Quantile (i / 10.0));
+			const string opt_name = string ("Decile (") + to_string (i * 10) + "%)";
+			deciles.Append (opt_name, Quantile (i / 10.0));
 		}
 		summary.Append (deciles);
 
