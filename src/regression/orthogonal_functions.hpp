@@ -2,7 +2,7 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#         SET OF ORTHOGONAL FUNCTIONS FOR AN ORTHOGONAL DECOMPOSITION          #
+#           SET OF ORTHOGONAL FUNCTIONS FOR AN ORTHOGONAL EXPANSION            #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
@@ -39,9 +39,9 @@ protected:
 	size_t degree;			// Polynomial degree
 
 //============================================================================//
-//      Protected methods                                                     //
+//      Private methods                                                       //
 //============================================================================//
-protected:
+private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Map a value to the orthogonality domain                               //
@@ -51,6 +51,11 @@ protected:
 	) const {
 		return domain * (x - center) / variation;
 	}
+
+//============================================================================//
+//      Protected methods                                                     //
+//============================================================================//
+protected:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Check the argument range and map to the orthogonality domain          //
