@@ -28,8 +28,8 @@ class OrthogonalFunctions
 //      Members                                                               //
 //============================================================================//
 protected:
-
 	Range range;			// Original range of X values (for validation)
+	mvector values;			// Original X values
 	mvector args;			// X values are mapped to the orthogonality domain
 	vector <mvector> funcs;	// Vector of the orthogonal functions
 	double center;			// Center point (mean) of original X values
@@ -46,11 +46,20 @@ protected:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Map a value to the orthogonality domain                               //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double ToOrthogonalityDomain (
+	double Map (
 		double x				// X value to map to the orthogonality domain
 	) const {
+		return domain * (x - center) / variation;
+	}
 
-		// Outside the original range of X values
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check the argument range and map to the orthogonality domain          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double Convert (
+		double x				// X value to validate
+	) const {
+
+		// Outside the range of original X values
 		if (x != range) {
 			const string &arg = to_string (x);
 			const string &min = to_string (range.Min());
@@ -58,8 +67,8 @@ protected:
 			throw invalid_argument ("OrthogonalFunctions: Argument value '" + arg + "' is outside the original range [" + min + ","+ max +"]");
 		}
 
-		// Map the value to the orthogonality domain
-		return domain * (x - center) / variation;
+		// Map the argument to the orthogonality domain
+		return Map (x);
 	}
 
 //============================================================================//
@@ -76,6 +85,7 @@ public:
 		size_t degree,			// Polynomial degree
 		double domain			// Range of the symmetrical orthogonality domain
 	) :	range (x, size),
+		values (x, size),
 		args (size),
 		center (Stats::Mean (x, size)),
 		variation (max (range.Max() - center, center - range.Min())),
@@ -89,7 +99,7 @@ public:
 
 		// Map the values to the orthogonality domain
 		for (size_t i = 0; i < size; i++)
-			x[i] = ToOrthogonalityDomain (x[i]);
+			x[i] = Map (x[i]);
 
 		// Convert them to a vector for the evaluation of the polynomials
 		args = mvector (x, size);
@@ -115,13 +125,6 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Number of the X values                                                //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	size_t Size (void) const {
-		return size;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Polynomial degree                                                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	size_t Degree (void) const {
@@ -129,9 +132,23 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Original X values                                                     //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	const mvector& Values (void) const {
+		return values;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Number of the X values                                                //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	size_t Size (void) const {
+		return size;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Virtual functions to override in derivative classes                   //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual mvector Values (double x) const = 0;
+	virtual mvector FuncValues (double x) const = 0;
 };
 /*
 ################################################################################
