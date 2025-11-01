@@ -2,7 +2,7 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#           POLYNOMIAL REGRESSION BY ORTHOGONAL LEGENDRE POLYNOMIALS           #
+#        TRIGONOMETRIC REGRESSION BY ORTHOGONAL TRIGONOMETRIC FUNCTIONS        #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
@@ -11,56 +11,10 @@
 # include	"../python_helpers.hpp"
 
 //****************************************************************************//
-//      Class "LegendrePolynomials"                                           //
+//      Class "TrigonometricFunctions"                                        //
 //****************************************************************************//
-class LegendrePolynomials : public OrthogonalFunctions
+class TrigonometricFunctions : public OrthogonalFunctions
 {
-//============================================================================//
-//      Private methods                                                       //
-//============================================================================//
-private:
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Evaluate recurrent polynomials for the target X value                 //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	template <typename T>
-	static vector <T> RecurrentPolynomials (
-		T arg,					// Argument (X values)
-		T temp,					// Temporary buffer for the recurrent algorithm
-		T poly0,				// 0 degree polynomial
-		T poly1,				// 1 degree polynomial
-		size_t degree			// Polynomial degree
-	){
-		// Set of all the orthogonal polynomials
-		vector <T> res;
-
-		// Add the initial polynomials to the set
-		res.push_back (poly0);
-		res.push_back (poly1);
-
-		// Evaluate the next recurrent polynomials until the target degree is achieved
-		T *p2 = &poly0;
-		T *p1 = &poly1;
-		T *p0 = &temp;
-		for (size_t j = 2; j <= degree; j++) {
-
-			// Evaluate the polynomial value
-			*p0 = (arg * *p1 * (2 * j - 1) - *p2 * (j - 1)) / j;
-
-			// Add it to the set
-			res.push_back (*p0);
-
-			// Swap the buffers for the next round
-			T *ptr = p2;
-			p2 = p1;
-			p1 = p0;
-			p0 = ptr;
-		}
-
-		// Return the set of orthogonal polynomials to the caller
-		return res;
-	}
-
 //============================================================================//
 //      Public methods                                                        //
 //============================================================================//
@@ -69,25 +23,30 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	LegendrePolynomials (
+	TrigonometricFunctions (
 		double x[],				// X values
 		size_t size,			// Number of the X values
 		size_t degree			// Polynomial degree
-	) : OrthogonalFunctions (x, size, degree, 1.0)
+	) : OrthogonalFunctions (x, size, degree, M_PI)
 	{
-		// Initial polynomials for the recurrent polynomials evaluation procedure
-		mvector poly (size);
-		mvector poly0 (1.0, size);
-		mvector poly1 = args;
+		// The first function is an average value
+		funcs.push_back (mvector (1.0, size));
 
-		// Store all the orthogonal polynomials as the orthogonal basis
-		vector <mvector> polynomials = RecurrentPolynomials (args, poly, poly0, poly1, degree);
-		for (auto &function : polynomials)
-			funcs.push_back (function);
+		// Compute sines and cosines for different multiplicity factors
+		double cos_vals [size];
+		double sin_vals [size];
+		for (size_t j = 1; j <= degree; j++) {
+			for (size_t i = 0; i < size; i++) {
+				cos_vals[i] = cos (j * args[i]);
+				sin_vals[i] = sin (j * args[i]);
+			}
+			funcs.push_back (mvector (cos_vals, size));
+			funcs.push_back (mvector (sin_vals, size));
+		}
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Calculate values of all the orthogonal polynomials for the target X   //
+//      Calculate values of all the trigonometric functions for the target X  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual mvector FuncValues (
 		double x				// Value to calculate the functions for
@@ -96,15 +55,25 @@ public:
 		// Check the argument range and map to the orthogonality domain
 		x = Convert (x);
 
-		// Evaluate recurrent polynomials for the target X value
-		return RecurrentPolynomials (x, 0.0, 1.0, x, degree);
+		// The first function is an average value
+		vector <double> vals;
+		vals.push_back (1.0);
+
+		// Compute sines and cosines for different multiplicity factors
+		for (size_t j = 1; j <= degree; j++) {
+			vals.push_back (cos (j * x));
+			vals.push_back (sin (j * x));
+		}
+
+		// Return the values
+		return vals;
 	}
 };
 
 //****************************************************************************//
-//      Class "LegendreRegression"                                            //
+//      Class "TrigonometricRegression"                                       //
 //****************************************************************************//
-class LegendreRegression : public OrthogonalRegression
+class TrigonometricRegression : public OrthogonalRegression
 {
 //============================================================================//
 //      Private methods                                                       //
@@ -112,17 +81,35 @@ class LegendreRegression : public OrthogonalRegression
 private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Adjust values for the approximation                                   //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	static void AdjustValues (
+		mvector &data,			// Values to correct with a linear correction algorithm
+		double coeff			// Coefficient for the linear correction
+	){
+		for (size_t i = 0; i < data.Size(); i++)
+			data [i] += coeff * i;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Internal constructor                                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	LegendreRegression (
+	TrigonometricRegression (
 		double x[],				// Predictors (independent variables)
 		double y[],				// Response (dependent variables)
 		size_t size,			// Size of the dataset
 		size_t degree			// Polynomial degree
-	) :	OrthogonalRegression (y, new LegendrePolynomials (Sort (x, y, size), size, degree))
+	) :	OrthogonalRegression (y, new TrigonometricFunctions (Sort (x, y, size), size, degree))
 	{
+		// Adjust X values before the approximation
+		const double coeff = (y[size - 1] - y[0]) / (size - 1);
+		AdjustValues (residuals, -coeff);
+
 		// Approximate the dependent variables by the regression
-		Approximate ();
+		Approximate();
+
+		// Adjust the regression values after the approximation
+		AdjustValues (approx, +coeff);
 	}
 
 //============================================================================//
@@ -133,27 +120,27 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructors                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	LegendreRegression (
+	TrigonometricRegression (
 		vector <double> x,		// Predictors (independent variables)
 		vector <double> y,		// Response (dependent variables)
 		size_t degree			// Polynomial degree
-	) :	LegendreRegression (x.data(), y.data(), min (x.size(), y.size()), degree)
+	) :	TrigonometricRegression (x.data(), y.data(), min (x.size(), y.size()), degree)
 	{}
 
-	LegendreRegression (
+	TrigonometricRegression (
 		const pylist &x,		// Predictors (independent variables)
 		const pylist &y,		// Response (dependent variables)
 		size_t degree			// Polynomial degree
-	) : LegendreRegression (to_vector (x), to_vector (y), degree)
+	) : TrigonometricRegression (to_vector (x), to_vector (y), degree)
 	{}
 };
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const LegendreRegression &object)
+ostream& operator << (ostream &stream, const TrigonometricRegression &object)
 {
-	stream << object.Summary ("Legendre regression (MSE)");
+	stream << object.Summary ("Trigonometric regression (MSE)");
 	return stream;
 }
 /*
