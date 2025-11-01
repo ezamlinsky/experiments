@@ -78,7 +78,8 @@ public:
 		// Initial polynomials for the recurrent polynomials evaluation procedure
 		mvector poly (size);
 		mvector poly0 (1.0, size);
-		mvector poly1 = args;
+		mvector poly1 (x, size);
+		mvector args (x, size);
 
 		// Store all the orthogonal polynomials as the orthogonal basis
 		vector <mvector> polynomials = RecurrentPolynomials (args, poly, poly0, poly1, degree);
