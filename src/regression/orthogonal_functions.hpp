@@ -30,7 +30,6 @@ class OrthogonalFunctions
 protected:
 	Range range;			// Original range of X values (for validation)
 	mvector values;			// Original X values
-	mvector args;			// X values are mapped to the orthogonality domain
 	vector <mvector> funcs;	// Vector of the orthogonal functions
 	double center;			// Center point (mean) of original X values
 	double variation;		// Variation around the center of the original X values
@@ -91,7 +90,6 @@ public:
 		double domain			// Range of the symmetrical orthogonality domain
 	) :	range (x, size),
 		values (x, size),
-		args (size),
 		center (Stats::Mean (x, size)),
 		variation (max (range.Max() - center, center - range.Min())),
 		domain (domain),
@@ -105,9 +103,6 @@ public:
 		// Map the values to the orthogonality domain
 		for (size_t i = 0; i < size; i++)
 			x[i] = Map (x[i]);
-
-		// Convert them to a vector for the evaluation of the polynomials
-		args = mvector (x, size);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
