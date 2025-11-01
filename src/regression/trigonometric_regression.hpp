@@ -37,8 +37,8 @@ public:
 		double sin_vals [size];
 		for (size_t j = 1; j <= degree; j++) {
 			for (size_t i = 0; i < size; i++) {
-				cos_vals[i] = cos (j * args[i]);
-				sin_vals[i] = sin (j * args[i]);
+				cos_vals[i] = cos (j * x[i]);
+				sin_vals[i] = sin (j * x[i]);
 			}
 			funcs.push_back (mvector (cos_vals, size));
 			funcs.push_back (mvector (sin_vals, size));
