@@ -46,6 +46,8 @@ T SumAbs (
 //============================================================================//
 //      Sum of squared values                                                 //
 //============================================================================//
+
+// Without weight coefficients
 template <typename T>
 T SumSqr (
 	const T array[],		// Array data
@@ -54,6 +56,19 @@ T SumSqr (
 	T sum = 0;
 	for (size_t i = 0; i < size; i++)
 		sum += array[i] * array[i];
+	return sum;
+}
+
+// With weight coefficients
+template <typename T>
+T SumSqr (
+	const T array[],		// Array data
+	const T weights[],		// Weight coefficients
+	size_t size				// Array size
+){
+	T sum = 0;
+	for (size_t i = 0; i < size; i++)
+		sum += array[i] * array[i] * weights[i];
 	return sum;
 }
 
@@ -207,9 +222,9 @@ T SumMulDiff (
 ){
 	T sum = 0;
 	for (size_t i = 0; i < size; i++) {
-		const T temp1 = array1[i] - value1;
-		const T temp2 = array2[i] - value2;
-		sum += temp1 * temp2;
+		const T diff1 = array1[i] - value1;
+		const T diff2 = array2[i] - value2;
+		sum += diff1 * diff2;
 	}
 	return sum;
 }
@@ -217,6 +232,8 @@ T SumMulDiff (
 //****************************************************************************//
 //      Sum of multiplied values (dot product)                                //
 //****************************************************************************//
+
+// Without weight coefficients
 template <typename T>
 T SumMul (
 	const T array1[],		// The first array
@@ -226,6 +243,20 @@ T SumMul (
 	T sum = 0;
 	for (size_t i = 0; i < size; i++)
 		sum += array1[i] * array2[i];
+	return sum;
+}
+
+// With weight coefficients
+template <typename T>
+T SumMul (
+	const T array1[],		// The first array
+	const T array2[],		// The second array
+	const T weights[],		// Weight coefficients
+	size_t size				// Array size
+){
+	T sum = 0;
+	for (size_t i = 0; i < size; i++)
+		sum += array1[i] * array2[i] * weights[i];
 	return sum;
 }
 }
