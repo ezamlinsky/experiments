@@ -116,10 +116,31 @@ public:
 	virtual ~OrthogonalFunctions (void) = default;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Values of the orthogonal functions for the X values                   //
+//      Values of the orthogonal function                                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	const vector <mvector>& Functions (void) const {
-		return funcs;
+	const mvector& Function (
+		size_t index			// Index of the function
+	) const {
+		return funcs.at (index);
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Squared Euclidean norm of the orthogonal function                     //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double NormSqr (
+		size_t index			// Index of the function
+	) const {
+		return funcs.at (index).NormSqr();
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Dot product of the orthogonal function                                //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	virtual double DotProduct (
+		size_t index,			// Index of the function
+		const mvector &vector	// Another vector to compute the dot product
+	) const {
+		return funcs.at (index).DotProduct (vector);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
