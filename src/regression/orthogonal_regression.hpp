@@ -100,18 +100,16 @@ protected:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void Approximate (void) {
 
-		// Get the orthogonal functions for an orthogonal expansion
-		const vector <mvector> &functions = funcs -> Functions();
-
 		// Find the first regression coefficient and its variance
-		double norm2 = functions[0].NormSqr();
-		double coeff = functions[0].DotProduct (residuals) / norm2;
+		double norm2 = funcs -> NormSqr (0);
+		double coeff = funcs -> DotProduct (0, residuals) / norm2;
 		coeffs[0] = coeff;
 		norms[0] = sqrt (norm2);
 
 		// Find residuals and regression approximation
-		residuals.Sub (functions[0], coeff);
-		approx.Add (functions[0], coeff);
+		const mvector &func0 = funcs -> Function (0);
+		residuals.Sub (func0, coeff);
+		approx.Add (func0, coeff);
 
 		// Calculate total sum of squares (TSS)
 		total_ss = residuals.NormSqr();
@@ -121,14 +119,15 @@ protected:
 		for (size_t j = 1; j < count; j++) {
 
 			// Find each regression coefficient and its variance
-			norm2 = functions[j].NormSqr();
-			coeff = functions[j].DotProduct (residuals) / norm2;
+			norm2 = funcs -> NormSqr (j);
+			coeff = funcs -> DotProduct (j, residuals) / norm2;
 			coeffs[j] = coeff;
 			norms[j] = sqrt (norm2);
 
 			// Find residuals and regression approximation
-			residuals.Sub (functions[j], coeff);
-			approx.Add (functions[j], coeff);
+			const mvector &func = funcs -> Function (j);
+			residuals.Sub (func, coeff);
+			approx.Add (func, coeff);
 		}
 
 		// Calculate residual sum of squares (RSS)
