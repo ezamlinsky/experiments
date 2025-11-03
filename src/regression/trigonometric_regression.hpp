@@ -76,20 +76,15 @@ public:
 class TrigonometricRegression : public OrthogonalRegression
 {
 //============================================================================//
+//      Members                                                               //
+//============================================================================//
+private:
+	double coeff;				// Coefficient for the linear correction
+
+//============================================================================//
 //      Private methods                                                       //
 //============================================================================//
 private:
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Adjust values for the approximation                                   //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	static void AdjustValues (
-		mvector &data,			// Values to correct with a linear correction algorithm
-		double coeff			// Coefficient for the linear correction
-	){
-		for (size_t i = 0; i < data.Size(); i++)
-			data [i] += coeff * i;
-	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Internal constructor                                                  //
@@ -99,17 +94,18 @@ private:
 		double y[],				// Response (dependent variables)
 		size_t size,			// Size of the dataset
 		size_t degree			// Polynomial degree
-	) :	OrthogonalRegression (y, new TrigonometricFunctions (Sort (x, y, size), size, degree))
+	) :	OrthogonalRegression (y, new TrigonometricFunctions (Sort (x, y, size), size, degree)),
+		coeff ((y[size - 1] - y[0]) / (x[size - 1] - x[0]))
 	{
 		// Adjust X values before the approximation
-		const double coeff = (y[size - 1] - y[0]) / (size - 1);
-		AdjustValues (residuals, -coeff);
+		mvector args (x, size);
+		residuals.Sub (args, coeff);
 
 		// Approximate the dependent variables by the regression
 		Approximate();
 
 		// Adjust the regression values after the approximation
-		AdjustValues (approx, +coeff);
+		approx.Add (args, coeff);
 	}
 
 //============================================================================//
@@ -133,6 +129,15 @@ public:
 		size_t degree			// Polynomial degree
 	) : TrigonometricRegression (to_vector (x), to_vector (y), degree)
 	{}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Regression value for the target argument                              //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double Regression (
+		double x				// Value to calculate the regression for
+	) const {
+		return OrthogonalRegression::Regression (x) + funcs -> Convert (x) * coeff;
+	}
 };
 
 //****************************************************************************//
