@@ -28,7 +28,7 @@ class OrthogonalFunctions
 //      Members                                                               //
 //============================================================================//
 protected:
-	Range range;			// Original range of X values (for validation)
+	Range range;			// Eange of original X values (for validation)
 	mvector values;			// Original X values
 	vector <mvector> funcs;	// Vector of the orthogonal functions
 	double center;			// Center point (mean) of original X values
@@ -49,30 +49,6 @@ private:
 		double x				// X value to map to the orthogonality domain
 	) const {
 		return domain * (x - center) / variation;
-	}
-
-//============================================================================//
-//      Protected methods                                                     //
-//============================================================================//
-protected:
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Check the argument range and map to the orthogonality domain          //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double Convert (
-		double x				// X value to validate
-	) const {
-
-		// Outside the range of original X values
-		if (x != range) {
-			const string &arg = to_string (x);
-			const string &min = to_string (range.Min());
-			const string &max = to_string (range.Max());
-			throw invalid_argument ("OrthogonalFunctions: Argument value '" + arg + "' is outside the original range [" + min + ","+ max +"]");
-		}
-
-		// Map the argument to the orthogonality domain
-		return Map (x);
 	}
 
 //============================================================================//
@@ -109,6 +85,25 @@ public:
 //      Destructor                                                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	virtual ~OrthogonalFunctions (void) = default;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Check the argument range and map to the orthogonality domain          //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	double Convert (
+		double x				// X value to validate
+	) const {
+
+		// Outside the range of original X values
+		if (x != range) {
+			const string &arg = to_string (x);
+			const string &min = to_string (range.Min());
+			const string &max = to_string (range.Max());
+			throw invalid_argument ("OrthogonalFunctions: Argument value '" + arg + "' is outside the original range [" + min + ","+ max +"]");
+		}
+
+		// Map the argument to the orthogonality domain
+		return Map (x);
+	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Values of the orthogonal function                                     //
