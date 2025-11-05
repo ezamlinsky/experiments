@@ -28,7 +28,7 @@ class OrthogonalFunctions
 //      Members                                                               //
 //============================================================================//
 protected:
-	Range range;			// Eange of original X values (for validation)
+	Range range;			// Range of original X values (for validation)
 	mvector values;			// Original X values
 	vector <mvector> funcs;	// Vector of the orthogonal functions
 	double center;			// Center point (mean) of original X values
@@ -117,7 +117,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Squared Euclidean norm of the orthogonal function                     //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double NormSqr (
+	double NormSqr (
 		size_t index			// Index of the function
 	) const {
 		return funcs.at (index).NormSqr();
@@ -126,7 +126,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Dot product of the orthogonal function                                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	virtual double DotProduct (
+	double DotProduct (
 		size_t index,			// Index of the function
 		const mvector &vector	// Another vector to compute the dot product
 	) const {
@@ -148,7 +148,14 @@ public:
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Original X values                                                     //
+//      Range of X values                                                     //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	const Model::Range& Domain (void) const {
+		return range;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      X values                                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	const mvector& Values (void) const {
 		return values;
