@@ -16,6 +16,9 @@
 //      Methods are inherited from the base class                             //
 //****************************************************************************//
 # define	BASE_CLASS_METHODS(class) 											\
+	.def ("Domain",			&class::Domain,										\
+		return_internal_reference <> (),										\
+		"Range of predictors (independent variables)")							\
 	.def ("X",				&class::X,											\
 		"Predictors (independent variables)")									\
 	.def ("Y",				&class::Y,											\
