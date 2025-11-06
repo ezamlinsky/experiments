@@ -72,6 +72,10 @@ public:
 		size (size),
 		degree (degree)
 	{
+		// Check if the requirement for a minimum size is satisfied
+		if (size < 2)
+			throw invalid_argument ("OrthogonalFunctions: The minimal polynomial size (nodes) is 2");
+
 		// Check if the degree is properly specified
 		if (degree > size)
 			throw invalid_argument ("OrthogonalFunctions: Polynomial degree should not be greater than the data size");
