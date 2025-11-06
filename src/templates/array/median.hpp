@@ -54,6 +54,7 @@ T Median (
 	T array[],				// Array data
 	size_t size				// Array size
 ){
+	using namespace std;
 	if (size > 1) {
 		const size_t middle = size / 2;
 		nth_element (array, array + middle, array + size);
