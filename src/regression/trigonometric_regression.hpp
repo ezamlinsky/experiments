@@ -87,6 +87,26 @@ private:
 private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Smoothly connects the left and right sides of the dataset             //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+// INFO:	To remove oscillations at the ends, we connect
+//			the left and right sides before the approximation
+	static double SmoothConnection (
+		double x[],				// Predictors (independent variables)
+		double y[],				// Response (dependent variables)
+		size_t size,			// Size of the dataset
+		size_t degree			// Polynomial degree
+	){
+		const size_t half_size = size / 2;
+		const size_t period = (degree == 0) ? half_size : max (half_size / degree, static_cast <size_t> (1));
+		const double left_mean = Stats::Mean (y, period);
+		const double right_mean = Stats::Mean (y + size - period, period);
+		const double p = right_mean - left_mean;
+		const double q = x[size-1] - x[0];
+		return p / q;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Internal constructor                                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	TrigonometricRegression (
@@ -95,7 +115,7 @@ private:
 		size_t size,			// Size of the dataset
 		size_t degree			// Polynomial degree
 	) :	OrthogonalRegression (y, new TrigonometricFunctions (Sort (x, y, size), size, degree)),
-		coeff ((y[size - 1] - y[0]) / (x[size - 1] - x[0]))
+		coeff (SmoothConnection (x, y, size, degree))
 	{
 		// Adjust X values before the approximation
 		mvector args (x, size);
