@@ -8,7 +8,10 @@
 ################################################################################
 */
 # pragma	once
-# include	"smooth.hpp"
+# include	"fir_filter.hpp"
+
+// Length of the tail of the filter oscillations
+# define	MINDELAY_EXTRA_PERIOD	10
 
 //****************************************************************************//
 //      Class "MinDelayFilter"                                                //
@@ -28,7 +31,7 @@ private:
 	){
 		// Filter period and size
 		const size_t period = points + 1;
-		const size_t size = (4 * EXTRA_PERIOD * period - points) / 2;
+		const size_t size = (4 * MINDELAY_EXTRA_PERIOD * period - points) / 2;
 
 		// Blackman window properties
 		const double alpha = 0.16;
