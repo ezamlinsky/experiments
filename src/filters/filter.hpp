@@ -8,80 +8,18 @@
 ################################################################################
 */
 # pragma	once
-# include	<cmath>
-# include	<vector>
-
-// Length of the tail of sics function oscillations
-# define	EXTRA_PERIOD	10
-
-//****************************************************************************//
-//      Compute values of the windowed Sinc function                          //
-//****************************************************************************//
-static vector <double> sinc_filter (
-	size_t points				// Count of neighbor points to smooth by
-){
-	// Filter period and size
-	const size_t period = points + 1;
-	const size_t size = 0.5 * (4 * EXTRA_PERIOD * period - points);
-
-	// Blackman window properties
-	const double alpha = 0.16;
-	const double a0 = 0.5 * (1.0 - alpha);
-	const double a1 = 0.5;
-	const double a2 = 0.5 * alpha;
-
-	// Compute the impulse response function
-	vector <double> impulse;
-	impulse.push_back (1.0);
-	for (size_t i = 1; i < size; i++) {
-
-		// Sinc function
-		const double x = M_PI * i / period;
-		const double sinc = sin (x) / x;
-
-		// Blackman window
-		const double temp = M_PI * i / size;
-		const double win = a0 + a1 * cos (temp) + a2 * cos (2 * temp);
-
-		// Final impulse response with applied window function
-		impulse.push_back (sinc * win);
-	}
-
-	// Return the impulse response function
-	return impulse;
-}
-
-//****************************************************************************//
-//      Normalize the vector coefficients                                     //
-//****************************************************************************//
-static vector <double>& normalize (
-	vector <double> &data		// The vector to normalize
-){
-	// Find the sum value
-	double sum = 0;
-	const size_t size = data.size();
-	for (size_t i = 0; i < size; i++)
-		sum += data [i];
-
-	// Normalize all the vector values to make the total sum equal to 1.0
-	for (size_t i = 0; i < size; i++)
-		data [i] /= sum;
-
-	// Return the same but normalized vector
-	return data;
-}
+# include	"base_filter.hpp"
 
 //****************************************************************************//
 //      Class "Filter"                                                        //
 //****************************************************************************//
-class Filter
+class Filter : public BaseFilter
 {
 //============================================================================//
 //      Members                                                               //
 //============================================================================//
 protected:
-	size_t points;				// Count of neighbor points to smooth by
-	vector <double> impulse;	// Values of the impulse response function
+	vector <double> impulse;		// Filter impulse response
 
 //============================================================================//
 //      Public methods                                                        //
@@ -89,19 +27,12 @@ protected:
 public:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Default constructor                                                   //
+//      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	Filter (
-		size_t points			// Count of neighbor points to smooth by
-	) :	points (points)
+		size_t points				// Count of neighbor points to smooth by
+	) :	BaseFilter (points)
 	{}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Count of neighbor points to smooth by                                 //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	size_t Points (void) const {
-		return points;
-	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Size of the impulse response function                                 //
