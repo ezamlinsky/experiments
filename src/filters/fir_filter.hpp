@@ -68,7 +68,7 @@ protected:
 		// Apply the window function to the impulse response
 		window (half_impulse.data(), half_impulse.size());
 
-		// Normalize the filter impulse response ()
+		// Normalize the filter impulse response
 		// In other words, we calibrate the filter after applying the window function
 		norm (half_impulse.data(), half_impulse.size(), scale);
 

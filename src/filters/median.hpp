@@ -8,7 +8,6 @@
 ################################################################################
 */
 # pragma	once
-# include	<stdexcept>
 # include	"data_cleaner.hpp"
 # include	"base_filter.hpp"
 # include	"../templates/array.hpp"
@@ -30,10 +29,7 @@ public:
 	MedianFilter (
 		size_t points				// Count of neighbor points to filter by
 	) : BaseFilter (points)
-	{
-		if (points == 0)
-			throw invalid_argument ("MedianFilter: The number of neighbor points must be positive");
-	}
+	{}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Apply the filter to the target time series                            //
