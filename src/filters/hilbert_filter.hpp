@@ -2,7 +2,7 @@
 ################################################################################
 # Encoding: UTF-8                                                  Tab size: 4 #
 #                                                                              #
-#                   DIFFERENTIATOR FILTER FOR A TIME SERIES                    #
+#                  HILBERT TRANSFORM FILTER FOR A TIME SERIES                  #
 #                                                                              #
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
@@ -11,12 +11,12 @@
 # include	"fir_filter.hpp"
 
 // Length of the tail of the filter oscillations
-# define	DIFF_EXTRA_PERIOD	10
+# define	HILBERT_EXTRA_PERIOD	10
 
 //****************************************************************************//
-//      Class "DiffFilter"                                                    //
+//      Class "HilbertFilter"                                                 //
 //****************************************************************************//
-class DiffFilter : public FIR_Filter
+class HilbertFilter : public FIR_Filter
 {
 //============================================================================//
 //      Private methods                                                       //
@@ -24,24 +24,20 @@ class DiffFilter : public FIR_Filter
 private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Compute values of the differentiator filter                           //
+//      Compute values of the Hilbert transform filter                        //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	static vector <double> Filter (
-		size_t points				// Count of neighbor points to smooth by
+		size_t size					// Size of impulse response
 	){
-		// Filter period and size
-		const size_t period = points + 1;
-		const size_t size = (4 * DIFF_EXTRA_PERIOD * period - points) / 2;
-
 		// Compute the impulse response
 		vector <double> impulse;
 		impulse.push_back (0.0);
 		for (size_t i = 1; i < size; i++) {
 
-			// Sinc derivative function
-			const double x = M_PI * i / period;
-			const double p = x * cos (x) - sin (x);
-			const double q = x * x;
+			// Hilbert transformation
+			const double x = M_PI * i;
+			const double p = 1.0 - cos (x);
+			const double q = x;
 			impulse.push_back (p / q);
 		}
 
@@ -60,10 +56,10 @@ private:
 		// Find the sum of weighted filter coefficients
 		double sum = 0;
 		for (size_t i = 1; i < size; i++)
-			sum += i * impulse [i];
+			sum += sin (0.5 * M_PI * i) * impulse [i];
 
-		// Normalize all the filter coefficients with a scale factor
-		Array::Div (impulse, size, 2.0 * sum * scale);
+		// Normalize all the filter coefficients
+		Array::Div (impulse, size, 2.0 * sum);
 	}
 
 //============================================================================//
@@ -74,19 +70,18 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Constructor                                                           //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	DiffFilter (
-		size_t points,				// Count of neighbor points to smooth by
-		double step					// Discretization step
-	) :	FIR_Filter (Filter, Blackman, Normalize, +1.0, -1.0, step, points)
+	HilbertFilter (
+		size_t size					// Set size of the dataset for the Hilbert transformation
+	) :	FIR_Filter (Filter, Blackman, Normalize, -1.0, +1.0, 1.0, size / 2)
 	{}
 };
 
 //****************************************************************************//
 //      Translate the object to a string                                      //
 //****************************************************************************//
-ostream& operator << (ostream &stream, const DiffFilter &object)
+ostream& operator << (ostream &stream, const HilbertFilter &object)
 {
-	stream << object.Summary ("Differentiator filter");
+	stream << object.Summary ("Hilbert filter");
 	return stream;
 }
 /*
