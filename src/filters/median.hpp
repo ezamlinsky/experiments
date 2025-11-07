@@ -7,7 +7,7 @@
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
-//# pragma	once
+# pragma	once
 # include	<stdexcept>
 # include	"data_cleaner.hpp"
 # include	"base_filter.hpp"
