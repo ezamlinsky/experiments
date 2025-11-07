@@ -60,7 +60,7 @@ public:
 			vector <double> temp = vector <double> (start_pos, start_pos + 2 * points + 1);
 
 			// Find the median value of the moving window
-			double median = Array::Median (temp.data(), temp.size());
+			const double median = Array::Median (temp.data(), temp.size());
 			response.push_back (median);
 		}
 
