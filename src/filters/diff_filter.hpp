@@ -76,7 +76,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	DiffFilter (
 		size_t points,				// Count of neighbor points to smooth by
-		double step
+		double step					// Discretization step
 	) :	FIR_Filter (Filter, Blackman, Normalize, +1.0, -1.0, step, points)
 	{}
 };
