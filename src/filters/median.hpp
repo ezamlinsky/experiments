@@ -7,23 +7,18 @@
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
-# pragma	once
+//# pragma	once
 # include	<stdexcept>
 # include	"data_cleaner.hpp"
+# include	"base_filter.hpp"
+# include	"../templates/array.hpp"
 # include	"../object_summary.hpp"
-# include	"../python_helpers.hpp"
 
 //****************************************************************************//
 //      Class "MedianFilter"                                                  //
 //****************************************************************************//
-class MedianFilter
+class MedianFilter : public BaseFilter
 {
-//============================================================================//
-//      Members                                                               //
-//============================================================================//
-protected:
-	size_t points;
-
 //============================================================================//
 //      Public methods                                                        //
 //============================================================================//
@@ -34,25 +29,18 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	MedianFilter (
 		size_t points				// Count of neighbor points to filter by
-	) : points (points)
+	) : BaseFilter (points)
 	{
 		if (points == 0)
 			throw invalid_argument ("MedianFilter: The number of neighbor points must be positive");
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Count of neighbor points to filter by                                 //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	size_t Points (void) const {
-		return points;
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Apply the filter to the target time series                            //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	vector <double> Apply (
+	virtual vector <double> Apply (
 		const vector <double> &data	// The time series to filter
-	) const {
+	) const override final {
 
 		// Clear the dataset from NaNs
 		DataCleaner cleaner = DataCleaner (data);
@@ -72,21 +60,12 @@ public:
 			vector <double> temp = vector <double> (start_pos, start_pos + 2 * points + 1);
 
 			// Find the median value of the moving window
-			sort (temp.begin(), temp.end());
-			response.push_back (temp [points]);
+			double median = Array::Median (temp.data(), temp.size());
+			response.push_back (median);
 		}
 
 		// Restore NaN values in the impulse response
 		return cleaner.Restore_NaNs (response);
-	}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Apply the filter to the target python list                            //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	vector <double> Apply (
-		const pylist &py_list		// The python list to filter
-	) const {
-		return Apply (to_vector (py_list));
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
