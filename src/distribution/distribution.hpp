@@ -9,7 +9,7 @@
 */
 # pragma	once
 # include	"raw.hpp"
-# include	"../filters/smooth.hpp"
+# include	"../filters/smooth_filter.hpp"
 # include	"../object_summary.hpp"
 
 //****************************************************************************//
