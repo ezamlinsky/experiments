@@ -72,6 +72,33 @@ T SumSqr (
 	return sum;
 }
 
+//============================================================================//
+//      Sum of positive and negative values                                   //
+//============================================================================//
+template <typename T>
+void Sum (
+	T &pos_sum,				// Sum of positive values
+	T &neg_sum,				// Sum of negative values
+	size_t &pos_cnt,		// Count of positive values
+	size_t &neg_cnt,		// Count of negative values
+	const T array[],		// Array data
+	size_t size				// Array size
+){
+	pos_sum = 0;
+	neg_sum = 0;
+	pos_cnt = 0;
+	neg_cnt = 0;
+	for (size_t i = 0; i < size; i++)
+		if (array[i] >= 0) {
+			pos_sum += array[i];
+			pos_cnt++;
+		}
+		else {
+			neg_sum += array[i];
+			neg_cnt++;
+		}
+}
+
 //****************************************************************************//
 //      Sums of differences                                                   //
 //****************************************************************************//
