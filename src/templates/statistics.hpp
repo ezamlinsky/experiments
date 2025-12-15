@@ -27,6 +27,24 @@ T Mean (
 }
 
 //****************************************************************************//
+//      Means of positive and negative values                                 //
+//****************************************************************************//
+template <typename T>
+void Mean (
+	T &pos_mean,			// Mean of positive values
+	T &neg_mean,			// Mean of negative values
+	const T array[],		// Array data
+	size_t size				// Array size
+){
+	if (size) {
+		size_t pos_cnt, neg_cnt;
+		Array::Sum (pos_mean, neg_mean, pos_cnt, neg_cnt, array, size);
+		pos_mean /= pos_cnt;
+		neg_mean /= neg_cnt;
+	}
+}
+
+//****************************************************************************//
 //      Mean value of deviations                                              //
 //****************************************************************************//
 # define	DEVIATION_POPULATION(func, sum)										\
