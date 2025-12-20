@@ -29,6 +29,10 @@ public:
 		size_t degree			// Polynomial degree
 	) : OrthogonalFunctions (x, size, degree, M_PI)
 	{
+		// Check if the degree is properly specified
+		if (2 * degree > size)
+			throw invalid_argument ("TrigonometricFunctions: The degree should not be greater than half of the data size");
+
 		// The first function is an average value
 		funcs.push_back (mvector (1.0, size));
 
