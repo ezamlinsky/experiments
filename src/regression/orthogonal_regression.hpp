@@ -100,14 +100,17 @@ protected:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	void Approximate (void) {
 
+		// Get all of the orthogonal functions in the set
+		const vector <mvector> &functions = funcs -> Functions();
+
 		// Find the first regression coefficient and its variance
-		double norm2 = funcs -> NormSqr (0);
-		double coeff = funcs -> DotProduct (0, residuals) / norm2;
+		double norm2 = functions[0].NormSqr();
+		double coeff = functions[0].DotProduct (residuals) / norm2;
 		coeffs[0] = coeff;
 		norms[0] = sqrt (norm2);
 
 		// Find residuals and regression approximation
-		const mvector &func0 = funcs -> Function (0);
+		const mvector &func0 = functions[0];
 		residuals.Sub (func0, coeff);
 		approx.Add (func0, coeff);
 
@@ -119,13 +122,13 @@ protected:
 		for (size_t j = 1; j < count; j++) {
 
 			// Find each regression coefficient and its variance
-			norm2 = funcs -> NormSqr (j);
-			coeff = funcs -> DotProduct (j, residuals) / norm2;
+			norm2 = functions[j].NormSqr();
+			coeff = functions[j].DotProduct (residuals) / norm2;
 			coeffs[j] = coeff;
 			norms[j] = sqrt (norm2);
 
 			// Find residuals and regression approximation
-			const mvector &func = funcs -> Function (j);
+			const mvector &func = functions[j];
 			residuals.Sub (func, coeff);
 			approx.Add (func, coeff);
 		}
