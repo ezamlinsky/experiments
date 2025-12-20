@@ -157,10 +157,12 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Regression value for the target argument                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double Regression (
+	virtual double Regression (
 		double x				// Value to calculate the regression for
-	) const {
-		return OrthogonalRegression::Regression (x) + funcs -> Convert (x) * coeff;
+	) const override final {
+		const double regression = OrthogonalRegression::Regression (x);
+		const double shift = funcs -> Convert (x) * coeff;
+		return regression + shift;
 	}
 };
 

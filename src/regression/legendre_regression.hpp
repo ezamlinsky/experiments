@@ -123,7 +123,7 @@ private:
 	) :	OrthogonalRegression (y, new LegendrePolynomials (Sort (x, y, size), size, degree))
 	{
 		// Approximate the dependent variables by the regression
-		Approximate ();
+		Approximate();
 	}
 
 //============================================================================//

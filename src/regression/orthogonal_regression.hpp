@@ -210,7 +210,7 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Regression value for the target argument                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-	double Regression (
+	virtual double Regression (
 		double x						// Value to calculate the regression for
 	) const {
 		return funcs -> FuncValues (x).DotProduct (coeffs);
