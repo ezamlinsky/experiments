@@ -383,6 +383,9 @@ public:
 	bool operator== (
 		const Vector &source		// Source vector to compare with
 	) const {
+		if (this == &source)
+			return true;
+
 		if (size != source.size)
 			throw invalid_argument ("Vector (operator==): " COMPARE_ERROR);
 
@@ -393,6 +396,9 @@ public:
 	bool operator!= (
 		const Vector &source		// Source vector to compare with
 	) const {
+		if (this == &source)
+			return false;
+
 		if (size != source.size)
 			throw invalid_argument ("Vector (operator!=): " COMPARE_ERROR);
 
