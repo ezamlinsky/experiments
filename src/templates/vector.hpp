@@ -259,7 +259,7 @@ public:
 
 	// Subtraction with a scale
 	void Sub (
-		const Vector &source,		// Source vector to add
+		const Vector &source,		// Source vector to subtract
 		T value						// Scalar value to use
 	){
 		if (size != source.size)
@@ -412,6 +412,8 @@ public:
 //----------------------------------------------------------------------------//
 //      Operator "[]"                                                         //
 //----------------------------------------------------------------------------//
+
+	// Non-constant vector
 	const T& operator[] (
 		size_t index				// The element index
 	) const {
@@ -421,6 +423,7 @@ public:
 		return data [index];
 	}
 
+	// Constant vector
 	T& operator[] (
 		size_t index				// The element index
 	){
@@ -442,6 +445,13 @@ public:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	size_t Size (void) const {
 		return size;
+	}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//      Raw vector data                                                       //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+	const T* Data (void) const {
+		return data;
 	}
 };
 }
