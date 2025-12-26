@@ -33,7 +33,6 @@ protected:
 	vector <mvector> funcs;	// Vector of the orthogonal functions
 	double center;			// Center point (mean) of original X values
 	double variation;		// Variation around the center of the original X values
-	double domain;			// Range of the symmetrical orthogonality domain
 	size_t size;			// Number of the X values
 	size_t degree;			// Polynomial degree
 
@@ -48,7 +47,7 @@ private:
 	double Map (
 		double x				// X value to map to the orthogonality domain
 	) const {
-		return domain * (x - center) / variation;
+		return (x - center) / variation;
 	}
 
 //============================================================================//
@@ -62,13 +61,11 @@ public:
 	OrthogonalFunctions (
 		double x[],				// X values to map to the orthogonality domain
 		size_t size,			// Number of the X values
-		size_t degree,			// Polynomial degree
-		double domain			// Range of the symmetrical orthogonality domain
+		size_t degree			// Polynomial degree
 	) :	range (x, size),
 		values (x, size),
 		center (Stats::Mean (x, size)),
 		variation (max (range.Max() - center, center - range.Min())),
-		domain (domain),
 		size (size),
 		degree (degree)
 	{
