@@ -46,8 +46,6 @@ T SumAbs (
 //============================================================================//
 //      Sum of squared values                                                 //
 //============================================================================//
-
-// Without weight coefficients
 template <typename T>
 T SumSqr (
 	const T array[],		// Array data
@@ -56,19 +54,6 @@ T SumSqr (
 	T sum = 0;
 	for (size_t i = 0; i < size; i++)
 		sum += array[i] * array[i];
-	return sum;
-}
-
-// With weight coefficients
-template <typename T>
-T SumSqr (
-	const T array[],		// Array data
-	const T weights[],		// Weight coefficients
-	size_t size				// Array size
-){
-	T sum = 0;
-	for (size_t i = 0; i < size; i++)
-		sum += array[i] * array[i] * weights[i];
 	return sum;
 }
 
