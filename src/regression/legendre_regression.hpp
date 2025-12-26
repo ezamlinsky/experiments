@@ -74,7 +74,7 @@ public:
 		double x[],				// X values
 		size_t size,			// Number of the X values
 		size_t degree			// Polynomial degree
-	) : OrthogonalFunctions (x, size, degree, 1.0)
+	) : OrthogonalFunctions (x, size, degree)
 	{
 		// Initial polynomials for the recurrent polynomials evaluation procedure
 		mvector poly (size);

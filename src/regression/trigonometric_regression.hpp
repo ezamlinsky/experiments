@@ -29,7 +29,7 @@ public:
 		double x[],				// X values
 		size_t size,			// Number of the X values
 		size_t degree			// Polynomial degree
-	) : OrthogonalFunctions (x, size, degree, M_PI)
+	) : OrthogonalFunctions (x, size, degree)
 	{
 		// Check if the degree is properly specified
 		if (2 * degree > size)
@@ -43,8 +43,8 @@ public:
 		double sin_vals [size];
 		for (size_t j = 1; j <= degree; j++) {
 			for (size_t i = 0; i < size; i++) {
-				cos_vals[i] = cos (j * x[i]);
-				sin_vals[i] = sin (j * x[i]);
+				cos_vals[i] = cos (M_PI * j * x[i]);
+				sin_vals[i] = sin (M_PI * j * x[i]);
 			}
 			funcs.push_back (mvector (cos_vals, size));
 			funcs.push_back (mvector (sin_vals, size));
@@ -67,8 +67,8 @@ public:
 
 		// Compute sines and cosines for different multiplicity factors
 		for (size_t j = 1; j <= degree; j++) {
-			vals.push_back (cos (j * x));
-			vals.push_back (sin (j * x));
+			vals.push_back (cos (M_PI * j * x));
+			vals.push_back (sin (M_PI * j * x));
 		}
 
 		// Return the values
@@ -112,7 +112,7 @@ private:
 		// Approximate the dependent variables by the regression
 		Approximate();
 
-		// Adjust the regression values after the approximation
+		// Adjust the regression with the trend line we eliminated before
 		approx += trend_line;
 	}
 
