@@ -7,6 +7,7 @@
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
+# pragma	once
 # include	"orthogonal_regression.hpp"
 # include	"../python_helpers.hpp"
 

@@ -7,7 +7,9 @@
 # Ordnung muss sein!                             Copyleft (Ɔ) Eugene Zamlinsky #
 ################################################################################
 */
+# pragma	once
 # include	"orthogonal_regression.hpp"
+# include	"../filters/trend_remover.hpp"
 # include	"../python_helpers.hpp"
 
 //****************************************************************************//
@@ -83,32 +85,12 @@ class TrigonometricRegression : public OrthogonalRegression
 //      Members                                                               //
 //============================================================================//
 private:
-	double coeff;				// Coefficient for the linear correction
+	TrendRemover trend;			// Linear trend cancellation algorithm
 
 //============================================================================//
 //      Private methods                                                       //
 //============================================================================//
 private:
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//      Smoothly connects the left and right sides of the dataset             //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// INFO:	To remove oscillations at the ends, we connect
-//			the left and right sides before the approximation
-	static double SmoothConnection (
-		double x[],				// Predictors (independent variables)
-		double y[],				// Response (dependent variables)
-		size_t size,			// Size of the dataset
-		size_t degree			// Polynomial degree
-	){
-		const size_t half_size = size / 2;
-		const size_t period = (degree == 0) ? half_size : max (half_size / degree, static_cast <size_t> (1));
-		const double left_mean = Stats::Mean (y, period);
-		const double right_mean = Stats::Mean (y + size - period, period);
-		const double p = right_mean - left_mean;
-		const double q = x[size-1] - x[0];
-		return p / q;
-	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //      Internal constructor                                                  //
@@ -119,17 +101,19 @@ private:
 		size_t size,			// Size of the dataset
 		size_t degree			// Polynomial degree
 	) :	OrthogonalRegression (y, new TrigonometricFunctions (Sort (x, y, size), size, degree)),
-		coeff (SmoothConnection (x, y, size, degree))
+		trend (x, y, size, degree == 0 ? size / 2 : size / 4 / degree)
 	{
+		// Build the linear trend line
+		const mvector trend_line = trend.Line();
+
 		// Adjust X values before the approximation
-		mvector args (x, size);
-		residuals.Sub (args, coeff);
+		residuals -= trend_line;
 
 		// Approximate the dependent variables by the regression
 		Approximate();
 
 		// Adjust the regression values after the approximation
-		approx.Add (args, coeff);
+		approx += trend_line;
 	}
 
 //============================================================================//
@@ -161,7 +145,7 @@ public:
 		double x				// Value to calculate the regression for
 	) const override final {
 		const double regression = OrthogonalRegression::Regression (x);
-		const double shift = funcs -> Convert (x) * coeff;
+		const double shift = funcs -> Convert (x) * trend.Coeff();
 		return regression + shift;
 	}
 };
