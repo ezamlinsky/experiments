@@ -9,7 +9,6 @@
 */
 # pragma	once
 # include	"orthogonal_regression.hpp"
-# include	"../filters/trend_remover.hpp"
 # include	"../python_helpers.hpp"
 
 //****************************************************************************//
@@ -85,7 +84,7 @@ class TrigonometricRegression : public OrthogonalRegression
 //      Members                                                               //
 //============================================================================//
 private:
-	TrendRemover trend;			// Linear trend cancellation algorithm
+	double coeff;				// Coefficient for the linear correction
 
 //============================================================================//
 //      Private methods                                                       //
@@ -100,11 +99,28 @@ private:
 		double y[],				// Response (dependent variables)
 		size_t size,			// Size of the dataset
 		size_t degree			// Polynomial degree
-	) :	OrthogonalRegression (y, new TrigonometricFunctions (Sort (x, y, size), size, degree)),
-		trend (x, y, size, degree == 0 ? size / 2 : size / 4 / degree)
+	) :	OrthogonalRegression (y, new TrigonometricFunctions (Sort (x, y, size), size, degree))
 	{
-		// Build the linear trend line
-		const mvector trend_line = trend.Line();
+		// Calculate the number of connection points to connect
+		// the left and right sides of the dataset smoothly
+		size_t points = degree == 0 ? size / 2 : size / 4 / degree;
+		if (!points) points = 1;
+
+		// Get the left point for smooth connection
+		const double left_x = Stats::Mean (x, points);
+		const double left_y = Stats::Mean (y, points);
+
+		// Get the right point for smooth connection
+		const double right_x = Stats::Mean (x + size - points, points);
+		const double right_y = Stats::Mean (y + size - points, points);
+
+		// Calculate the connection line
+		const double p = right_y - left_y;
+		const double q = right_x - left_x;
+		coeff = p / q;
+
+		// Build the connection line
+		const mvector trend_line = mvector (x, size) * coeff;
 
 		// Adjust X values before the approximation
 		residuals -= trend_line;
@@ -112,7 +128,7 @@ private:
 		// Approximate the dependent variables by the regression
 		Approximate();
 
-		// Adjust the regression with the trend line we eliminated before
+		// Adjust the regression with the connection line we eliminated before
 		approx += trend_line;
 	}
 
@@ -145,7 +161,7 @@ public:
 		double x				// Value to calculate the regression for
 	) const override final {
 		const double regression = OrthogonalRegression::Regression (x);
-		const double shift = funcs -> Convert (x) * trend.Coeff();
+		const double shift = funcs -> Convert (x) * coeff;
 		return regression + shift;
 	}
 };
