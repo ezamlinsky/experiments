@@ -13,7 +13,6 @@
 
 // Exceptions
 # define	UNIT_ERROR		"Index of a non-zero element of a unit vector is outside the vector size"
-# define	NORM_ERROR		"Squared weighted norm of different-sized vectors is an error"
 # define	ASSIGN_ERROR	"Assignment of different-sized vectors is an error"
 # define	ADD_ERROR		"Addition of different-sized vectors is an error"
 # define	SUB_ERROR		"Subtraction of different-sized vectors is an error"
@@ -137,19 +136,9 @@ public:
 //      Vector norms                                                          //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-	// Squared Euclidean norm (without weight coefficients)
+	// Squared Euclidean norm
 	T NormSqr (void) const {
 		return Array::SumSqr (data, size);
-	}
-
-	// Squared Euclidean norm (with weight coefficients)
-	T NormSqr (
-		const Vector &weights		// Weight coefficients
-	) const {
-		if (size != weights.size)
-			throw invalid_argument ("Vector (NormSqr): " NORM_ERROR);
-
-		return Array::SumSqr (data, weights.data, size);
 	}
 
 	// L1 space norm (Manhattan norm)
@@ -353,8 +342,6 @@ public:
 //----------------------------------------------------------------------------//
 //      Dot product                                                           //
 //----------------------------------------------------------------------------//
-
-	// Dot product of two vectors (without weight coefficients)
 	T DotProduct (
 		const Vector &source		// Another vector to compute the dot product
 	) const {
@@ -362,17 +349,6 @@ public:
 			throw invalid_argument ("Vector (DotProduct): " PRODUCT_ERROR);
 
 		return Array::SumMul (data, source.data, size);
-	}
-
-	// Dot product of two vectors (with weight coefficients)
-	T DotProduct (
-		const Vector &source,		// Another vector to compute the dot product
-		const Vector &weights		// Weight coefficients
-	) const {
-		if (size != source.size or size != weights.size)
-			throw invalid_argument ("Vector (DotProduct): " PRODUCT_ERROR);
-
-		return Array::SumMul (data, source.data, weights.data, size);
 	}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
