@@ -38,8 +38,8 @@ public:
 		funcs.push_back (mvector (1.0, size));
 
 		// Compute sines and cosines for different multiplicity factors
-		double cos_vals [size];
-		double sin_vals [size];
+		alignas (SIMD_VSIZE) double cos_vals [size];
+		alignas (SIMD_VSIZE) double sin_vals [size];
 		for (size_t j = 1; j <= degree; j++) {
 			for (size_t i = 0; i < size; i++) {
 				cos_vals[i] = cos (M_PI * j * x[i]);
