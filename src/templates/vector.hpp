@@ -57,7 +57,7 @@ public:
 		size_t size					// Vector size
 	) :	size (size)
 	{
-		data = new (align_val_t (VSIZE)) T [size];
+		data = new (align_val_t (SIMD_VSIZE)) T [size];
 		Array::Init (data, size, 0.0);
 	}
 
@@ -69,7 +69,7 @@ public:
 		size_t size					// Vector size
 	) :	size (size)
 	{
-		data = new (align_val_t (VSIZE)) T [size];
+		data = new (align_val_t (SIMD_VSIZE)) T [size];
 		Array::Init (data, size, value);
 	}
 
@@ -78,7 +78,7 @@ public:
 		size_t size					// Vector size
 	) :	size (size)
 	{
-		data = new (align_val_t (VSIZE)) T [size];
+		data = new (align_val_t (SIMD_VSIZE)) T [size];
 		Array::Copy (data, array, size);
 	}
 

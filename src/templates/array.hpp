@@ -8,6 +8,11 @@
 ################################################################################
 */
 # pragma	once
+# ifdef	__AVX__
+	# define	SIMD_VSIZE	32
+# else
+	# define	SIMD_VSIZE	16
+# endif
 # include	<cmath>
 # include	<algorithm>
 # include	"array/unary.hpp"
